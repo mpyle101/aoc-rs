@@ -1,8 +1,10 @@
+use std::num::ParseIntError;
 
 fn main() {
     use std::time::Instant;
 
-    let input = load(include_str!("./input.txt"));
+    let input = load(include_str!("./input.txt"))
+        .expect("Failed to load input data");
 
     let t1 = Instant::now();
     let count = part_one(&input);
@@ -15,8 +17,8 @@ fn main() {
     println!("Part 2: {} ({:?})", count, t2 - t1);
 }
 
-fn load(input: &str) -> Vec<i32> {
-    input.lines().map(|v| v.parse::<i32>().unwrap()).collect()
+fn load(input: &str) -> Result<Vec<i32>, ParseIntError> {
+    input.lines().map(|v| v.parse::<i32>()).collect()
 }
 
 fn part_one(depths: &[i32]) -> i32 {
@@ -48,7 +50,8 @@ mod tests {
 
   #[test]
   fn it_works() {
-    let input = load(include_str!("./input.txt"));
+    let input = load(include_str!("./input.txt"))
+        .expect("Failed to load input data");
 
     let count = part_one(&input);
     assert_eq!(count, 1676);
