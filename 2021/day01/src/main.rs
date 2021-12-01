@@ -1,10 +1,11 @@
+use std::fs;
+use std::error::Error;
 use std::num::ParseIntError;
 
-fn main() {
+fn main() -> Result<(), Box<dyn Error>> {
     use std::time::Instant;
 
-    let input = load(include_str!("./input.txt"))
-        .expect("Failed to load input data");
+    let input = load(&fs::read_to_string("./input.txt")?)?;
 
     let t1 = Instant::now();
     let count = part_one(&input);
@@ -15,6 +16,8 @@ fn main() {
     let count = part_two(&input);
     let t2 = Instant::now();
     println!("Part 2: {} ({:?})", count, t2 - t1);
+
+    Ok(())
 }
 
 fn load(input: &str) -> Result<Vec<i32>, ParseIntError> {
@@ -50,7 +53,7 @@ mod tests {
 
   #[test]
   fn it_works() {
-    let input = load(include_str!("./input.txt"))
+    let input = load(include_str!("../input.txt"))
         .expect("Failed to load input data");
 
     let count = part_one(&input);
