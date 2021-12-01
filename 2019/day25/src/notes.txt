@@ -1,0 +1,113 @@
+== Start ==
+Doors: north (Navigation), east (Crew Quarters), south (Kitchen)
+
+start => north
+== Navigation ==
+Status: Stranded. Please supply measurements from fifty stars to recalibrate.
+Items: giant electromagnet
+Doors: south (Start), west (Holodeck)
+
+start => south
+== Kitchen ==
+Everything's freeze-dried.
+Items: space heater
+Doors: north (Start), east (Storage), south (Observatory)
+
+start => east
+== Crew Quarters ==
+The beds are all too small for you.
+Items: manifold
+Doors: south (Warp Drive), west (Start)
+
+Crew => south
+== Warp Drive Maintenance ==
+It appears to be working normally.
+Items: whirled peas
+Doors: north (Crew Quarters)
+
+Navigation => west
+== Holodeck ==
+Someone seems to have left it on the Giant Grid setting.
+Items: photons
+Doors: east (Navigation)
+
+Kitchen => east
+== Storage ==
+The boxes just contain more boxes.  Recursively.
+Doors: north (Passages), east (Science Lab), west (Kitchen)
+
+Kitchen => south
+== Observatory ==
+There are a few telescopes; they're all bolted down, though.
+Items: dark matter
+Doors: north (Kitchen), west (Sick Bay)
+
+Observatory => west
+== Sick Bay ==
+Supports both Red-Nosed Reindeer medicine and regular reindeer medicine.
+Items: escape pod
+Doors: east (Observatory)
+
+Storage => east
+== Science Lab ==
+You see evidence here of prototype polymer design work.
+Items: bowl of rice
+Doors: north, south, west (Storage)
+
+Storage => north
+== Passages ==
+They're a little twisty and starting to look all alike.
+Items: molten lava
+Doors: south (Storage), west
+
+Science Lab => north
+== Hallway ==
+This area has been optimized for something; you're just not quite sure what.
+Items: klein bottle
+Doors: north (Hallway), south (Science Lab)
+
+Hallway => north
+== Stables ==
+Reindeer-sized. They're all empty.
+Items: spool of cat6
+Doors: south (Hallway), west (Security Checkpoint)
+
+Stables => west
+== Security Checkpoint ==
+In the next room, a pressure-sensitive floor will verify your identity.
+Doors: east (Stables), north (Pressure-Sensitive Floor)
+
+Science Lab => south
+== Gift Wrapping Center ==
+How else do you wrap presents on the go?
+Doors: north
+
+Passages => west
+== Engineering ==
+You see a whiteboard with plans for Springdroid v2.
+Doors: east (Passages), north, south
+
+Engineering => north
+== Hot Chocolate Fountain ==
+Somehow, it's still working.
+Items: infinite loop
+Doors: south (Engineering)
+
+Engineering => south
+== Corridor ==
+The metal walls and the metal floor are slightly different colors. Or are they?
+Items: antenna
+Doors: north (Engineering), south (Arcade)
+
+Corridor => south
+== Arcade ==
+None of the cabinets seem to have power.
+Doors: north (Corridor)
+
+Security Checkpoint => north
+== Pressure-Sensitive Floor ==
+Doors: south (Security Checkpoint)
+
+antenna, spool of cat6, klein bottle, space heater
+
+Password: 8462464
