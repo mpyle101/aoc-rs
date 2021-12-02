@@ -13,7 +13,7 @@ fn main() {
     let t1 = Instant::now();
     let pos = part_two(&input);
     let t2 = Instant::now();
-    println!("Part 1: {} ({:?})", pos, t2 - t1);
+    println!("Part 2: {} ({:?})", pos, t2 - t1);
 }
 
 enum Action {
