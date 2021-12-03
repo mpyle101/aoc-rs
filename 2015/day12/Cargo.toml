@@ -7,4 +7,5 @@ authors = ["Michael Pyle <mpyle101@gmail.com>"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+serde_json = "1.0.59"
 regex = { version = "1.5.4", default-features = false, features = ["std", "perf"] }
