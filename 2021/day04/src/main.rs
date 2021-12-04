@@ -12,14 +12,18 @@ fn main() {
 
 fn load(input: &str) -> (Vec<i32>, Vec<Vec<(i32, bool)>>) {
     let mut iter = input.split("\n\n");
-    let cards = iter.next().unwrap().split(',')
+    let cards = iter
+        .next()
+        .unwrap()
+        .split(',')
         .map(|s| s.parse::<i32>().unwrap())
         .collect::<Vec<_>>();
 
     let boards = iter.fold(Vec::new(), |mut v, s| {
-        let m = s.split_whitespace().map(|s|
-            (s.parse::<i32>().unwrap(), false)
-        ).collect::<Vec<_>>();
+        let m = s
+            .split_whitespace()
+            .map(|s| (s.parse::<i32>().unwrap(), false))
+            .collect::<Vec<_>>();
         v.push(m);
         v
     });
@@ -47,13 +51,13 @@ fn do_it(cards: &[i32], boards: &mut Vec<Vec<(i32, bool)>>) -> (i32, i32) {
     boards.remove(idx);
 
     let mut squid = 0;
-    while let Some(card) = iter.next() {
+    for card in iter {
         mark(card, boards);
         while let Some(idx) = boards.iter().position(bingo) {
             let board = boards.get(idx).unwrap();
             let unmarked: i32 = board.iter().filter(|t| !t.1).map(|t| t.0).sum();
             squid = unmarked * card;
-            boards.remove(idx);       
+            boards.remove(idx);
         }
     }
 
@@ -67,8 +71,8 @@ fn mark(n: &i32, boards: &mut [Vec<(i32, bool)>]) {
 }
 
 fn bingo(tab: &Vec<(i32, bool)>) -> bool {
-    (0..5).any(|i| get_row(i, tab).iter().all(|v| v.1)) ||
-    (0..5).any(|i| get_col(i, tab).iter().all(|v| v.1))
+    (0..5).any(|i| get_row(i, tab).iter().all(|v| v.1))
+        || (0..5).any(|i| get_col(i, tab).iter().all(|v| v.1))
 }
 
 fn get_row(row: usize, tab: &[(i32, bool)]) -> Vec<(i32, bool)> {
@@ -79,17 +83,16 @@ fn get_col(col: usize, tab: &[(i32, bool)]) -> Vec<(i32, bool)> {
     tab.iter().cloned().skip(col).step_by(5).collect()
 }
 
-
 #[cfg(test)]
 mod tests {
-  use super::*;
+    use super::*;
 
-  #[test]
-  fn it_works() {
-    let (cards, mut boards) = load(include_str!("../input.txt"));
+    #[test]
+    fn it_works() {
+        let (cards, mut boards) = load(include_str!("../input.txt"));
 
-    let (winner, squid) = do_it(&cards, &mut boards);
-    assert_eq!(winner, 58838);
-    assert_eq!(squid, 6256);
-  }
+        let (winner, squid) = do_it(&cards, &mut boards);
+        assert_eq!(winner, 58838);
+        assert_eq!(squid, 6256);
+    }
 }
