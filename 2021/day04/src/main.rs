@@ -71,16 +71,12 @@ fn mark(n: &i32, boards: &mut [Vec<(i32, bool)>]) {
 }
 
 fn bingo(tab: &Vec<(i32, bool)>) -> bool {
-    (0..5).any(|i| get_row(i, tab).iter().all(|v| v.1))
-        || (0..5).any(|i| get_col(i, tab).iter().all(|v| v.1))
+    tab.chunks(5).any(|row| row.iter().all(|v| v.1))
+        || (0..5).any(|i| get_col(i, tab).all(|v| v.1))
 }
 
-fn get_row(row: usize, tab: &[(i32, bool)]) -> Vec<(i32, bool)> {
-    tab.iter().cloned().skip(row * 5).take(5).collect()
-}
-
-fn get_col(col: usize, tab: &[(i32, bool)]) -> Vec<(i32, bool)> {
-    tab.iter().cloned().skip(col).step_by(5).collect()
+fn get_col(col: usize, tab: &[(i32, bool)]) -> impl Iterator<Item = &(i32, bool)> {
+    tab.iter().skip(col).step_by(5)
 }
 
 #[cfg(test)]
