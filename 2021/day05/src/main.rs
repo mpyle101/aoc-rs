@@ -1,6 +1,7 @@
-use std::fs;
+use std::collections::HashMap;
 
 fn main() {
+    use std::fs;
     use std::time::Instant;
 
     let lines = load(&fs::read_to_string("./input.txt").unwrap());
@@ -37,7 +38,6 @@ fn load(input: &str) -> Vec<Line> {
 }
 
 fn doit(lines: &[Line]) -> (i32, i32) {
-    use std::collections::HashMap;
     use itertools::zip;
     use num::range_step_inclusive as range;
 
@@ -45,26 +45,14 @@ fn doit(lines: &[Line]) -> (i32, i32) {
     let diag = lines.iter().fold(Vec::new(), |mut v, line| {
         match line {
             Line::Vert(p1, p2) => {
-                let x = p1.0;
+                let x = std::iter::repeat(p1.0);
                 let step = if p1.1 > p2.1 { -1 } else { 1 };
-                range(p1.1, p2.1, step).for_each(|y| {
-                    if let Some(n) = pts.get_mut(&(x, y)) {
-                        *n += 1;
-                    } else {
-                        pts.insert((x, y), 0);
-                    }
-                });
+                mark(zip(x, range(p1.1, p2.1, step)), &mut pts);
             },
             Line::Horz(p1, p2) => {
-                let y = p1.1;
+                let y = std::iter::repeat(p1.1);
                 let step = if p1.0 > p2.0 { -1 } else { 1 };
-                range(p1.0, p2.0, step).for_each(|x| {
-                    if let Some(n) = pts.get_mut(&(x, y)) {
-                        *n += 1;
-                    } else {
-                        pts.insert((x, y), 0);
-                    }
-                });
+                mark(zip(range(p1.0, p2.0, step), y), &mut pts);
             },
             Line::Diag(_, _) => { v.push(line); }
         };
@@ -78,13 +66,7 @@ fn doit(lines: &[Line]) -> (i32, i32) {
             let vs = if p1.1 > p2.1 { -1 } else { 1 };
             let hs = if p1.0 > p2.0 { -1 } else { 1 };
             let it = zip(range(p1.0, p2.0, hs), range(p1.1, p2.1, vs));
-            for pt in it {
-                if let Some(n) = pts.get_mut(&pt) {
-                    *n += 1;
-                } else {
-                    pts.insert(pt, 0);
-                }
-            }
+            mark(it, &mut pts);
         }
     });
     let part2 = pts.values().filter(|&v| *v > 0).count();
@@ -92,10 +74,21 @@ fn doit(lines: &[Line]) -> (i32, i32) {
     (part1 as i32, part2 as i32)
 }
 
+fn mark<I: Iterator<Item = (i32, i32)>>(it: I, pts: &mut HashMap<(i32, i32), i32>) {
+    for pt in it {
+        if let Some(n) = pts.get_mut(&pt) {
+            *n += 1;
+        } else {
+            pts.insert(pt, 0);
+        }
+    }
+}
+
 
 #[cfg(test)]
 mod tests {
   use super::*;
+  use std::fs;
 
   #[test]
   fn it_works() {
@@ -103,6 +96,6 @@ mod tests {
 
     let (p1, p2) = doit(&lines);
     assert_eq!(p1, 7085);
-    assert_eq!(p2, 7085);
+    assert_eq!(p2, 20271);
   }
 }
