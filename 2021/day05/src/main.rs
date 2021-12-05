@@ -47,12 +47,14 @@ fn doit(lines: &[Line]) -> (i32, i32) {
             Line::Vert(p1, p2) => {
                 let x = std::iter::repeat(p1.0);
                 let step = if p1.1 > p2.1 { -1 } else { 1 };
-                mark(zip(x, range(p1.1, p2.1, step)), &mut pts);
+                let iter = zip(x, range(p1.1, p2.1, step));
+                iter.for_each(|pt| *pts.entry(pt).or_insert(-1) += 1 );
             },
             Line::Horz(p1, p2) => {
                 let y = std::iter::repeat(p1.1);
                 let step = if p1.0 > p2.0 { -1 } else { 1 };
-                mark(zip(range(p1.0, p2.0, step), y), &mut pts);
+                let iter = zip(range(p1.0, p2.0, step), y);
+                iter.for_each(|pt| *pts.entry(pt).or_insert(-1) += 1 );
             },
             Line::Diag(_, _) => { v.push(line); }
         };
@@ -63,25 +65,15 @@ fn doit(lines: &[Line]) -> (i32, i32) {
 
     diag.iter().for_each(|l| {
         if let Line::Diag(p1, p2) = l {
-            let vs = if p1.1 > p2.1 { -1 } else { 1 };
-            let hs = if p1.0 > p2.0 { -1 } else { 1 };
-            let it = zip(range(p1.0, p2.0, hs), range(p1.1, p2.1, vs));
-            mark(it, &mut pts);
+            let xs = if p1.0 > p2.0 { -1 } else { 1 };
+            let ys = if p1.1 > p2.1 { -1 } else { 1 };
+            let it = zip(range(p1.0, p2.0, xs), range(p1.1, p2.1, ys));
+            it.for_each(|pt| *pts.entry(pt).or_insert(-1) += 1 );
         }
     });
     let part2 = pts.values().filter(|&v| *v > 0).count();
 
     (part1 as i32, part2 as i32)
-}
-
-fn mark<I: Iterator<Item = (i32, i32)>>(it: I, pts: &mut HashMap<(i32, i32), i32>) {
-    for pt in it {
-        if let Some(n) = pts.get_mut(&pt) {
-            *n += 1;
-        } else {
-            pts.insert(pt, 0);
-        }
-    }
 }
 
 
