@@ -17,7 +17,8 @@ fn main() {
 }
 
 fn load(input: &str) -> Vec<i32> {
-    // We only need the number of fish at a given age.
+    // A vector of number of fish at a given age where the index
+    // is the age and value is the count.
     input.split(',').fold(vec![0i32;6], |mut v, s| {
         v[s.parse::<usize>().unwrap()] += 1;
         v
@@ -27,6 +28,11 @@ fn load(input: &str) -> Vec<i32> {
 fn doit(fish: &[i32], days: usize) -> i64 {
     use num::range_step_inclusive as range;
 
+    // Build a vector of total population value given a fish being
+    // "born" on a given day. We do this by walking backwards and
+    // building up previous totals from existing starting with any
+    // fish born in the last nine days. For those we know the total
+    // population is 1 since they don't have time to reproduce.
     let population = (2..=days-9).rev()
         .fold(vec![1i64; days+1], |mut v, n| {
             v[n] = range(n + 9, days, 7).fold(1,
@@ -35,6 +41,9 @@ fn doit(fish: &[i32], days: usize) -> i64 {
             v
         });
 
+    // Build a vector of total population for a fish having a given
+    // age in the initial population. Build using the values from the
+    // "born on" vector for each day an initial fish will reproduce.
     let fish_growth = (1..=5)
         .fold(vec![0i64;6], |mut v, n| {
             v[n] = range(n + 1, days, 7).fold(1,
@@ -43,6 +52,10 @@ fn doit(fish: &[i32], days: usize) -> i64 {
             v
         });
 
+    // The final population is the sum of all the fish created from
+    // each initial fish. We only need to know how many of each age
+    // were in the initial population. The index is the age of the
+    // fish and the value is the number of fish that age.
     fish.iter().enumerate()
         .map(|(i, &n)| n as i64 * fish_growth[i])
         .sum()
