@@ -23,21 +23,21 @@ fn load(input: &str) -> Vec<i32> {
 fn doit(fish: &[i32], days: usize) -> i64 {
     use num::range_step_inclusive as range;
 
-    let mut population = vec![1i64; days + 1];
-    (2..=days-9).rev().for_each(|n| {
-        let children = range(n + 9, days, 7).fold(1,
-            |acc, d| acc + population[d]
-        );
-        population[n] = children;
-    });
+    let population = (2..=days-9).rev()
+        .fold(vec![1i64; days+1], |mut v, n| {
+            v[n] = range(n + 9, days, 7).fold(1,
+                |acc, d| acc + v[d]
+            );
+            v
+        });
 
-    let fish_growth = (1..=5).fold(vec![0i64;6], |mut v, n| {
-        let children = range(n + 1, days, 7).fold(1,
-            |acc, d| acc + population[d]
-        );
-        v[n] = children;
-        v
-    });
+    let fish_growth = (1..=5)
+        .fold(vec![0i64;6], |mut v, n| {
+            v[n] = range(n + 1, days, 7).fold(1,
+                |acc, d| acc + population[d]
+            );
+            v
+        });
 
     fish.iter().map(|&n| fish_growth[n as usize]).sum()
 }
