@@ -39,20 +39,21 @@ fn load(input: &str) -> Vec<Line> {
 
 fn doit(lines: &[Line]) -> (i32, i32) {
     use itertools::zip;
+//    use num::signum;
     use num::range_step_inclusive as range;
 
     let mut pts = HashMap::new();
     let diag = lines.iter().fold(Vec::new(), |mut v, line| {
         match line {
             Line::Vert(p1, p2) => {
-                let x = std::iter::repeat(p1.0);
-                let step = if p1.1 > p2.1 { -1 } else { 1 };
-                mark(zip(x, range(p1.1, p2.1, step)), &mut pts);
+                let x  = std::iter::repeat(p1.0);
+                let dy = (p2.1 - p1.1).signum();
+                mark(zip(x, range(p1.1, p2.1, dy)), &mut pts);
             },
             Line::Horz(p1, p2) => {
-                let y = std::iter::repeat(p1.1);
-                let step = if p1.0 > p2.0 { -1 } else { 1 };
-                mark(zip(range(p1.0, p2.0, step), y), &mut pts);
+                let y  = std::iter::repeat(p1.1);
+                let dx = (p2.0 - p1.0).signum();
+                mark(zip(range(p1.0, p2.0, dx), y), &mut pts);
             },
             Line::Diag(_, _) => { v.push(line); }
         };
@@ -63,9 +64,9 @@ fn doit(lines: &[Line]) -> (i32, i32) {
 
     diag.iter().for_each(|l| {
         if let Line::Diag(p1, p2) = l {
-            let xs = if p1.0 > p2.0 { -1 } else { 1 };
-            let ys = if p1.1 > p2.1 { -1 } else { 1 };
-            mark(zip(range(p1.0, p2.0, xs), range(p1.1, p2.1, ys)), &mut pts);
+            let dx = (p2.0 - p1.0).signum();
+            let dy = (p2.1 - p1.1).signum();
+            mark(zip(range(p1.0, p2.0, dx), range(p1.1, p2.1, dy)), &mut pts);
         }
     });
     let part2 = pts.values().filter(|&v| *v > 0).count();
