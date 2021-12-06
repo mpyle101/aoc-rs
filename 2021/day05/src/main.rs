@@ -39,7 +39,6 @@ fn load(input: &str) -> Vec<Line> {
 
 fn doit(lines: &[Line]) -> (i32, i32) {
     use itertools::zip;
-//    use num::signum;
     use num::range_step_inclusive as range;
 
     let mut pts = HashMap::new();
