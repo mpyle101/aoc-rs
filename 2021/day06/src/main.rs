@@ -20,27 +20,26 @@ fn load(input: &str) -> Vec<i32> {
     input.split(',').map(|s| s.parse::<i32>().unwrap()).collect()
 }
 
-fn doit(fish: &[i32], days: i32) -> i64 {
-    use std::collections::HashMap;
+fn doit(fish: &[i32], days: usize) -> i64 {
     use num::range_step_inclusive as range;
 
-    let mut total: HashMap<_, _> = (0..9).map(|n| (days - n, 1)).collect();
+    let mut population = vec![1i64; days + 1];
     (2..=days-9).rev().for_each(|n| {
         let children = range(n + 9, days, 7).fold(1,
-            |acc, d| acc + total.get(&d).unwrap()
+            |acc, d| acc + population[d]
         );
-        total.insert(n, children);
+        population[n] = children;
     });
 
-    let fish_growth = (1..=5).fold(HashMap::new(), |mut map, n| {
+    let fish_growth = (1..=5).fold(vec![0i64;6], |mut v, n| {
         let children = range(n + 1, days, 7).fold(1,
-            |acc, d| acc + total.get(&d).unwrap()
+            |acc, d| acc + population[d]
         );
-        map.insert(n, children);
-        map
+        v[n] = children;
+        v
     });
 
-    fish.iter().map(|n| fish_growth.get(n).unwrap()).sum()
+    fish.iter().map(|&n| fish_growth[n as usize]).sum()
 }
 
 
