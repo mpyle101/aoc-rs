@@ -17,7 +17,11 @@ fn main() {
 }
 
 fn load(input: &str) -> Vec<i32> {
-    input.split(',').map(|s| s.parse::<i32>().unwrap()).collect()
+    // We only need the number of fish at a given age.
+    input.split(',').fold(vec![0i32;6], |mut v, s| {
+        v[s.parse::<usize>().unwrap()] += 1;
+        v
+    })
 }
 
 fn doit(fish: &[i32], days: usize) -> i64 {
@@ -39,7 +43,9 @@ fn doit(fish: &[i32], days: usize) -> i64 {
             v
         });
 
-    fish.iter().map(|&n| fish_growth[n as usize]).sum()
+    fish.iter().enumerate()
+        .map(|(i, &n)| n as i64 * fish_growth[i])
+        .sum()
 }
 
 
