@@ -24,9 +24,9 @@ fn part_one(phrases: &[&str]) -> i32 {
     use std::collections::HashSet;
 
     phrases.iter().map(|s| {
-        let parts: Vec<_> = s.split(' ').collect();
-        let unique = HashSet::<&&str>::from_iter(parts.iter());
-        unique.len() == parts.len()
+        let words: Vec<_> = s.split(' ').collect();
+        let unique = HashSet::<&&str>::from_iter(words.iter());
+        unique.len() == words.len()
     }).filter(|valid| *valid).count() as i32
 }
 
@@ -34,8 +34,7 @@ fn part_two(phrases: &[&str]) -> i32 {
     use itertools::Itertools;
 
     phrases.iter().map(|s| {
-        let parts: Vec<_> = s.split(' ').collect();
-        parts.iter().combinations(2).any(|v| {
+        s.split(' ').combinations(2).any(|v| {
             v[0].len() == v[1].len() &&  // a little optimization
             (*v[0]).chars().sorted().eq((*v[1]).chars().sorted())
         })
