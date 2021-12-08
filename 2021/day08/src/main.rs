@@ -49,6 +49,11 @@ fn part_two(signals: &[(Vec<String>, Vec<String>)]) -> i32 {
         ("abcdefg", '8'),
     ];
 
+    // Brute force using what amounts to a rainbow table.
+    // Generate a vector of all the possible wire mappings.
+    // Use that vector to generate the set of resulting display
+    // values for each wire mapping and capture the mapping,
+    // the display results and the reverse mapping.
     let base = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
     let keys = base.iter()
         .permutations(7)
@@ -72,6 +77,12 @@ fn part_two(signals: &[(Vec<String>, Vec<String>)]) -> i32 {
         })
         .collect::<Vec<_>>();
 
+    // For each signal find the set of "encrypted" display
+    // values which contain all the signal values. That gives
+    // us a valid key. Take the inverse of the key and use it
+    // "decrypt" the output values and look them up in the base
+    // display map to get the "numeric" value. Combine those and
+    // parse the result into an i32.
     signals.iter().map(|(wires, outputs)| {
         let (_, d, _) = digits.iter()
             .find(|(_, _, v)| wires.iter().all(|w| v.contains(w)))
