@@ -69,16 +69,16 @@ fn get_counts(nums: &[u32]) -> [i32;12] {
 
 #[cfg(test)]
 mod tests {
-  use super::*;
+    use super::*;
 
-  #[test]
-  fn it_works() {
-    let lines = load(include_str!("../input.txt"));
+    #[test]
+    fn it_works() {
+        let lines = load(include_str!("../input.txt"));
 
-    let power = part_one(&lines);
-    assert_eq!(power, 2583164);
+        let power = part_one(&lines);
+        assert_eq!(power, 2583164);
 
-    let life_support = part_two(&lines);
-    assert_eq!(life_support, 2784375);
-  }
+        let life_support = part_two(&lines);
+        assert_eq!(life_support, 2784375);
+    }
 }

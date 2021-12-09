@@ -79,15 +79,15 @@ fn mark<I: Iterator<Item = (i32, i32)>>(it: I, pts: &mut HashMap<(i32, i32), i32
 
 #[cfg(test)]
 mod tests {
-  use super::*;
-  use std::fs;
+    use super::*;
+    use std::fs;
 
-  #[test]
-  fn it_works() {
-    let lines = load(&fs::read_to_string("./input.txt").unwrap());
+    #[test]
+    fn it_works() {
+        let lines = load(&fs::read_to_string("./input.txt").unwrap());
 
-    let (p1, p2) = doit(&lines);
-    assert_eq!(p1, 7085);
-    assert_eq!(p2, 20271);
-  }
+        let (p1, p2) = doit(&lines);
+        assert_eq!(p1, 7085);
+        assert_eq!(p2, 20271);
+    }
 }

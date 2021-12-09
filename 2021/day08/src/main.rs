@@ -120,18 +120,18 @@ fn as_char(set: &HashSet<char>) -> char {
 
 #[cfg(test)]
 mod tests {
-  use super::*;
-  use std::fs;
+    use super::*;
+    use std::fs;
 
-  #[test]
-  fn it_works() {
-    let input   = fs::read_to_string("./input.txt").unwrap();
-    let signals = load(&input);
+    #[test]
+    fn it_works() {
+        let input   = fs::read_to_string("./input.txt").unwrap();
+        let signals = load(&input);
 
-    let count = part_one(&signals);
-    assert_eq!(count, 381);
+        let count = part_one(&signals);
+        assert_eq!(count, 381);
 
-    let total = part_two(&signals);
-    assert_eq!(total, 1023686);
-  }
+        let total = part_two(&signals);
+        assert_eq!(total, 1023686);
+    }
 }

@@ -62,16 +62,16 @@ fn part_two(actions: &[Action]) -> i32 {
 
 #[cfg(test)]
 mod tests {
-  use super::*;
+    use super::*;
 
-  #[test]
-  fn it_works() {
-    let input = load(include_str!("../input.txt"));
+    #[test]
+    fn it_works() {
+        let input = load(include_str!("../input.txt"));
 
-    let pos = part_one(&input);
-    assert_eq!(pos, 1924923);
+        let pos = part_one(&input);
+        assert_eq!(pos, 1924923);
 
-    let pos = part_two(&input);
-    assert_eq!(pos, 1982495697);
-  }
+        let pos = part_two(&input);
+        assert_eq!(pos, 1982495697);
+    }
 }

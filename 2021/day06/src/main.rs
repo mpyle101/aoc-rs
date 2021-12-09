@@ -64,17 +64,17 @@ fn doit(fish: &[i32], days: usize) -> i64 {
 
 #[cfg(test)]
 mod tests {
-  use super::*;
-  use std::fs;
+    use super::*;
+    use std::fs;
 
-  #[test]
-  fn it_works() {
-    let fish = load(&fs::read_to_string("./input.txt").unwrap());
+    #[test]
+    fn it_works() {
+        let fish = load(&fs::read_to_string("./input.txt").unwrap());
 
-    let population = doit(&fish, 80);
-    assert_eq!(population, 350917);
+        let population = doit(&fish, 80);
+        assert_eq!(population, 350917);
 
-    let population = doit(&fish, 256);
-    assert_eq!(population, 1592918715629);
-  }
+        let population = doit(&fish, 256);
+        assert_eq!(population, 1592918715629);
+    }
 }

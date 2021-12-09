@@ -47,17 +47,17 @@ fn fuel(from: i32, to: i32) -> i32 {
 
 #[cfg(test)]
 mod tests {
-  use super::*;
-  use std::fs;
+    use super::*;
+    use std::fs;
 
-  #[test]
-  fn it_works() {
-    let crabs = load(&fs::read_to_string("./input.txt").unwrap());
+    #[test]
+    fn it_works() {
+        let crabs = load(&fs::read_to_string("./input.txt").unwrap());
 
-    let fuel = part_one(&crabs);
-    assert_eq!(fuel, 325528);
+        let fuel = part_one(&crabs);
+        assert_eq!(fuel, 325528);
 
-    let fuel = part_two(&crabs);
-    assert_eq!(fuel, 85015836);
-  }
+        let fuel = part_two(&crabs);
+        assert_eq!(fuel, 85015836);
+    }
 }

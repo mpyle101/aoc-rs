@@ -49,17 +49,17 @@ fn part_two(depths: &[i32]) -> i32 {
 
 #[cfg(test)]
 mod tests {
-  use super::*;
+    use super::*;
 
-  #[test]
-  fn it_works() {
-    let input = load(include_str!("../input.txt"))
-        .expect("Failed to load input data");
+    #[test]
+    fn it_works() {
+        let input = load(include_str!("../input.txt"))
+            .expect("Failed to load input data");
 
-    let count = part_one(&input);
-    assert_eq!(count, 1676);
+        let count = part_one(&input);
+        assert_eq!(count, 1676);
 
-    let count = part_two(&input);
-    assert_eq!(count, 1706);
-  }
+        let count = part_two(&input);
+        assert_eq!(count, 1706);
+    }
 }
