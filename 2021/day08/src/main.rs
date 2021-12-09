@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::{ HashSet, HashMap };
 
 fn main() {
     use std::fs;
@@ -34,20 +34,18 @@ fn part_one(signals: &[(Vec<&str>, Vec<&str>)]) -> i32 {
 }
 
 fn part_two(signals: &[(Vec<&str>, Vec<&str>)]) -> i32 {
-    use std::collections::HashMap;
-
-    let digits = [
-        ("cf",      '1'),
-        ("acf",     '7'),
-        ("bcdf",    '4'),
-        ("acdeg",   '2'),
-        ("acdfg",   '3'),
-        ("abdfg",   '5'),
-        ("abcefg",  '0'),
-        ("abdefg",  '6'),
-        ("abcdfg",  '9'),
-        ("abcdefg", '8'),
-    ];
+    let digits = HashMap::from([
+        (String::from("cf"),      '1'),
+        (String::from("acf"),     '7'),
+        (String::from("bcdf"),    '4'),
+        (String::from("acdeg"),   '2'),
+        (String::from("acdfg"),   '3'),
+        (String::from("abdfg"),   '5'),
+        (String::from("abcefg"),  '0'),
+        (String::from("abdefg"),  '6'),
+        (String::from("abcdfg"),  '9'),
+        (String::from("abcdefg"), '8'),
+    ]);
 
     signals.iter().map(|(wires, outputs)| {
         let one   = find_by_length(&wires, 2);
@@ -87,13 +85,8 @@ fn part_two(signals: &[(Vec<&str>, Vec<&str>)]) -> i32 {
         ]);
 
         let v = outputs.iter()
-            .map(|s| {
-                let mut chars = s.chars().map(|c| *key.get(&c).unwrap()).collect::<Vec<char>>();
-                chars.sort();
-                String::from_iter(chars)
-            })
-            .map(|s| digits.iter().find(|(k, _)| s == *k).unwrap())
-            .map(|(_, v)| v)
+            .map(|s| decode(&key, s))
+            .map(|s| digits.get(&s).unwrap())
             .collect::<String>();
         v.parse::<i32>().unwrap()
     }).sum()
@@ -101,6 +94,12 @@ fn part_two(signals: &[(Vec<&str>, Vec<&str>)]) -> i32 {
 
 fn split(line: &str) -> Vec<&str> {
     line.split(' ').collect::<Vec<_>>()
+}
+
+fn decode(key: &HashMap<char, char>, s: &str) -> String {
+    let mut chars = s.chars().map(|c| *key.get(&c).unwrap()).collect::<Vec<char>>();
+    chars.sort();
+    String::from_iter(chars)
 }
 
 fn find_by_length(wires: &[&str], len: usize) -> HashSet<char> {
