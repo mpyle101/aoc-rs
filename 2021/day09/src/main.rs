@@ -18,8 +18,9 @@ fn main() {
 }
 
 fn load(input: &str) -> Vec<u32> {
-    input.lines().flat_map(|l| l.chars().map(|c| c.to_digit(10).unwrap()).collect::<Vec<_>>()
-        ).collect()
+    input.lines().flat_map(|l|
+        l.chars().map(|c| c.to_digit(10).unwrap()).collect::<Vec<_>>()
+    ).collect()
 }
 
 fn part_one(heights: &[u32]) -> u32 {
