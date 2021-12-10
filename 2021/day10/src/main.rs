@@ -21,7 +21,7 @@ fn load(input: &str) -> Vec<&str> {
     input.lines().collect()
 }
 
-fn part_one<'a>(lines: &[&'a str]) -> (i32, Vec<&'a str>) {
+fn part_one(lines: &[&str]) -> (i32, Vec<Vec<char>>) {
     use std::collections::HashMap;
 
     let mut inc  = Vec::new();
@@ -41,7 +41,7 @@ fn part_one<'a>(lines: &[&'a str]) -> (i32, Vec<&'a str>) {
                 stack.push(c);
             }
         };
-        if stack.len() > 0 { inc.push(l) }
+        if stack.len() > 0 { inc.push(stack) }
         0
     })
     .sum();
@@ -49,18 +49,13 @@ fn part_one<'a>(lines: &[&'a str]) -> (i32, Vec<&'a str>) {
     (score, inc)
 }
 
-fn part_two(lines: &[&str]) -> i64 {
-    use std::collections::{HashMap, HashSet};
+fn part_two(lines: &[Vec<char>]) -> i64 {
+    use std::collections::HashMap;
 
-    let points  = HashMap::from([('(', 1), ('[', 2), ('{', 3), ('<', 4)]);
-    let closers = HashSet::from([')',']', '}', '>']);
-    let mut scores = lines.iter().map(|l| {
-        let stack = l.chars().fold(Vec::new(), |mut v, c| {
-            if closers.contains(&c) { v.pop(); } else { v.push(c); };
-            v
-        });
-        stack.iter().rev().fold(0, |acc, c| acc * 5 + points.get(c).unwrap())
-    })
+    let points = HashMap::from([('(', 1), ('[', 2), ('{', 3), ('<', 4)]);
+    let mut scores = lines.iter().map(|l|
+        l.iter().rev().fold(0, |acc, c| acc * 5 + points.get(c).unwrap())
+    )
     .collect::<Vec<i64>>();
 
     scores.sort();
