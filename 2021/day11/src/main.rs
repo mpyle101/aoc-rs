@@ -67,7 +67,7 @@ fn step(m: &mut [u32]) -> u32 {
 
 #[allow(dead_code)]
 fn print(m: &[u32]) {
-    m.iter().enumerate().for_each(|(i, n)| 
+    m.iter().enumerate().for_each(|(i, n)|
         if (i + 1) % 10 == 0 { println!("{}", *n); } else { print!("{}", *n); }
     );
     println!("");
@@ -75,35 +75,19 @@ fn print(m: &[u32]) {
 
 fn neighbors(m: &[u32], pos: usize) -> [(usize, u32);8] {
     const XDIM: usize = 10;
-    const LAST_ROW: usize = XDIM * (XDIM - 1);
-    const INVALID: (usize, u32) = (usize::MAX, u32::MAX);
 
-    let lt = if pos % XDIM == 0 { INVALID } else { (pos - 1, m[pos - 1]) };
-    let rt = if (pos + 1) % XDIM == 0 { INVALID } else { (pos + 1, m[pos + 1]) };
+    let top = pos - XDIM;
+    let bot = pos + XDIM;
+    let pre = if pos % XDIM == 0 { 1000 } else { 1 };
+    let pst = if (pos + 1) % XDIM == 0 { 1000 } else { 1 };
+    let mut arr = [
+        (top - pre, u32::MAX), (top, u32::MAX), (top + pst, u32::MAX),
+        (pos - pre, u32::MAX),                  (pos + pst, u32::MAX),
+        (bot - pre, u32::MAX), (bot, u32::MAX), (bot + pst, u32::MAX)
+    ];
 
-    let (tl, tm, tr) = if pos < XDIM {
-        (INVALID, INVALID, INVALID)
-    } else {
-        let row = pos - XDIM;
-        (
-            if pos % XDIM == 0 { INVALID } else { (row - 1, m[row - 1]) },
-            (row, m[row]),
-            if (pos + 1) % XDIM == 0 { INVALID } else { (row + 1, m[row + 1]) }
-        )
-    };
-
-    let (bl, bm, br) = if pos >= LAST_ROW {
-        (INVALID, INVALID, INVALID)
-    } else {
-        let row = pos + XDIM;
-        (
-            if pos % XDIM == 0 { INVALID } else { (row - 1, m[row - 1]) },
-            (row, m[row]),
-            if (pos + 1) % XDIM == 0 { INVALID } else { (row + 1, m[row + 1]) }
-        )
-    };
-
-    [tl, tm, tr, lt, rt, bl, bm, br]
+    arr.iter_mut().for_each(|(i, n)| if *i < 100 { *n = m[*i] });
+    arr
 }
 
 
