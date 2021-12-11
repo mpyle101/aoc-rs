@@ -27,6 +27,7 @@ fn main() {
   // GKCKH
 }
 
+#[allow(dead_code)]
 #[derive(Clone, Debug, Eq)]
 struct Layer {
   pos: usize,

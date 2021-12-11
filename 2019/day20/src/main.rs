@@ -53,7 +53,7 @@ fn load(maze: &str) -> Maze {
         if let Some(portal) = portals_by_name.get_mut(&name) {
             portal.gate2 = pos;
         } else {
-            portals_by_name.insert(name, Portal { name, gate1: pos, gate2: ((0, 0), (0, 0), 0) });
+            portals_by_name.insert(name, Portal { gate1: pos, gate2: ((0, 0), (0, 0), 0) });
         }
     });
 
@@ -107,7 +107,6 @@ fn make_gate(
 
 #[derive(Clone, Copy, Debug)]
 struct Portal {
-    name: [char;2],
     gate1: (Loc, Loc, i32),
     gate2: (Loc, Loc, i32),
 }

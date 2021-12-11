@@ -12,6 +12,7 @@ fn main() {
 
 type Year = u32;
 
+#[allow(dead_code)]
 #[derive(Debug)]
 struct Passport<'a> {
     byr: Option<Year>,

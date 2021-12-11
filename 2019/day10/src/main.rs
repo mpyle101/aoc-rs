@@ -161,6 +161,7 @@ impl Hash for Slope {
   }
 }
 
+#[allow(dead_code)]
 #[derive(Clone, Copy, Debug)]
 struct Line {
   src: Coord,
