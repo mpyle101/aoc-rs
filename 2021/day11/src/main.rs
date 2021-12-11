@@ -121,6 +121,6 @@ mod tests {
         assert_eq!(flashes, 1546);
 
         let steps = part_two(&squid);
-        assert_eq!(flashes, 471);
+        assert_eq!(steps, 471);
     }
 }
