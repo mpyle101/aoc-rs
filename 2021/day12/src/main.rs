@@ -3,11 +3,9 @@ use std::collections::HashMap;
 fn main() {
     use std::fs;
     use std::time::Instant;
-    
+
     let input = fs::read_to_string("./input.txt").unwrap();
     let caves = load(&input);
-
-//    dbg!(&caves);
 
     let t1 = Instant::now();
     let paths = part_one(&caves);
