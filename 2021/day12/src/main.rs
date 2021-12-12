@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 fn main() {
     use std::fs;
@@ -34,14 +34,14 @@ fn load(input: &str) -> HashMap<&str, Vec<&str>> {
 #[derive(Clone, Debug)]
 struct Path<'a> {
     caves: Vec<&'a str>,
-    visited: HashSet<&'a str>,
+    visited: HashMap<&'a str, u8>,
 }
 
 impl<'a> Path<'a> {
     fn new() -> Path<'a> {
         Path {
             caves: vec!["start"],
-            visited: HashSet::from_iter(vec!["start"])
+            visited: HashMap::from_iter(vec![("start", 0)])
         }
     }
 }
@@ -58,7 +58,7 @@ fn part_one(caves: &HashMap<&str, Vec<&str>>) -> usize {
             // See if we'll either be at the end (Yay!) or we're allowed
             // to enter the next cave (we can only visit lowercase caves
             // once).
-            if *s == "end" || !path.visited.contains(s) {
+            if *s == "end" || !path.visited.contains_key(s) {
                 let mut p = path.clone();
                 p.caves.push(s);
                 if *s == "end" { 
@@ -66,7 +66,7 @@ fn part_one(caves: &HashMap<&str, Vec<&str>>) -> usize {
                 } else { 
                     let c = s.chars().next().unwrap();
                     if c.is_ascii_lowercase() {
-                        p.visited.insert(s);
+                        p.visited.insert(s, 1);
                     }
                     q.push_back(p)
                 }
@@ -86,23 +86,26 @@ fn part_two(caves: &HashMap<&str, Vec<&str>>) -> usize {
         let cave = path.caves.last().unwrap();
         let adjacent = caves.get(cave).unwrap();
         adjacent.iter().for_each(|s| {
+            let c = s.chars().next().unwrap();
+            let mut p = path.clone();
+
             if *s == "end" {
-                let mut p = path.clone();
-                p.caves.push(s);
                 paths.push(p);
-            } else {
-                
-            }
-            if *s == "end" || !path.visited.contains(s) {
-                let mut p = path.clone();
+            } else if c.is_ascii_uppercase() {
                 p.caves.push(s);
-                if *s == "end" { 
-                    paths.push(p)
-                } else { 
-                    let c = s.chars().next().unwrap();
-                    if c.is_ascii_lowercase() {
-                        p.visited.insert(s);
+                q.push_back(p)
+            } else {
+                // We can visit one small cave twice.
+                let twice = path.visited.values().any(|v| *v == 2);
+                if twice {
+                    if !path.visited.contains_key(s) {
+                        p.caves.push(s);
+                        p.visited.insert(s, 1);
+                        q.push_back(p)
                     }
+                } else if *s != "start" {
+                    p.caves.push(s);
+                    *p.visited.entry(s).or_insert(0) += 1;
                     q.push_back(p)
                 }
             }
@@ -111,6 +114,7 @@ fn part_two(caves: &HashMap<&str, Vec<&str>>) -> usize {
 
     paths.len()
 }
+
 
 #[cfg(test)]
 mod tests {
@@ -126,6 +130,6 @@ mod tests {
         assert_eq!(paths, 4970);
 
         let paths = part_two(&caves);
-        assert_eq!(paths, 4970);
+        assert_eq!(paths, 137948);
     }
 }
