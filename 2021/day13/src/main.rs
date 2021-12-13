@@ -55,7 +55,7 @@ fn load(input: &str) -> (HashSet<(u32, u32)>, Vec<Fold>) {
 
 fn part_one(dots: &HashSet<(u32, u32)>, folds: &[Fold]) -> usize {
     let axis = folds.first().unwrap();
-    dots.iter().map(|d| fold(&axis, d)).count()
+    dots.iter().map(|d| fold(&axis, d)).collect::<HashSet<_>>().len()
 }
 
 fn part_two(dots: &HashSet<(u32, u32)>, folds: &[Fold]) -> HashSet<(u32, u32)> {
