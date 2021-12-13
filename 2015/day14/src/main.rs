@@ -63,5 +63,8 @@ mod tests {
 
     let dist = part_one(&reindeer);
     assert_eq!(dist, 2655);
+
+    let winner = part_two(&reindeer);
+    assert_eq!(winner, 1059);
   }
 }
