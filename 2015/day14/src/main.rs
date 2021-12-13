@@ -53,6 +53,7 @@ fn traveled(r: &Reindeer, secs: i32) -> i32 {
     traveled + std::cmp::min(r.time, time_left) * r.rate
 }
 
+
 #[cfg(test)]
 mod tests {
   use super::*;
