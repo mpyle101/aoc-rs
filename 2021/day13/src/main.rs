@@ -54,32 +54,23 @@ fn load(input: &str) -> (HashSet<(u32, u32)>, Vec<Fold>) {
 }
 
 fn part_one(dots: &HashSet<(u32, u32)>, folds: &[Fold]) -> usize {
-    let fold   = folds.first().unwrap();
-    let folded = dots.iter().map(|(x, y)|
-        match fold {
-            Fold::Vert(n) if x > n => (n - (x - n), *y),
-            Fold::Horz(n) if y > n => (*x, n - (y - n)),
-            _ => (*x, *y)
-        }
-    )
-    .collect::<HashSet<_>>();
-
-    folded.len()
+    let axis = folds.first().unwrap();
+    dots.iter().map(|d| fold(&axis, d)).count()
 }
 
 fn part_two(dots: &HashSet<(u32, u32)>, folds: &[Fold]) -> HashSet<(u32, u32)> {
-    let folded = folds.iter().fold(dots.clone(), |paper, fold|
-        paper.iter().map(|(x, y)|
-            match fold {
-                Fold::Vert(n) if x > n => (n - (x - n), *y),
-                Fold::Horz(n) if y > n => (*x, n - (y - n)),
-                _ => (*x, *y)
-            }
-        )
-        .collect::<HashSet<_>>()
-    );
+    folds.iter().fold(dots.clone(), |paper, axis|
+        paper.iter().map(|d| fold(axis, d)).collect::<HashSet<_>>()
+    )
+}
 
-    folded
+fn fold(axis: &Fold, dot: &(u32, u32)) -> (u32, u32) {
+    let (x, y) = dot;
+    match axis {
+        Fold::Vert(n) if x > n => (n - (x - n), *y),
+        Fold::Horz(n) if y > n => (*x, n - (y - n)),
+        _ => (*x, *y)
+    }
 }
 
 #[allow(dead_code)]
