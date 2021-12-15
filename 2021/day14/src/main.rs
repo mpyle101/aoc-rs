@@ -1,10 +1,14 @@
 use std::collections::{BTreeMap, HashMap};
 
+type Counts = HashMap<u8, i64>;
+type Cache  = HashMap<(u16, u8), Counts>;
+type Rules  = BTreeMap<u16, u8>;
+
 fn main() {
     use std::fs;
     use std::time::Instant;
     
-    let input = fs::read_to_string("./test.txt").unwrap();
+    let input = fs::read_to_string("./input.txt").unwrap();
     let (template, rules) = load(&input);
 
     let t1 = Instant::now();
@@ -18,8 +22,6 @@ fn main() {
     println!("Part 2: {} {:?}", diff, t2 - t1);
 }
 
-type Rules = BTreeMap<[u8;2], u8>;
-
 fn load(input: &str) -> (&[u8], Rules) {
     let mut iter = input.split("\n\n");
     let template = iter.next().unwrap().as_bytes();
@@ -27,66 +29,60 @@ fn load(input: &str) -> (&[u8], Rules) {
     let rules = iter.next().unwrap().lines()
         .map(|l| {
             let v = l.split(" -> ").collect::<Vec<_>>();
-            let c1 = v[0].as_bytes()[0];
-            let c2 = v[0].as_bytes()[1];
-
-            ([c1, c2], v[1].as_bytes()[0])
+            let c1 = (v[0].as_bytes()[0] as u16) << 8;
+            let c2 = v[0].as_bytes()[1] as u16;
+            (c1 | c2, v[1].as_bytes()[0])
         })
         .collect::<Rules>();
 
     (template, rules)
 }
 
-fn part_one(template: &[u8], rules: &Rules) -> i32 {
-    polymerize_a(10, template, rules)
+fn part_one(template: &[u8], rules: &Rules) -> i64 {
+    polymerize(10, template, rules)
 }
 
-fn part_two(template: &[u8], rules: &Rules) -> i32 {
-    polymerize_b(10, template, rules)
+fn part_two(template: &[u8], rules: &Rules) -> i64 {
+    polymerize(40, template, rules)
 }
 
-fn polymerize_a(steps: i32, template: &[u8], rules: &Rules) -> i32 {
-    let tmpl = (0..steps).fold(template.to_vec(), |s, _| {
-        let mut t = s.windows(2).flat_map(|v| {
-            let r = rules.get(v).unwrap();
-            [v[0], *r]
-        })
-        .collect::<Vec<_>>();
-        t.push(s[s.len() - 1]);
-        t
-    });
-
-    let mut counts = HashMap::new();
-    tmpl.iter().for_each(|c| *counts.entry(c).or_insert(0) += 1);
-    let most  = counts.iter().max_by(|a, b| a.1.cmp(&b.1)).unwrap();
-    let least = counts.iter().max_by(|a, b| b.1.cmp(&a.1)).unwrap();
-
-    most.1 - least.1
-}
-
-fn polymerize_b(steps: i32, template: &[u8], rules: &Rules) -> i32 {
+fn polymerize(steps: u8, template: &[u8], rules: &Rules) -> i64 {
     let mut counts = HashMap::new();
     template.iter().for_each(|c| *counts.entry(*c).or_insert(0) += 1);
 
-    template.windows(2).for_each(|v| expand(v, steps, &mut counts, rules));
+    let mut cache = HashMap::new();
+    template.windows(2).for_each(|v| {
+        let tmpl = (v[0] as u16) << 8 | v[1] as u16;
+        let cnts = expand(tmpl, steps, rules, &mut cache);
+        cnts.iter().for_each(|(k, v)| *counts.entry(*k).or_insert(0) += v);
+    });
     
-    let most  = counts.iter().max_by(|a, b| a.1.cmp(&b.1)).unwrap();
-    let least = counts.iter().max_by(|a, b| b.1.cmp(&a.1)).unwrap();
-
-    most.1 - least.1
+    let mut v = counts.values().cloned().collect::<Vec<_>>();
+    v.sort();
+    
+    v[v.len() - 1] - v[0]
 }
 
 fn expand(
-    tmpl: &[u8],
-    steps: i32,
-    counts: &mut HashMap<u8, i32>,
-    rules: &Rules
-) {
-    if steps > 0 {
-        let r = *rules.get(tmpl).unwrap();
-        *counts.entry(r).or_insert(0) += 1;
-        expand(&[tmpl[0], r], steps - 1, counts, rules);
-        expand(&[r, tmpl[1]], steps - 1, counts, rules);
+    tmpl: u16,
+    steps: u8,
+    rules: &Rules,
+    cache: &mut Cache,
+) -> Counts {
+    if let Some(counts) = cache.get(&(tmpl, steps)) {
+        counts.clone()
+    } else if steps > 0 {
+        let r = *rules.get(&tmpl).unwrap() as u16;
+        let mut counts = HashMap::from([(r as u8, 1)]);
+        let c1 = expand(tmpl & 0xFF00 | r, steps - 1, rules, cache);
+        let c2 = expand(r << 8 | tmpl & 0xFF, steps - 1, rules, cache);
+        c1.iter().for_each(|(k, v)| *counts.entry(*k).or_insert(0) += v);
+        c2.iter().for_each(|(k, v)| *counts.entry(*k).or_insert(0) += v);
+        cache.insert((tmpl, steps), counts.clone());
+
+        counts
+    } else {
+        HashMap::new()
     }
 }
 
@@ -103,5 +99,8 @@ mod tests {
 
         let diff = part_one(template, &rules);
         assert_eq!(diff, 3697);
+
+        let diff = part_two(template, &rules);
+        assert_eq!(diff, 4371307836157);
     }
 }
