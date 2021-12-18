@@ -1,6 +1,6 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 
-type Rules<'a> = HashMap<&'a str, Vec<&'a str>>;
+type Rules<'a> = Vec<(&'a str, &'a str)>;
 
 fn main() {
     use std::time::Instant;
@@ -16,14 +16,16 @@ fn main() {
     let steps = part_two(molecule, &rules);
     let t2 = Instant::now();
     println!("Part 2: {} ({:?})", steps, t2 - t1);
+
+    // 207
 }
 
 fn load(input: &str) -> (Rules, &str) {
     let mut it = input.split("\n\n");
     let rules = it.next().map(|v| {
-        v.lines().fold(HashMap::new(), |mut rules, s| {
+        v.lines().fold(Vec::new(), |mut rules, s| {
             let kv = s.split(" => ").collect::<Vec<_>>();
-            rules.entry(kv[0]).or_insert(Vec::new()).push(kv[1]);
+            rules.push((kv[0], kv[1]));
             rules
         })
     }).unwrap();
@@ -33,65 +35,35 @@ fn load(input: &str) -> (Rules, &str) {
 
 fn part_one(molecule: &str, rules: &Rules) -> i32 {
     let mut molecules = HashSet::new();
-    rules.iter().for_each(|(&k, v)|
-        v.iter().for_each(|s|
-            molecule.match_indices(k).for_each(|(i, _)| {
-                let mut m = molecule.to_string();
-                m.replace_range(i..i+k.len(), s);
-                molecules.insert(m);
-            })
-        )
+    rules.iter().for_each(|(k, s)|
+        molecule.match_indices(k).for_each(|(i, _)| {
+            let mut m = molecule.to_string();
+            m.replace_range(i..i+k.len(), s);
+            molecules.insert(m);
+        })
     );
     
     molecules.len() as i32
 }
 
 fn part_two(molecule: &str, rules: &Rules) -> u32 {
-    let rrules = rules.iter().map(|(&k, v)|
-        v.iter().map(|&s| (s, k)).collect::<Vec<_>>()
-    ).flatten().collect::<HashMap<_, _>>();
+    use rand::seq::SliceRandom;
 
-    let mut cache = HashMap::new();
-    reduce(&mut cache, molecule.to_string(), 0, &rrules)
-}
+    let rrules = rules.iter().map(|(k, v)| (*v, *k)).collect::<Vec<_>>();
 
-fn reduce(
-    cache: &mut HashMap<String, u32>,
-    molecule: String,
-    steps: u32,
-    rules: &HashMap<&str, &str>
-) -> u32 {
-    if cache.contains_key(&molecule) {
-        *cache.get(&molecule).unwrap()
-    } else if molecule == "e" {
-        println!("found: {}", steps);
-        steps
-    } else {
-        let mut v = rules.iter().filter_map(|(&k, &s)|
-            if let Some(i) = molecule.find(k) {
-                Some((k, s, i))
-            } else {
-                None
-            })
-            .collect::<Vec<_>>();
-        if v.len() > 0 {
-            v.sort_by(|(a, _, _), (b, _, _)| b.len().cmp(&a.len()));
-            v.iter().map(|(k, s, i)| {
-                let mut m1 = molecule.clone();
-                m1.replace_range(i..&(i+k.len()), s);
-                let st = if m1.len() > 1 && m1.contains("e") {
-                    // e can't be reduced
-                    u32::MAX
-                } else {
-                    reduce(cache, m1.clone(), steps + 1, rules)
-                };
-                cache.insert(m1, st);
-                st
-            }).min().unwrap()
-        } else {
-            u32::MAX
+    let mut cnt = 0;
+    let mut m = molecule.to_string();
+    while m != "e" {
+        // Pick a completely random rule to apply. Sometimes we get stuck
+        // sometimes we find the answer: 207.
+        let rule = rrules.choose(&mut rand::thread_rng()).unwrap();
+        while let Some(i) = m.find(rule.0) {
+            m.replace_range(i..(i+rule.0.len()), rule.1);
+            cnt += 1;
         }
     }
+
+    cnt
 }
 
 
