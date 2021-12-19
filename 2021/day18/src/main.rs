@@ -36,7 +36,7 @@ fn load(input: &str) -> Vec<&str> {
 fn part_one(nums: &[&str]) -> i64 {
     let mut it = nums.iter();
     let first = it.next().unwrap();
-    let s = nums.iter().fold(first.to_string(), |a, b| add(&a, b));
+    let s = it.fold(first.to_string(), |a, b| add(&a, b));
 
     magnitude(&s)
 }
@@ -45,8 +45,7 @@ fn part_two(nums: &[&str]) -> i64 {
     use itertools::Itertools;
 
     nums.iter().permutations(2).map(|v| {
-        let s = add(v[0], v[1]);
-        magnitude(&s)
+        magnitude(&add(v[0], v[1]))
     }).max().unwrap()
 }
 
@@ -220,6 +219,5 @@ mod tests {
             "[[[[4,2],2],6],[8,7]]",
         ].iter().fold(a.to_string(), |a, b| add(&a, b));
         assert_eq!(n, "[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]");
-
     }
 }
