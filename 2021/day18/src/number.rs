@@ -2,27 +2,26 @@ use std::fmt;
 use std::str::Chars;
 
 #[derive(Clone, Debug)]
-enum NumberType {
+enum Value {
     Null,
     Regular(u32),
     Complex(Box<Number>),
 }
 
-impl fmt::Display for NumberType {
+impl fmt::Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        use NumberType::*;
         match self {
-            Null       => write!(f, ""),
-            Regular(n) => write!(f, "{}", n),
-            Complex(n) => write!(f, "{}", n)
+            Value::Null       => write!(f, ""),
+            Value::Regular(n) => write!(f, "{}", n),
+            Value::Complex(n) => write!(f, "{}", n)
         }
     }
 }
 
 #[derive(Clone, Debug)]
 pub struct Number {
-    left:  NumberType,
-    right: NumberType,
+    left:  Value,
+    right: Value,
 }
 
 impl fmt::Display for Number {
@@ -40,38 +39,34 @@ impl Number {
     }
 
     pub fn magnitude(&self) -> i64 {
-        use NumberType::*;
-
         let ml = 3 * match &self.left {
-            Regular(n) => *n as i64,
-            Complex(n) => (*n).magnitude(),
-            Null => panic!("Null number found on left"),
+            Value::Regular(n) => *n as i64,
+            Value::Complex(n) => (*n).magnitude(),
+            Value::Null => panic!("Null found on left"),
         };
         let mr = 2 * match &self.right {
-            Regular(n) => *n as i64,
-            Complex(n) => (*n).magnitude(),
-            Null => panic!("Null number found on right"),
+            Value::Regular(n) => *n as i64,
+            Value::Complex(n) => (*n).magnitude(),
+            Value::Null => panic!("Null found on right"),
         };
 
         ml + mr
     }
 }
 
-fn read_value(chars: &mut Chars) -> NumberType {
-    use NumberType::*;
-
+fn read_value(chars: &mut Chars) -> Value {
     if let Some(c) = chars.next() {
         if c == '[' {
-            Complex(Box::from(Number::new(chars)))
+            Value::Complex(Box::from(Number::new(chars)))
         } else if c == ',' {
             read_value(chars)
         } else if c == ']' {
             read_value(chars)
         } else {
-            Regular(c.to_digit(10).unwrap())
+            Value::Regular(c.to_digit(10).unwrap())
         }
     } else {
-        Null
+        Value::Null
     }
 }
 
