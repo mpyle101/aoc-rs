@@ -57,7 +57,7 @@ impl Cuboid {
         let a = self;
         let b = other;
 
-        vec![
+        [
             Cuboid::new(a.x1, b.x1, a.y1, a.y2, a.z1, a.z2),
             Cuboid::new(b.x2, a.x2, a.y1, a.y2, a.z1, a.z2),
             Cuboid::new(b.x1, b.x2, a.y1, b.y1, a.z1, a.z2),
@@ -65,6 +65,10 @@ impl Cuboid {
             Cuboid::new(b.x1, b.x2, b.y1, b.y2, a.z1, b.z1),
             Cuboid::new(b.x1, b.x2, b.y1, b.y2, b.z2, a.z2),
         ]
+        .iter()
+        .filter(|c| c.is_valid())
+        .map(|c| *c)
+        .collect()
     }
 }
 
