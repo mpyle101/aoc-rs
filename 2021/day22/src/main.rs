@@ -126,7 +126,7 @@ fn part_one(steps: &[Step]) -> usize {
 }
 
 fn part_two(steps: &[Step]) -> u64 {
-    // For each step, create a cuboid and intersect it (bit |) with each cube
+    // For each step, create a cuboid and intersect it (bitor) with each cube
     // in the list. If the result is valid, punch out the intersection from
     // the cube in the list. This results in 6 more "on" cubes. Stuff the valid
     // ones back list for the next step. If the new cubiod (a) is an "on" step,
