@@ -1,0 +1,281 @@
+inp w
+mul x 0     w = w1, x =  0, y =  0,   z = 0
+add x z     w = w1, x =  0, y =  0,   z = 0
+mod x 26    w = w1, x =  0, y =  0,   z = 0
+div z 1     w = w1, x =  0, y =  0,   z = 0
+add x 10    w = w1, x = 10, y =  0,   z = 0
+eql x w     w = w1, x =  0, y =  0,   z = 0
+eql x 0     w = w1, x =  1, y =  0,   z = 0
+mul y 0     w = w1, x =  1, y =  0,   z = 0
+add y 25    w = w1, x =  1, y = 25,   z = 0
+mul y x     w = w1, x =  1, y = 25,   z = 0
+add y 1     w = w1, x =  1, y = 26,   z = 0
+mul z y     w = w1, x =  1, y = 26,   z = 0
+mul y 0     w = w1, x =  1, y =  0,   z = 0
+add y w     w = w1, x =  1, y = w1,   z = 0
+add y 2     w = w1, x =  1, y = w1+2, z = 0
+mul y x     w = w1, x =  1, y = w1+2, z = 0
+add z y     w = w1, x =  1, y = w1+2, z = w1+2
+
+inp w       w = w2, x =  1, y = w1+2, z = w1+2
+mul x 0     w = w2, x =  0, y = w1+2, z = w1+2
+add x z     w = w2, x = w1+2, y = w1+2, z = w1+2
+mod x 26    w = w2, x = w1+2, y = w1+2, z = w1+2
+div z 1     w = w2, x = w1+2, y = w1+2, z = w1+2
+add x 15    w = w2, x = w1+17, y = w1+2, z = w1+2
+eql x w     w = w2, x = 0, y = w1+2, z = w1+2
+eql x 0     w = w2, x = 1, y = w1+2, z = w1+2
+mul y 0     w = w2, x = 1, y =  0, z = w1+2
+add y 25    w = w2, x = 1, y = 25, z = w1+2
+mul y x     w = w2, x = 1, y = 25, z = w1+2
+add y 1     w = w2, x = 1, y = 26, z = w1+2
+mul z y     w = w2, x = 1, y = 26, z = 26w1+52
+mul y 0     w = w2, x = 1, y =  0, z = 26w1+52
+add y w     w = w2, x = 1, y = w2, z = 26w1+52
+add y 16    w = w2, x = 1, y = w2+16, z = 26w1+52
+mul y x     w = w2, x = 1, y = w2+16, z = 26w1+52
+add z y     w = w2, x = 1, y = w2+16, z = w2+26w1+68
+
+inp w       w = w3, x = 1, y = w2+16, z = w2+26w1+68
+mul x 0     w = w3, x = 0, y = w2+16, z = w2+26w1+68
+add x z     w = w3, x = w2+26w1+68, y = w2+16, z = w2+26w1+68
+mod x 26    w = w3, x = w2+16, y = w2+16, z = w2+26w1+68
+div z 1     w = w3, x = w2+16, y = w2+16, z = w2+26w1+68
+add x 14    w = w3, x = w2+30, y = w2+16, z = w2+26w1+68
+eql x w     w = w3, x = 0, y = w2+16, z = w2+26w1+68
+eql x 0     w = w3, x = 1, y = w2+16, z = w2+26w1+68
+mul y 0     w = w3, x = 1, y = 0,  z = w2+26w1+68
+add y 25    w = w3, x = 1, y = 25, z = w2+26w1+68
+mul y x     w = w3, x = 1, y = 25, z = w2+26w1+68
+add y 1     w = w3, x = 1, y = 26, z = w2+26w1+68
+mul z y     w = w3, x = 1, y = 26, z = 26w2+676w1+1768
+mul y 0     w = w3, x = 1, y = 0,  z = 26w2+676w1+1768
+add y w     w = w3, x = 1, y = w3, z = 26w2+676w1+1768
+add y 9     w = w3, x = 1, y = w3+9, z = 26w2+676w1+1768
+mul y x     w = w3, x = 1, y = w3+9, z = 26w2+676w1+1768
+add z y     w = w3, x = 1, y = w3+9, z = w3+26w2+676w1+1777
+
+inp w       w = w4, x = 1, y = w3+9, z = w3+26w2+676w1+1777
+mul x 0     w = w4, x = 0, y = w3+9, z = w3+26w2+676w1+1777
+add x z     w = w4, x = w3+26w2+676w1+1777, y = w3+9, z = w3+26w2+676w1+1777
+mod x 26    w = w4, x = w3+9,  y = w3+9, z = w3+26w2+676w1+1777
+div z 1     w = w4, x = w3+9,  y = w3+9, z = w3+26w2+676w1+1777
+add x 15    w = w4, x = w3+24, y = w3+9, z = w3+26w2+676w1+1777
+eql x w     w = w4, x = 0, y = w3+9, z = w3+26w2+676w1+1777
+eql x 0     w = w4, x = 1, y = w3+9, z = w3+26w2+676w1+1777
+mul y 0     w = w4, x = 1, y =  0, z = w3+26w2+676w1+1777
+add y 25    w = w4, x = 1, y = 25, z = w3+26w2+676w1+1777
+mul y x     w = w4, x = 1, y = 25, z = w3+26w2+676w1+1777
+add y 1     w = w4, x = 1, y = 26, z = w3+26w2+676w1+1777
+mul z y     w = w4, x = 1, y = 26, z = 26w3+676w2+17576w1+46202
+mul y 0     w = w4, x = 1, y =  0, z = 26w3+676w2+17576w1+46202
+add y w     w = w4, x = 1, y = w4, z = 26w3+676w2+17576w1+46202
+add y 0     w = w4, x = 1, y = w4, z = 26w3+676w2+17576w1+46202
+mul y x     w = w4, x = 1, y = w4, z = 26w3+676w2+17576w1+46202
+add z y     w = w4, x = 1, y = w4, z = w4+26w3+676w2+17576w1+46202
+
+inp w       w = w5, x = 1, y = w4,    z = w4+26w3+676w2+17576w1+46202
+mul x 0     w = w5, x = 0, y = w4,    z = w4+26w3+676w2+17576w1+46202
+add x z     w = w5, x = w4+26w3+676w2+17576w1+46202, y = w4, z = w4+26w3+676w2+17576w1+46202
+mod x 26    w = w5, x = w4, y = w4,   z = w4+26w3+676w2+17576w1+46202
+div z 26    w = w5, x = w4, y = w4,   z = w3+26w2+676w1+1777
+add x -8    w = w5, x = w4-8, y = w4, z = w3+26w2+676w1+1777
+eql x w     w = w5, x = w4-8, y = w4, z = w3+26w2+676w1+1777
+[w5 == w4 - 8]
+eql x 0     w = w5, x = 0, y = w4,    z = w3+26w2+676w1+1777
+mul y 0     w = w5, x = 0, y = 0,     z = w3+26w2+676w1+1777
+add y 25    w = w5, x = 0, y = 25,    z = w3+26w2+676w1+1777
+mul y x     w = w5, x = 0, y = 0,     z = w3+26w2+676w1+1777
+add y 1     w = w5, x = 0, y = 1,     z = w3+26w2+676w1+1777
+mul z y     w = w5, x = 0, y = 1,     z = w3+26w2+676w1+1777
+mul y 0     w = w5, x = 0, y = 0,     z = w3+26w2+676w1+1777
+add y w     w = w5, x = 0, y = w5,    z = w3+26w2+676w1+1777
+add y 1     w = w5, x = 0, y = w5+1,  z = w3+26w2+676w1+1777
+mul y x     w = w5, x = 0, y = 0,     z = w3+26w2+676w1+1777
+add z y     w = w5, x = 0, y = 0,     z = w3+26w2+676w1+1777
+
+inp w       w = w6, x = 0, y = 0,     z = w3+26w2+676w1+1777
+mul x 0     w = w6, x = 0, y = 0,     z = w3+26w2+676w1+1777
+add x z     w = w6, x = w3+26w2+676w1+1777, y = 0, z = w3+26w2+676w1+1777
+mod x 26    w = w6, x = w3+9, y = 0,  z = w3+26w2+676w1+1777
+div z 1     w = w6, x = w3+9, y = 0,  z = w3+26w2+676w1+1777
+add x 10    w = w6, x = w3+19, y = 0, z = w3+26w2+676w1+1777
+eql x w     w = w6, x = 0, y = 0,     z = w3+26w2+676w1+1777
+eql x 0     w = w6, x = 1, y = 0,     z = w3+26w2+676w1+1777
+mul y 0     w = w6, x = 1, y = 0,     z = w3+26w2+676w1+1777
+add y 25    w = w6, x = 1, y = 25,    z = w3+26w2+676w1+1777
+mul y x     w = w6, x = 1, y = 25,    z = w3+26w2+676w1+1777
+add y 1     w = w6, x = 1, y = 26,    z = w3+26w2+676w1+1777
+mul z y     w = w6, x = 1, y = 26,    z = 26w3+676w2+17576w1+46202
+mul y 0     w = w6, x = 1, y = 0,     z = 26w3+676w2+17576w1+46202
+add y w     w = w6, x = 1, y = w6,    z = 26w3+676w2+17576w1+46202
+add y 12    w = w6, x = 1, y = w6+12, z = 26w3+676w2+17576w1+46202
+mul y x     w = w6, x = 1, y = w6+12, z = 26w3+676w2+17576w1+46202
+add z y     w = w6, x = 1, y = w6+12, z = w6+26w3+676w2+17576w1+46214
+
+inp w       w = w7, x = 1, y = w6+12, z = w6+26w3+676w2+17576w1+46214
+mul x 0     w = w7, x = 0, y = w6+12, z = w6+26w3+676w2+17576w1+46214
+add x z     w = w7, x = w6+26w3+676w2+17576w1+46214, y = w6+12, z = w6+26w3+676w2+17576w1+46214
+mod x 26    w = w7, x = w6+12, y = w6+12, z = w6+26w3+676w2+17576w1+46214
+div z 26    w = w7, x = w6+12, y = w6+12, z = w3+26w2+676w1+1777
+add x -16   w = w7, x = w6-4,  y = w6+12, z = w3+26w2+676w1+1777
+[w7 == w6 - 4]
+eql x w     w = w7, x = 1, y = w6+12, z = w3+26w2+676w1+1777
+eql x 0     w = w7, x = 0, y = w6+12, z = w3+26w2+676w1+1777
+mul y 0     w = w7, x = 0, y = 0, z = w3+26w2+676w1+1777
+add y 25    w = w7, x = 0, y = 25, z = w3+26w2+676w1+1777
+mul y x     w = w7, x = 0, y = 0, z = w3+26w2+676w1+1777
+add y 1     w = w7, x = 0, y = 1, z = w3+26w2+676w1+1777
+mul z y     w = w7, x = 0, y = 1, z = w3+26w2+676w1+1777
+mul y 0     w = w7, x = 0, y = 0, z = w3+26w2+676w1+1777
+add y w     w = w7, x = 0, y = w7, z = w3+26w2+676w1+1777
+add y 6     w = w7, x = 0, y = w7+6, z = w3+26w2+676w1+1777
+mul y x     w = w7, x = 0, y = 0, z = w3+26w2+676w1+1777
+add z y     w = w7, x = 0, y = 0, z = w3+26w2+676w1+1777
+
+inp w       w = w8, x = 0, y = 0, z = w3+26w2+676w1+1777
+mul x 0     w = w8, x = 0, y = 0, z = w3+26w2+676w1+1777
+add x z     w = w8, x = w3+26w2+676w1+1777, y = 0, z = w3+26w2+676w1+1777
+mod x 26    w = w8, x = w3+9, y = 0, z = w3+26w2+676w1+1777
+div z 26    w = w8, x = w3+9, y = 0, z = w2+26w1+68
+add x -4    w = w8, x = w3+5, y = 0, z = w2+26w1+68
+[w8 == w3 + 5]
+eql x w     w = w8, x = 1, y = 0, z = w2+26w1+68
+eql x 0     w = w8, x = 0, y = 0, z = w2+26w1+68
+mul y 0     w = w8, x = 0, y = 0, z = w2+26w1+68
+add y 25    w = w8, x = 0, y = 25, z = w2+26w1+68
+mul y x     w = w8, x = 0, y = 0, z = w2+26w1+68
+add y 1     w = w8, x = 0, y = 1, z = w2+26w1+68
+mul z y     w = w8, x = 0, y = 1, z = w2+26w1+68
+mul y 0     w = w8, x = 0, y = 0, z = w2+26w1+68
+add y w     w = w8, x = 0, y = w8, z = w2+26w1+68
+add y 6     w = w8, x = 0, y = w8+6, z = w2+26w1+68
+mul y x     w = w8, x = 0, y = 0, z = w2+26w1+68
+add z y     w = w8, x = 0, y = 0, z = w2+26w1+68
+
+inp w       w = w9, x = 0, y = 0, z = w2+26w1+68
+mul x 0     w = w9, x = 0, y = 0, z = w2+26w1+68
+add x z     w = w9, x = w2+26w1+68, y = 0, z = w2+26w1+68
+mod x 26    w = w9, x = w2+68, y = 0, z = w2+26w1+68
+div z 1     w = w9, x = w2+68, y = 0, z = w2+26w1+68
+add x 11    w = w9, x = w2+79, y = 0, z = w2+26w1+68
+eql x w     w = w9, x = 0, y = 0,     z = w2+26w1+68
+eql x 0     w = w9, x = 1, y = 0,     z = w2+26w1+68
+mul y 0     w = w9, x = 1, y = 0,     z = w2+26w1+68
+add y 25    w = w9, x = 1, y = 25,    z = w2+26w1+68
+mul y x     w = w9, x = 1, y = 25,    z = w2+26w1+68
+add y 1     w = w9, x = 1, y = 26,    z = w2+26w1+68
+mul z y     w = w9, x = 1, y = 26,    z = 26w2+676w1+1768
+mul y 0     w = w9, x = 1, y = 0,     z = 26w2+676w1+1768
+add y w     w = w9, x = 1, y = w9,    z = 26w2+676w1+1768
+add y 3     w = w9, x = 1, y = w9+3,  z = 26w2+676w1+1768
+mul y x     w = w9, x = 1, y = w9+3,  z = 26w2+676w1+1768
+add z y     w = w9, x = 1, y = w9+3,  z = w9+26w2+676w1+1771
+
+inp w       w = w10, x = 1, y = w9+3,    z = w9+26w2+676w1+1771
+mul x 0     w = w10, x = 0, y = w9+3,    z = w9+26w2+676w1+1771
+add x z     w = w10, x = w9+26w2+676w1+1771, y = w9+3, z = w9+26w2+676w1+1771
+mod x 26    w = w10, x = w9+3, y = w9+3, z = w9+26w2+676w1+1771
+div z 26    w = w10, x = w9+3, y = w9+3, z = w2+26w1+68
+add x -3    w = w10, x = w9,   y = w9+3, z = w2+26w1+68
+[w10 == w9]
+eql x w     w = w10, x = 1, y = w9+3,    z = w2+26w1+68
+eql x 0     w = w10, x = 0, y = w9+3,    z = w2+26w1+68
+mul y 0     w = w10, x = 0, y = 0,       z = w2+26w1+68
+add y 25    w = w10, x = 0, y = 25,      z = w2+26w1+68
+mul y x     w = w10, x = 0, y = 0,       z = w2+26w1+68
+add y 1     w = w10, x = 0, y = 1,       z = w2+26w1+68
+mul z y     w = w10, x = 0, y = 1,       z = w2+26w1+68
+mul y 0     w = w10, x = 0, y = 0,       z = w2+26w1+68
+add y w     w = w10, x = 0, y = w10,     z = w2+26w1+68
+add y 5     w = w10, x = 0, y = w10+5,   z = w2+26w1+68
+mul y x     w = w10, x = 0, y = 0,       z = w2+26w1+68
+add z y     w = w10, x = 0, y = 0,       z = w2+26w1+68
+
+inp w       w = w11, x = 0, y = 0,     z = w2+26w1+68
+mul x 0     w = w11, x = 0, y = 0,     z = w2+26w1+68
+add x z     w = w11, x = w2+26w1+68, y = 0, z = w2+26w1+68
+mod x 26    w = w11, x = w2+16, y = 0,  z = w2+26w1+68
+div z 1     w = w11, x = w2+16, y = 0,  z = w2+26w1+68
+add x 12    w = w11, x = w2+28, y = 0,  z = w2+26w1+68
+eql x w     w = w11, x = 0, y = 0,      z = w2+26w1+68
+eql x 0     w = w11, x = 1, y = 0,      z = w2+26w1+68
+mul y 0     w = w11, x = 1, y = 0,      z = w2+26w1+68
+add y 25    w = w11, x = 1, y = 25,     z = w2+26w1+68
+mul y x     w = w11, x = 1, y = 25,     z = w2+26w1+68
+add y 1     w = w11, x = 1, y = 26,     z = w2+26w1+68
+mul z y     w = w11, x = 1, y = 26,     z = 26w2+676w1+1768
+mul y 0     w = w11, x = 1, y = 0,      z = 26w2+676w1+1768
+add y w     w = w11, x = 1, y = w11,    z = 26w2+676w1+1768
+add y 9     w = w11, x = 1, y = w11+9,  z = 26w2+676w1+1768
+mul y x     w = w11, x = 1, y = w11+9,  z = 26w2+676w1+1768
+add z y     w = w11, x = 1, y = w11+9,  z = w11+26w2+676w1+1777
+
+inp w       w = w12, x = 1, y = w11+9,     z = w11+26w2+676w1+1777
+mul x 0     w = w12, x = 0, y = w11+9,     z = w11+26w2+676w1+1777
+add x z     w = w12, x = w11+26w2+676w1+1777, y = w11+9, z = w11+26w2+676w1+1777
+mod x 26    w = w12, x = w11+9, y = w11+9, z = w11+26w2+676w1+1777
+div z 26    w = w12, x = w11+9, y = w11+9, z = w2+26w1+68
+add x -7    w = w12, x = w11+2, y = w11+9, z = w2+26w1+68
+[w12 == w11 + 2]
+eql x w     w = w12, x = 1, y = w11+9,     z = w2+26w1+68
+eql x 0     w = w12, x = 0, y = w11+9,     z = w2+26w1+68
+mul y 0     w = w12, x = 0, y = 0,         z = w2+26w1+68
+add y 25    w = w12, x = 0, y = 25,        z = w2+26w1+68
+mul y x     w = w12, x = 0, y = 0,         z = w2+26w1+68
+add y 1     w = w12, x = 0, y = 1,         z = w2+26w1+68
+mul z y     w = w12, x = 0, y = 1,         z = w2+26w1+68
+mul y 0     w = w12, x = 0, y = 0,         z = w2+26w1+68
+add y w     w = w12, x = 0, y = w12,       z = w2+26w1+68
+add y 3     w = w12, x = 0, y = w12+3,     z = w2+26w1+68
+mul y x     w = w12, x = 0, y = 0,         z = w2+26w1+68
+add z y     w = w12, x = 0, y = 0,         z = w2+26w1+68
+
+inp w       w = w13, x = 0, y = 0,     z = w2+26w1+68
+mul x 0     w = w13, x = 0, y = 0,     z = w2+26w1+68
+add x z     w = w13, x = w2+26w1+68, y = 0, z = w2+26w1+68
+mod x 26    w = w13, x = w2+16, y = 0, z = w2+26w1+68
+div z 26    w = w13, x = w2+16, y = 0, z = w1 + 2
+add x -15   w = w13, x = w2+1,  y = 0, z = w1 + 2
+[w13 == w2 + 1]
+eql x w     w = w13, x = 1, y = 0,     z = w1 + 2
+eql x 0     w = w13, x = 0, y = 0,     z = w1 + 2
+mul y 0     w = w13, x = 0, y = 0,     z = w1 + 2
+add y 25    w = w13, x = 0, y = 25,    z = w1 + 2
+mul y x     w = w13, x = 0, y = 0,     z = w1 + 2
+add y 1     w = w13, x = 0, y = 1,     z = w1 + 2
+mul z y     w = w13, x = 0, y = 1,     z = w1 + 2
+mul y 0     w = w13, x = 0, y = 0,     z = w1 + 2
+add y w     w = w13, x = 0, y = w13,   z = w1 + 2
+add y 2     w = w13, x = 0, y = w13+2, z = w1 + 2
+mul y x     w = w13, x = 0, y = 0,     z = w1 + 2
+add z y     w = w13, x = 0, y = 0,     z = w1 + 2
+
+inp w       w = w14, x = 0,    y = 0,  z = w1 + 2
+mul x 0     w = w14, x = 0,    y = 0,  z = w1 + 2
+add x z     w = w14, x = w1+2, y = 0,  z = w1 + 2
+mod x 26    w = w14, x = w1+2, y = 0,  z = w1 + 2
+div z 26    w = w14, x = w1+2, y = 0,  z = 0
+add x -7    w = w14, x = w1-5, y = 0,  z = 0
+[w14 == w1 - 5]
+eql x w     w = w14, x = 1, y = 0,     z = 0
+eql x 0     w = w14, x = 0, y = 0,     z = 0
+mul y 0     w = w14, x = 0, y = 0,     z = 0
+add y 25    w = w14, x = 0, y = 25,    z = 0
+mul y x     w = w14, x = 0, y = 0,     z = 0
+add y 1     w = w14, x = 0, y = 1,     z = 0
+mul z y     w = w14, x = 0, y = 0,     z = 0
+mul y 0     w = w14, x = 0, y = 0,     z = 0
+add y w     w = w14, x = 0, y = w14,   z = 0
+add y 3     w = w14, x = 0, y = w14+3, z = 0
+mul y x     w = w14, x = 0, y = 0,     z = 0
+add z y     w = w14, x = 0, y = 0,     z = 0
+
+
+[w5 == w4 - 8]
+[w7 == w6 - 4]
+[w8 == w3 + 5]
+[w10 == w9]
+[w12 == w11 + 2]
+[w13 == w12 - 1]
+[w14 == w1 - 5]
