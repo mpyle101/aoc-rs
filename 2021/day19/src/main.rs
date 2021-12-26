@@ -11,6 +11,7 @@ fn main() {
     println!("Part 1: {} {:?}", beacons, t2 - t1);
 }
 
+#[allow(dead_code)]
 #[derive(Debug)]
 struct Beacon {
     x: i32,
@@ -18,6 +19,7 @@ struct Beacon {
     z: i32,
 }
 
+#[allow(dead_code)]
 #[derive(Debug)]
 struct Scanner {
     facing: i32,
@@ -43,7 +45,43 @@ fn load(input: &str) -> Vec<Scanner> {
     }).collect()
 }
 
-fn part_one(scanners: &[Scanner]) -> i64 {
+fn part_one(_scanners: &[Scanner]) -> i64 {
+    use nalgebra::{Reflection, Rotation3, Vector3};
+
+    let vec = Vector3::new(8.0, 0.0, 7.0);
+
+    let angle = Vector3::x() * std::f32::consts::FRAC_PI_2;
+    let rot_x = Rotation3::new(angle);
+
+    let pt = rot_x * vec;
+    println!("x: 90 => {:?}", pt);
+    let pt = rot_x * pt;
+    println!("x:180 => {:?}", pt);
+    let pt = rot_x * pt;
+    println!("x:270 => {:?}", pt);
+
+    let angle = Vector3::y() * std::f32::consts::FRAC_PI_2;
+    let rot_y = Rotation3::new(angle);
+
+    let pt = rot_y * vec;
+    println!("y: 90 => {:?}", pt);
+    let pt = rot_y * pt;
+    println!("y:180 => {:?}", pt);
+    let pt = rot_y * pt;
+    println!("y:270 => {:?}", pt);
+
+    let angle = Vector3::z() * std::f32::consts::FRAC_PI_2;
+    let rot_z = Rotation3::new(angle);
+    
+    let pt = rot_z * vec;
+    println!("z: 90 => {:?}", pt);
+    let pt = rot_z * pt;
+    println!("z:180 => {:?}", pt);
+    let pt = rot_z * pt;
+    println!("z:270 => {:?}", pt);
+
+    let unit = Vector3::new(1.0, 0.0, 0.0);
+    let refl = Reflection::new(unit, 0);
 
     0
 }
