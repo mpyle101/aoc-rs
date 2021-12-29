@@ -10,7 +10,7 @@ fn main() {
     let t1 = Instant::now();
     let energy = part_two();
     let t2 = Instant::now();
-    println!("Part 1: {} {:?}", energy, t2 - t1);
+    println!("Part 2: {} {:?}", energy, t2 - t1);
 }
 
 type Shrimp = ((i32, i32), char);
