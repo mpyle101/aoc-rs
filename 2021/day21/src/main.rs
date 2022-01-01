@@ -2,7 +2,7 @@ fn main() {
     use std::fs;
     use std::time::Instant;
     
-    let input = fs::read_to_string("./test.txt").unwrap();
+    let input = fs::read_to_string("./input.txt").unwrap();
     let positions = load(&input);
 
     let t1 = Instant::now();
@@ -23,82 +23,44 @@ fn load(input: &str) -> Vec<i32> {
     }).collect()
 }
 
-#[derive(Clone, Debug)]
-struct Game {
-    dice: i32,
-    pos: [i32;2],
-    scores: [i32;2],
-    rolls: i32,
-    wins: i32,
-}
-
-impl Game {
-    fn new(start: &[i32], dice: i32, wins: i32) -> Game {
-        Game {
-            dice,
-            wins,
-            pos: [start[0], start[1]],
-            scores: [0, 0],
-            rolls: 0,
-        }
-    }
-
-    fn eval(&self) -> i32 {
-        self.scores.iter().min().unwrap() * self.rolls
-    }
-
-    fn done(&self) -> bool {
-        self.scores[0] >= self.wins || self.scores[1] >= self.wins
-    }
-}
-
 fn part_one(starting: &[i32]) -> i32 {
-    let mut game = Game::new(starting, 0, 1000);
-    while !game.done() {
-        if !game.done() {
-            do_turn(0, &mut game);
-        }
-        if !game.done() {
-            do_turn(1, &mut game);
-        }    
+    let mut pos = [starting[0] - 1, starting[1] - 1];
+    let mut score = [0, 0];
+
+    let mut p = 1;
+    let mut r = 1;
+
+    while score[p] < 1000 {
+        p = 1 - p;
+        pos[p] = (pos[p] + 3 * r + 3) % 10;
+        score[p] += pos[p] + 1;
+        r += 3;
     }
 
-    game.eval()
+    score.iter().min().unwrap() * (r - 1)  
 }
 
 fn part_two(starting: &[i32]) -> u64 {
-    println!("P1: {}", dirac(21 - starting[0] as usize));
-    println!("P2: {}", dirac(21 - starting[1] as usize));
+    // roll result to frequency
+    let rf = [(3, 1), (4, 3), (5, 6), (6, 7), (7, 6), (8, 3), (9, 1)];
 
-    0
+    let pos = [(starting[0] - 1) as u64, (starting[1] - 1) as u64];
+    let won = wins(pos[0], 21, pos[1], 21, &rf);
+
+    won.0.max(won.1)
 }
 
-fn dirac(goal: usize) -> u64 {
-    let mut ways = vec![0;goal + 1];
-    ways[0] = 1;
-    for d in 1..=3 {
-        for n in d..goal + 1 {
-            ways[n] += ways[n - d]
-        }
+fn wins(p1: u64, s1: i64, p2: u64, s2: i64, rf: &[(u64, u64); 7],
+) -> (u64, u64) {
+    if s2 <= 0 {
+        (0, 1)
+    } else {
+        rf.iter().fold((0, 0), |w, (r, f)| {
+            let c = wins(p2, s2, (p1+r) % 10, s1 - 1 - ((p1+r) % 10) as i64, rf);
+            (w.0 + f * c.1, w.1 + f * c.0)
+        })
     }
-
-    ways[goal]
 }
-
-fn do_turn(p: usize, game: &mut Game) {
-    (0..3).for_each(|_| {
-        game.dice = if game.dice == 100 { 1 } else { game.dice + 1 };
-        game.pos[p] = (game.pos[p] + game.dice) % 10;
-        game.rolls += 1;
-    });
-
-    game.scores[p] += score(game.pos[p]);
-}
-
-fn score(pos: i32) -> i32 {
-    if pos == 0 { 10 } else { pos }
-}
-
 
 #[cfg(test)]
 mod tests {
@@ -112,6 +74,9 @@ mod tests {
 
         let score = part_one(&positions);
         assert_eq!(score, 678468);
+
+        let wins = part_two(&positions);
+        assert_eq!(wins, 131180774190079);
     }
 
     #[test]
