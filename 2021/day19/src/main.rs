@@ -69,6 +69,9 @@ struct Scanner {
 }
 
 fn load(input: &str) -> Vec<Report> {
+    // For each report generate a list of the distances between all points
+    // and sort them in ascending order (Report::deltas).
+
     use nalgebra::point;
 
     let mut id = -1;
@@ -95,6 +98,35 @@ fn load(input: &str) -> Vec<Report> {
 }
 
 fn part_one(reports: &[Report]) -> (i32, Vec<Scanner>) {
+    // For part one seed a queue with all the reports except the first one
+    // which is used to seed the list of known scanners. A scanner has a
+    // known origin and a list of beacons relative to it's origin but rotated
+    // to the perspective of Scanner 0.
+    // Cycle through the reports in the queue trying to find a scanner with
+    // a matching beacon pattern. A matching pattern is considered to be a
+    // set of at least 12 beacons which have at least 7 of the same delta
+    // values in each point cloud. So, we look for things like Beacon 29 in
+    // Scanner 3 has deltas of 5, 10, 3, 27, etc and Beacon 14 in Report 5
+    // has at least those same delta values. Putting the lower limit at 6
+    // and requiring 12 gives us confidence we've round a pattern match.
+    // We then work through rotating those beacons until the offset between
+    // the associated Scanner beacon and report beacon is the same for all
+    // 12 (this is what the pts hashset does). When we find the pts hashset
+    // with only one value we know we have the correct rotation and, nicely,
+    // the origin of the report with respect to the scanner.
+    // From this we create a Scanner from the report with an origin offset
+    // by the scanner we compared against so we wind up with an origin in
+    // relation to Scanner 0. We also rotate all the report beacons by the
+    // rotation found during pattern matching and store that in the Scanner.
+    // We then stuff the scanner into the list for possible comparison to
+    // next report in the queue. Lastly we add offset beacons into the master
+    // beacon hashset so it only contains any new ones found.
+    // If we don't find a beacon pattern match, we through the report back
+    // in the queue, in hopes the next time it shows up we'll have more
+    // scanners to compare with.
+    // When the queue is empty, we're done and the master beacon list has
+    // a unique set of beacon points relative to Scanner 0.
+
     use std::collections::{HashSet, VecDeque};
     use nalgebra::point;
 
@@ -174,12 +206,15 @@ fn delta(b1: &Beacon, b2: &Beacon) -> i32 {
 fn find_matches<'a>(scanners: &'a [Scanner], report: &Report)
     -> Option<(&'a Scanner, Vec<((usize, usize), i32)>)>
 {
+    // Look for matches of at least 12 correlated points
+    // based on 7 or more deltas and return them along
+    // with the correlations.
     let mut correlations = None;
 
     let scanner = scanners.iter().find(|s| {
         let matches = get_matches(&s.deltas, &report.deltas);
-        let v = correlate(&matches, 5);
-        if v.len() > 10 {
+        let v = correlate(&matches, 6);
+        if v.len() > 11 {
             correlations = Some(v);
             true
         } else {
@@ -199,6 +234,9 @@ fn get_matches(
     d2: &Vec<(i32, usize, usize)>
 ) -> Vec<((i32, usize, usize), (i32, usize, usize))>
 {
+    // Look for deltas between points in each point cloud
+    // that are the same. Since both are sorted we only need
+    // to go through both lists once.
     let mut i = 0;
     let mut matching = d1.iter().fold(vec![], |mut v, n| {
         let mut t = d2[i];
@@ -221,6 +259,10 @@ fn correlate(
     threshold: i32
 ) -> Vec<((usize, usize), i32)>
 {
+    // Creating a map of the number of times a match contains
+    // a beacon from point cloud to another and return any
+    // which show up more than specified threshold. These represent
+    // a beacon in A which we think is the same one in B.
     use std::collections::HashMap;
 
     let mut map = HashMap::new();
