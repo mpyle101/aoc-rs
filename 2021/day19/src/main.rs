@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use lazy_static::lazy_static;
 use nalgebra::{Matrix3, Point3};
 
@@ -38,9 +39,14 @@ fn main() {
     let reports = load(&input);
 
     let t1 = Instant::now();
-    let beacons = part_one(&reports);
+    let (beacons, scanners) = part_one(&reports);
     let t2 = Instant::now();
     println!("Part 1: {} {:?}", beacons, t2 - t1);
+
+    let t1 = Instant::now();
+    let manhattan = part_two(&scanners);
+    let t2 = Instant::now();
+    println!("Part 2: {} {:?}", manhattan, t2 - t1);
 }
 
 type Beacon = Point3<i32>;
@@ -88,7 +94,7 @@ fn load(input: &str) -> Vec<Report> {
     }).collect()
 }
 
-fn part_one(reports: &[Report]) -> i32 {
+fn part_one(reports: &[Report]) -> (i32, Vec<Scanner>) {
     use std::collections::{HashSet, VecDeque};
     use nalgebra::point;
 
@@ -141,13 +147,22 @@ fn part_one(reports: &[Report]) -> i32 {
             q.push_back(report)
         }
     }
-/*
-    scanners.iter().for_each(|s| println!("{} {:?}", s.id, s.origin));
-    let mut v = beacons.iter().map(|p| (p.x, p.y, p.z)).collect::<Vec<_>>();
-    v.sort();
-    v.iter().for_each(|pt| println!("{:?}", pt));
-*/
-    beacons.len() as i32
+
+    (beacons.len() as i32, scanners)
+}
+
+fn part_two(scanners: &[Scanner]) -> i32 {
+    scanners.iter().combinations(2)
+        .map(|v| {
+            let s1 = v[0].origin;
+            let s2 = v[1].origin;
+
+            (s1.0 - s2.0).abs() +
+            (s1.1 - s2.1).abs() +
+            (s1.2 - s2.2).abs()
+        })
+        .max()
+        .unwrap()
 }
 
 fn delta(b1: &Beacon, b2: &Beacon) -> i32 {
@@ -239,8 +254,11 @@ mod tests {
         let input = fs::read_to_string("./input.txt").unwrap();
         let reports = load(&input);
 
-        let beacons = part_one(&reports);
-        assert_eq!(beacons, 79);
+        let (beacons, scanners) = part_one(&reports);
+        assert_eq!(beacons, 462);
+
+        let manhattan = part_two(&scanners);
+        assert_eq!(manhattan, 12158);
     }
 
     #[test]
@@ -248,7 +266,7 @@ mod tests {
         let input = fs::read_to_string("./test.txt").unwrap();
         let reports = load(&input);
 
-        let beacons = part_one(&reports);
+        let (beacons, _) = part_one(&reports);
         assert_eq!(beacons, 79);
     }
 }
