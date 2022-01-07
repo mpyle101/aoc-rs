@@ -48,7 +48,7 @@ fn part_two(starting: &[i32]) -> u64 {
     // Number of unfinished states at each roll. The total number
     // of possible states minus the number of won states. The total
     // number of possible states is the last number of states times
-    // 27 (possible 2 die rolls).
+    // 27 (all possible 3 die rolls).
     let states1 = wins1.iter()
         .skip(1).fold(vec![27], |mut v, w| {
             if let Some(&n) = v.last() { v.push(n * 27 - w) }
@@ -62,20 +62,13 @@ fn part_two(starting: &[i32]) -> u64 {
 
     // Since player 1 goes first, they match against the unfinished
     // states in player 2's previous roll.
-    let tot1 = wins1.iter().skip(1).zip(states2.iter())
-        .map(|(w, s)| w * s)
-        .collect::<Vec<_>>();
+    let tot1 = wins1.iter().skip(1).zip(states2.iter()).map(|(w, s)| w * s).sum::<u64>();
 
     // Since player 2 goes second, they match against the same roll in
     // player 1's unfinished states.
-    let tot2 = wins2.iter().zip(states1.iter())
-        .map(|(w, s)| w * s)
-        .collect::<Vec<_>>();
+    let tot2 = wins2.iter().zip(states1.iter()).map(|(w, s)| w * s).sum::<u64>();
 
-    let sum1 = tot1.iter().sum::<u64>();
-    let sum2 = tot2.iter().sum::<u64>();
-
-    sum1.max(sum2)
+    tot1.max(tot2)
 }
 
 fn wins(pos: i32) -> Vec<u64> {
@@ -84,23 +77,25 @@ fn wins(pos: i32) -> Vec<u64> {
     // dice result to frequency of rolls producing that value
     let df = [(3, 1), (4, 3), (5, 6), (6, 7), (7, 6), (8, 3), (9, 1)];
 
-    // Number of unfinished states for a given position/score
-    // combination.
+    // Number of unfinished states for a given position/score combination.
+    // Starting position is minus 1 because we are using modulo 10 to cycle
+    // around and adding one to the position for scoring.
     let mut states = HashMap::new();
-    states.insert((pos, 0), 1);
+    states.insert((pos - 1, 0), 1);
 
-    // Number of wins on a given roll
+    // Continue rolling and counting up the wins until we run out of
+    // unfinished states.
     let mut wins = Vec::new();
     while !states.is_empty() {
-        // Count the wins for the next set of rolls.
+        // Count the wins for the next set of possible rolls.
         wins.push(0);
         states = states.iter().fold(HashMap::new(), |mut m, ((p, s), c)| {
             df.iter().for_each(|(d, f)| {
-                let pos   = (p + d - 1) % 10 + 1;
-                let score = s + pos;
+                let pos   = (p + d) % 10;
+                let score = s + pos + 1;
                 if score < 21 {
-                    // Gonna need to roll again, add the new number of possibilities,
-                    // which is all the old ones time the frequency of this dice roll.
+                    // Gonna need to roll again so add the number of possibilities:
+                    // all the existing ones times the frequency of this dice roll.
                     *m.entry((pos, score)).or_insert(0) += c * f;
                 } else if let Some(last) = wins.last_mut() {
                     // Number of wins goes up by the number of possibliities
@@ -135,11 +130,14 @@ mod tests {
     }
 
     #[test]
-    fn small() {
+    fn example() {
         let input = fs::read_to_string("./test.txt").unwrap();
         let positions = load(&input);
 
         let score = part_one(&positions);
         assert_eq!(score, 739785);
+
+        let wins = part_two(&positions);
+        assert_eq!(wins, 444356092776315);
     }
 }
