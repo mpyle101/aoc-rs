@@ -166,6 +166,10 @@ fn part_one(reports: &[Report]) -> (i32, Vec<Scanner>) {
                         deltas: report.deltas.clone(),
                         beacons: v.clone(),
                     };
+
+                    // Insert new scanners at the front so they get tried first.
+                    // Basically, so we don't run through non-matching when a
+                    // report comes up again before we get to new ones.
                     scanners.insert(0, s);
                     v.iter().for_each(|p| {
                         let pt = point![p.x + origin.0, p.y + origin.1, p.z + origin.2];
