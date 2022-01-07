@@ -41,22 +41,26 @@ fn part_one(starting: &[i32]) -> i32 {
 }
 
 fn part_two(starting: &[i32]) -> u64 {
+    use std::cmp::max;
+
     // roll result to frequency
     let rf = [(3, 1), (4, 3), (5, 6), (6, 7), (7, 6), (8, 3), (9, 1)];
 
     let pos = [(starting[0] - 1) as u64, (starting[1] - 1) as u64];
     let won = wins(pos[0], 21, pos[1], 21, &rf);
 
-    won.0.max(won.1)
+    max(won.0, won.1)
 }
 
 fn wins(p1: u64, s1: i64, p2: u64, s2: i64, rf: &[(u64, u64); 7],
 ) -> (u64, u64) {
     if s2 <= 0 {
+        // Because the player flips back and forth
         (0, 1)
     } else {
         rf.iter().fold((0, 0), |w, (r, f)| {
             let c = wins(p2, s2, (p1+r) % 10, s1 - 1 - ((p1+r) % 10) as i64, rf);
+            // Add the "swapped" values from c to w
             (w.0 + f * c.1, w.1 + f * c.0)
         })
     }
