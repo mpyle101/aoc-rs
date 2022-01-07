@@ -166,7 +166,7 @@ fn part_one(reports: &[Report]) -> (i32, Vec<Scanner>) {
                         deltas: report.deltas.clone(),
                         beacons: v.clone(),
                     };
-                    scanners.push(s);
+                    scanners.insert(0, s);
                     v.iter().for_each(|p| {
                         let pt = point![p.x + origin.0, p.y + origin.1, p.z + origin.2];
                         beacons.insert(pt);
