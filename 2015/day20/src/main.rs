@@ -12,37 +12,50 @@ fn main() {
     println!("Part 2: {} ({:?})", house, t2 - t1);
 }
 
-#[allow(dead_code)]
 fn part_one(presents: i32) -> i32 {
     let mut house = 0;
 
     loop {
         house += 1;
-        if elves(house).iter().map(|n| n * 10).sum::<i32>() >= presents {
+        let end = (f64::from(house).sqrt() as i32) + 1;
+        let count = (1..=end).fold(0, |acc, n|
+            if house % n == 0 {
+                acc + (n * 10) + (house / n * 10)
+            } else {
+                acc
+            }
+        );
+        if count >= presents {
             break house
         }
     }
 }
 
-#[allow(dead_code)]
 fn part_two(presents: i32) -> i32 {
     use std::collections::HashMap;
 
     let mut active = HashMap::new();
-
     let mut house = 0;
     loop {
         house += 1;
-        active.insert(house, (house, 0));
-        let count = elves(house).iter().fold(0, |acc, n| {
-            if let Some(elf) = active.get_mut(n) {
-                elf.0 += n;
-                elf.1 += 1;
-                if elf.1 == 50 { active.remove(n); }
-                acc + n * 11
-            } else {
-                acc
-            }
+        active.insert(house, 0);
+        let end = (f64::from(house).sqrt() as i32) + 1;
+        let count = (1..=end).fold(0, |mut acc, n| {
+            if house % n == 0 {
+                if let Some(visits) = active.get_mut(&n) {
+                    acc += n * 11;
+                    *visits += 1;
+                    if *visits == 50 { active.remove(&n); }
+                }
+                let v = house / n;
+                if let Some(visits) = active.get_mut(&v) {
+                    acc += v * 11;
+                    *visits += 1;
+                    if *visits == 50 { active.remove(&v); }
+                }
+            };
+
+            acc
         });
         if count >= presents {
             break house
@@ -50,8 +63,9 @@ fn part_two(presents: i32) -> i32 {
     }
 }
 
+#[allow(dead_code)]
 fn elves(val: i32) -> Vec<i32> {
-    let end = ((val as f32).sqrt() + 1.0) as i32;
+    let end = (f64::from(val).sqrt() as i32) + 1;
     (1..=end).fold(vec![], |mut v, n| {
         if val % n == 0 {
             v.push(n);
