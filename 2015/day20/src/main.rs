@@ -18,7 +18,7 @@ fn part_one(presents: i32) -> i32 {
     loop {
         house += 1;
         let end = (f64::from(house).sqrt() as i32) + 1;
-        let count = (1..=end).fold(0, |acc, n|
+        let count = (2..end).fold(house * 10 + 10, |acc, n|
             if house % n == 0 {
                 acc + (n * 10) + (house / n * 10)
             } else {
@@ -38,9 +38,9 @@ fn part_two(presents: i32) -> i32 {
     let mut house = 0;
     loop {
         house += 1;
-        active.insert(house, 0);
+        active.insert(house, 1);
         let end = (f64::from(house).sqrt() as i32) + 1;
-        let count = (1..=end).fold(0, |mut acc, n| {
+        let count = (2..end).fold(house * 11 + 11, |mut acc, n| {
             if house % n == 0 {
                 if let Some(visits) = active.get_mut(&n) {
                     acc += n * 11;
@@ -61,19 +61,6 @@ fn part_two(presents: i32) -> i32 {
             break house
         }
     }
-}
-
-#[allow(dead_code)]
-fn elves(val: i32) -> Vec<i32> {
-    let end = (f64::from(val).sqrt() as i32) + 1;
-    (1..=end).fold(vec![], |mut v, n| {
-        if val % n == 0 {
-            v.push(n);
-            v.push(val / n);
-        }
-
-        v
-    })
 }
 
 #[cfg(test)]
