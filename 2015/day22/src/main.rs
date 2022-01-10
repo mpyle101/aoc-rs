@@ -128,6 +128,11 @@ fn main() {
     let mana = part_one();
     let t2 = Instant::now();
     println!("Part 1: {} ({:?})", mana, t2 - t1);
+
+    let t1 = Instant::now();
+    let mana = part_two();
+    let t2 = Instant::now();
+    println!("Part 2: {} ({:?})", mana, t2 - t1);
 }
 
 fn part_one() -> i32 {
@@ -146,15 +151,46 @@ fn part_one() -> i32 {
         if st.boss.hp <= 0 {
             mana = mana.min(st.mana);
         } else {
-            do_move(&st).iter().for_each(|s| q.push_back(*s));
+            do_move(&st, false).iter().for_each(|s| q.push_back(*s));
         }
     }
 
     mana
 }
 
-fn do_move(state: &State) -> Vec<State> {
-    let st = apply_effects(state);
+fn part_two() -> i32 {
+    use std::collections::VecDeque;
+
+    let state = State {
+        mana: 0,
+        hero: Wizard { hp: 50, mana: 500, armor: 0 },
+        boss: Monster { hp: 71, damage: 10 },
+        effects: [0i32;3],
+    };
+
+    let mut mana = i32::MAX;
+    let mut q = VecDeque::from([state]);
+    while let Some(st) = q.pop_front() {
+        if st.boss.hp <= 0 {
+            mana = mana.min(st.mana);
+        } else {
+            do_move(&st, true).iter().for_each(|s| q.push_back(*s));
+        }
+    }
+
+    mana
+}
+
+fn do_move(state: &State, hard: bool) -> Vec<State> {
+    let mut st0 = *state;
+    if hard {
+        if st0.hero.hp == 1 {
+            return vec![]
+        }
+        st0.hero.hp -= 1;
+    }
+
+    let st = apply_effects(&st0);
     if st.boss.hp <= 0 {
         return vec![st]
     }
@@ -194,7 +230,7 @@ fn do_move(state: &State) -> Vec<State> {
 fn apply_effects(state: &State) -> State {
     use Effect::*;
 
-    let mut st = (*state).clone();
+    let mut st = *state;
     if st.effects[Shield] > 0 {
         st.hero.armor = 7;
         st.effects[Shield] -= 1;
@@ -211,4 +247,19 @@ fn apply_effects(state: &State) -> State {
     }
 
     st
+}
+
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn it_works() {
+    let mana = part_one();
+    assert_eq!(mana, 1824);
+
+    let mana = part_two();
+    assert_eq!(mana, 1937);
+  }
 }
