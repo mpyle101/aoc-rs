@@ -3,35 +3,17 @@ fn main() {
     use std::time::Instant;
 
     let t1 = Instant::now();
-    let password = part_one("hepxcrrq");
+    let password = generate("hepxcrrq");
     let t2 = Instant::now();
     println!("Part 1: {} ({:?})", password, t2 - t1);
 
     let t1 = Instant::now();
-    let password = part_two(&password);
+    let password = generate(&password);
     let t2 = Instant::now();
     println!("Part 2: {} ({:?})", password, t2 - t1);
 }
 
-fn part_one(pword: &str) -> String {
-    // Turn our input into an array of zero based bytes.
-    // This will make incrementing trivial using mod 26.
-    // hepxcrrq
-    let mut password = [0u8;8];
-    pword.as_bytes().iter()
-        .enumerate()
-        .for_each(|(i, b)| password[i] = *b - ('a' as u8));
-
-    increment(&mut password);
-    while !is_valid(&password) {
-        increment(&mut password);
-    }
-
-    // Rehydrate back into 'a' based characters.
-    password.iter().map(|b| (b + 'a' as u8) as char).collect::<String>()
-}
-
-fn part_two(pword: &str) -> String {
+fn generate(pword: &str) -> String {
     // Turn our input into an array of zero based bytes.
     // This will make incrementing trivial using mod 26.
     // hepxcrrq
@@ -87,10 +69,10 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let password = part_one("hepxcrrq");
+        let password = generate("hepxcrrq");
         assert_eq!(password, "hepxxyzz");
 
-        let password = part_one("hepxxyzz");
+        let password = generate("hepxxyzz");
         assert_eq!(password, "heqaabcc");
     }
 }
