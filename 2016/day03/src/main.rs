@@ -38,7 +38,7 @@ fn part_two(rows: &[[i32;3]]) -> i32 {
     // Chunk by 3 so we can extract 3 sets of 3 values in
     // column order.
     rows.chunks(3).fold(0, |m, r|
-        m + (0..3).fold(0, |n, i| {
+        (0..3).fold(m, |n, i| {
             let (a, b, c) = (r[0][i], r[1][i], r[2][i]);
             n + (a + b > c && a + c > b && b + c > a) as i32
         })
