@@ -34,22 +34,16 @@ fn load(input: &str) -> Vec<Action> {
 }
 
 fn part_one(actions: &[Action]) -> i32 {
-    // facing => 0:N, 1:E, 2:S, 3:W
-    let (x, y, _) = actions.iter()
-        .fold((0, 0, 0), |(x, y, f), action| {
-            let (facing, blocks) = match action {
-                Action::Left(n)  => (if f == 0 { 3 } else { f - 1 }, n),
-                Action::Right(n) => (if f == 3 { 0 } else { f + 1 }, n),
-            };
-            let (dx, dy) = if facing % 2 == 0 {
-                (0, if facing == 0 { *blocks } else { -blocks })
-            } else {
-                (if facing == 1 { *blocks } else { -blocks }, 0)
-            };
-            (x + dx, y + dy, facing)
-        });
-    
-    x.abs() + y.abs()
+    // Rotate the world instead of moving around in it.
+    let p = actions.iter()
+        .fold((0, 0), |(x, y), action|
+            match action {
+                Action::Left(n)  => ( y, n - x),
+                Action::Right(n) => (-y, x + n),
+            }
+        );
+        
+    p.0.abs() + p.1.abs()
 }
 
 fn part_two(actions: &[Action]) -> i32 {
