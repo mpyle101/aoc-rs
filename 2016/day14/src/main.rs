@@ -1,5 +1,3 @@
-//use std::collections::HashMap;
-
 fn main() {
     use std::time::Instant;
 
