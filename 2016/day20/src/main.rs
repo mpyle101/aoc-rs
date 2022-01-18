@@ -73,6 +73,6 @@ mod tests {
         assert_eq!(ip, 4793564);
         
         let ips = part_two(&excluded);
-        assert_eq!(ip, 146);
+        assert_eq!(ips, 146);
     }
 }
