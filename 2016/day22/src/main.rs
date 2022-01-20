@@ -18,8 +18,8 @@ fn main() {
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 struct Disk {
-    x: i32,
-    y: i32,
+    x: usize,
+    y: usize,
     size: i32,
     used: i32,
 }
@@ -31,7 +31,6 @@ impl Disk {
 }
 
 type Disks = Vec<Disk>;
-type State = ((i32, i32), Disks);
 
 fn load(input: &str) -> Disks {
     input.lines().skip(2).map(|s| {
@@ -39,8 +38,8 @@ fn load(input: &str) -> Disks {
         let size = v[1][0..v[1].len()-1].parse::<i32>().unwrap();
         let used = v[2][0..v[2].len()-1].parse::<i32>().unwrap();
         let v = v[0].split('-').collect::<Vec<_>>();
-        let x = v[1][1..].parse::<i32>().unwrap();
-        let y = v[2][1..].parse::<i32>().unwrap();
+        let x = v[1][1..].parse::<usize>().unwrap();
+        let y = v[2][1..].parse::<usize>().unwrap();
         Disk { x, y, size, used }
     })
     .collect()
@@ -55,68 +54,32 @@ fn part_one(disks: &Disks) -> usize {
 }
 
 fn part_two(disks: &Disks) -> usize {
-    use pathfinding::prelude::bfs;
-
-    let goal = (0, 0);
-    let result = bfs(&((34, 0), disks.clone()), |st| do_xfers(st), |st| st.0 == goal);
-
-    result.unwrap().len() - 1
-}
-
-fn do_xfers((node, disks): &State) -> Vec<((i32, i32), Disks)> {
-    use itertools::Itertools;
-
-    let xfers = disks.iter()
-        .permutations(2)
-        .filter(|v| can_xfer(&node, v[0], v[1]))
-        .map(|v| {
-            let mut d1 = *v[0];
-            let mut d2 = *v[1];
-            d2.used += d1.used;
-            d1.used = 0;
-            let n = if *node == (d1.x, d1.y) {
-                (d2.x, d2.y)
+    (0..29).for_each(|y| {
+        (0..35).for_each(|x| {
+            let disk = disks[x*29+y];
+            if x == 0 && y == 0 {
+                print!("(.)")
+            } else if x == 34 && y == 0 {
+                print!(" G ")
+            } else if disk.used == 0 {
+                print!(" - ")
+            } else if disk.size > 500 {
+                print!(" # ")
             } else {
-                *node
-            };
-                
-            (n, d1, d2)
-        })
-        .collect::<Vec<_>>();
-
-    xfers.iter().map(|(n, d1, d2)| {
-        let dsks = disks.iter().map(|d|
-            if d.x == d1.x && d.y == d1.y {
-                *d1
-            } else if d.x == d2.x && d.y == d2.y {
-                *d2
-            } else {
-                *d
+                print!(" . ")
             }
-        )
-        .collect::<Vec<_>>();
+        });
+        println!();
+    });
 
-        (*n, dsks)
-    })
-    .collect()
+    // Manually look at the print out. It takes 26 moves to get the
+    // empty disk to the left of G. Then it'll take 34 moves to get
+    // G to (0, 0) and it'll take 4 moves to get the free disk in
+    // front of G each time and we need to do that one less than G
+    // moves so 33 times => 26 + 34 + (33 * 4) = 192
+    192
 }
 
-fn can_xfer(p: &(i32, i32), d1: &Disk, d2: &Disk) -> bool {
-    let md = (d1.x - d2.x).abs() + (d1.y - d2.y).abs();
-    if md == 1 {
-        if *p == (d1.x, d1.y) {
-            // Can only move target data onto an empty disk
-            d2.used == 0 && d2.can_hold(d1)
-        } else if *p == (d2.x, d2.y) {
-            // Can't mix target data with other data
-            false
-        } else {
-            d1.used != 0 && d2.can_hold(d1)
-        }
-    } else {
-        false
-    }
-}
 
 #[cfg(test)]
 mod tests {
