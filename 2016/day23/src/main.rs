@@ -18,16 +18,6 @@ impl Value {
         }
     }
 
-    fn mul(&self, reg: &mut Registers, n: i32) {
-        match self {
-            Value::Number(_)   => panic!("Can only 'mul' register"),
-            Value::Register(c) => {
-                let r = (*c as u8 - 'a' as u8) as usize;
-                reg[r] *= n
-            }
-        }
-    }
-
     fn dec(&self, reg: &mut Registers) {
         match self {
             Value::Number(_)   => panic!("Can only 'dec' register"),
@@ -65,7 +55,6 @@ enum Cmd {
     cpy(Value, Value),
     dec(Value),
     inc(Value),
-    mul(Value, Value),
     jnz(Value, Value),
     tgl(Value)
 }
@@ -78,7 +67,6 @@ impl Cmd {
             cpy(v, n) => { n.set(reg, v.get(reg)); ip+1 },
             dec(v) => { v.dec(reg); ip+1 },
             inc(v) => { v.inc(reg); ip+1 },
-            mul(v, n) => { v.mul(reg, n.get(reg)); ip+1 },
             jnz(v, n) => {
                 if v.get(reg) != 0 { 
                     (ip as i32 + n.get(reg)) as usize
@@ -94,7 +82,6 @@ impl Cmd {
                         inc(r) => dec(r),
                         dec(r) => inc(r),
                         tgl(r) => inc(r),
-                        mul(v1, v2) => mul(v1, v2),
                         jnz(v1, v2) => cpy(v1, v2),
                         cpy(v1, v2) => jnz(v1, v2),
                     };
@@ -134,7 +121,6 @@ fn load(input: &str) -> Vec<Cmd> {
             "cpy" => cpy(p1, get_value(it.next().unwrap())),
             "dec" => dec(p1),
             "inc" => inc(p1),
-            "mul" => mul(p1, get_value(it.next().unwrap())),
             "jnz" => jnz(p1, get_value(it.next().unwrap())),
             "tgl" => tgl(p1),
             _ => panic!("Unknown command: {}", cmd)
@@ -156,13 +142,17 @@ fn part_one(program: &[Cmd]) -> i32 {
     reg[0]
 }
 
-fn part_two(_program: &[Cmd]) -> i32 {
-    // 12! from # of eggs
-    // 80 from 'cpy 80 c'
-    // 77 from 'jnz 77 d'
+fn part_two(program: &[Cmd]) -> i32 {
+    let mut ip  = 0;
+    let mut reg = [12, 0, 0, 0];
 
-    // 12! + (80 * 77)
-    479007760
+    let mut cmds = program.to_vec();
+    while ip < program.len() {
+        let cmd = cmds[ip];
+        ip = cmd.exec(ip, &mut reg, &mut cmds);
+    }
+
+    reg[0]
 }
 
 fn get_value(s: &str) -> Value {
