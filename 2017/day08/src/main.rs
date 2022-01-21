@@ -17,24 +17,22 @@ fn main() {
 fn part_one(input: &str) -> i32 {
     use std::collections::HashMap;
 
-    let registers = input.lines()
-        .fold(HashMap::new(), |mut m, s| {
-            let v = s.split(' ').collect::<Vec<_>>();
-            let r2 = *m.entry(v[4]).or_insert(0);
-            let r1 = m.entry(v[0]).or_insert(0);
-            let p1 = v[2].parse::<i32>().unwrap();
-            let p2 = v[6].parse::<i32>().unwrap();
-            let op = v[5];
-            if check(r2, p2, op) {
-                if v[1] == "inc" {
-                    *r1 += p1
-                } else {
-                    *r1 -= p1
-                }
+    let mut registers = HashMap::new();
+    input.lines().for_each(|s| {
+        let v = s.split(' ').collect::<Vec<_>>();
+        let r2 = *registers.entry(v[4]).or_insert(0);
+        let r1 = registers.entry(v[0]).or_insert(0);
+        let p1 = v[2].parse::<i32>().unwrap();
+        let p2 = v[6].parse::<i32>().unwrap();
+        let op = v[5];
+        if check(r2, p2, op) {
+            if v[1] == "inc" {
+                *r1 += p1
+            } else {
+                *r1 -= p1
             }
-
-            m
-        });
+        }
+    });
 
     *registers.values().max().unwrap()
 }
