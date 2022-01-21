@@ -66,9 +66,7 @@ fn part_two(input: &str) -> i32 {
     highest
 }
 
-
 fn check(r: i32, p: i32, op: &str) -> bool {
-
     match op {
         "<"  => r < p,
         ">"  => r > p,
