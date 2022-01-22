@@ -15,28 +15,19 @@ fn main() {
 }
 
 fn part_one(input: &str) -> i32 {
-    let (x, y) = input.split(',')
+    let tile = input.split(',')
         .fold((0i32, 0i32), |tile, s| step(s, tile));
 
-    let dx = x.abs();
-    let dy = y.abs();
-
-    if dy >= dx { dy / 2 } else { (dx + dy) / 4 }
+    steps(tile)
 }
 
 fn part_two(input: &str) -> i32 {
     let mut farthest = 0;
 
-    let (mut x, mut y) = (0i32, 0i32);
+    let mut tile = (0i32, 0i32);
     input.split(',').for_each(|s| {
-        let (x1, y1) = step(s, (x, y));
-        let dx = x1.abs();
-        let dy = y1.abs();
-        let steps = if dy >= dx { dy / 2 } else { (dx + dy) / 4 };
-        farthest = farthest.max(steps);
-
-        x = x1;
-        y = y1;
+        tile = step(s, tile);
+        farthest = farthest.max(steps(tile));
     });
 
     farthest
@@ -53,6 +44,14 @@ fn step(s: &str, (x, y): (i32, i32)) -> (i32, i32) {
         _ => panic!("Unknown direction: {}", s)
     }
 }
+
+fn steps((x, y): (i32, i32)) -> i32 {
+    let dx = x.abs();
+    let dy = y.abs();
+
+    if dy >= dx { dy / 2 } else { (dx + dy) / 4 }
+}
+
 
 #[cfg(test)]
 mod tests {
