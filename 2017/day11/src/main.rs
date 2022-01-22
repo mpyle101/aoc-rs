@@ -34,6 +34,9 @@ fn part_two(input: &str) -> i32 {
 }
 
 fn step(s: &str, (x, y): (i32, i32)) -> (i32, i32) {
+    // Walk like a hexagon
+    // https://richstrat.com/zug.html
+    // https://www.gamedev.net/forums/topic/701811-hexagonal-movement/5404943/
     match s {
         "n"  => (x + 2, y + 2),
         "ne" => (x + 4, y + 0),
