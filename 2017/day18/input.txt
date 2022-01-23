@@ -1,0 +1,41 @@
+set d 31
+set a 1
+mul c 17
+jgz c c
+mul a 2
+add d -1
+jgz d -2
+add a -1
+set d 127
+set c 952
+mul c 8505
+mod c a
+mul c 129749
+add c 12345
+mod c a
+set b c
+mod b 10000
+snd b
+add d -1
+jgz d -9
+jgz a 3
+rcv b
+jgz b -1
+set e 0
+set d 126
+rcv a
+rcv b
+set c a
+mul c -1
+add c b
+jgz c 4
+snd a
+set a b
+jgz 1 3
+snd b
+set e 1
+add d -1
+jgz d -11
+snd a
+jgz e -16
+jgz a -19
