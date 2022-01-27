@@ -17,6 +17,11 @@ fn main() {
     let score = part_one(&units, &tiles);
     let t2 = Instant::now();
     println!("Part 1: {}  ({:?})", score, t2 - t1);
+
+    let t1 = Instant::now();
+    let score = part_two(&units, &tiles);
+    let t2 = Instant::now();
+    println!("Part 2: {}  ({:?})", score, t2 - t1);
 }
 
 type Tile = (i32, i32);             // (row, col)
@@ -44,60 +49,87 @@ fn load(input: &str) -> (Units, Tiles) {
 }
 
 fn part_one(units: &Units, tiles: &Tiles) -> i32 {
-    let mut round = -1;
+    let (_, _, round, hp) = do_game(3, units, tiles);
+
+    round * hp
+}
+
+fn part_two(units: &Units, tiles: &Tiles) -> i32 {
+    let elves = units.values().filter(|unit| unit.1).count();
+    let mut attack_power = 4;
+
+    loop {
+        let (race, count, round, hp) = do_game(attack_power, units, tiles);
+        if race && count == elves {
+            return round * hp
+        }
+        attack_power += 1
+    }
+}
+
+fn do_game(ap: i32, units: &Units, tiles: &Tiles) -> (bool, usize, i32, i32) {
+    let mut round = 0;
     let mut units = units.clone();
 
-    'outer: loop {
-        round += 1;
-        // println!("Round: {}", round);
-        // println!("Units: {:?}", units);
-        // print(&units, tiles, 7);
+    let winners = loop {
+        if let Some(elves) = do_round(ap, &mut units, tiles) {
+            break elves
+        } else {
+            round += 1
+        }
+    };
 
-        let keys = units.keys().cloned().collect::<Vec<_>>();
-        for pos in keys {
-            if let Some(&actor) = units.get(&pos) {
-                let targets = enemies(&actor, &units);
-                if targets.len() == 0 {
-                    break 'outer
-                } else {
-                    do_turn(&pos, &actor, &targets, &mut units, tiles)
-                }
+    let hp = units.values().map(|(hp, _)| hp).sum::<i32>();
+
+    (winners, units.len(), round, hp)
+}
+
+fn do_round(ap: i32, units: &mut Units, tiles: &Tiles) -> Option<bool> {
+    let keys = units.keys().cloned().collect::<Vec<_>>();
+    for pos in keys {
+        if let Some(&actor) = units.get(&pos) {
+            let targets = enemies(&actor, &units);
+            if targets.len() == 0 {
+                return Some(actor.1)
+            } else {
+                do_turn(ap, &pos, &actor, &targets, units, tiles)
             }
         }
     }
-    // print(&units, tiles, 7);
-    // println!("{} {:?}", round, units);
 
-    round * units.values().map(|(hp, _)| hp).sum::<i32>()
+    return None
 }
 
 fn do_turn(
+    ap: i32,
     pos: &Tile,
     actor: &Unit,
     targets: &[(Tile, i32)],
     units: &mut Units,
     tiles: &Tiles)
 {
-    // If we can attack someone we're done.
-    if !do_attack(pos, targets, units) {
+    // If we can attack someone we're done. Goblins always have an
+    // attack power of 3.
+    let attack = if actor.1 { ap } else { 3 };
+    if !do_attack(attack, pos, targets, units) {
         let p = do_move(pos, targets, units, tiles);
         units.remove(pos);
         units.insert(p, *actor);
-        do_attack(&p, targets, units);
+        do_attack(attack, &p, targets, units);
     }
 }
 
-fn do_attack(pos: &Tile, targets: &[(Tile, i32)], units: &mut Units) -> bool {
+fn do_attack(ap: i32, pos: &Tile, targets: &[(Tile, i32)], units: &mut Units) -> bool {
     let mut opponents = in_range(pos, targets);
     if opponents.len() > 0 {
         // Sort by hit points, then row, then column so we get the
         // lowest hit point opponents first in "reading order".
         opponents.sort_by_key(|&((r, c), hp)| (hp, r, c));
         let (tile, hp) = opponents[0];
-        if hp <= 3 {
+        if hp <= ap {
             units.remove(&tile);
         } else {
-            units.get_mut(&tile).unwrap().0 -= 3;
+            units.get_mut(&tile).unwrap().0 -= ap;
         }
     }
 
@@ -201,5 +233,8 @@ mod tests {
 
     let score = part_one(&units, &tiles);
     assert_eq!(score, 181952);
+
+    let score = part_two(&units, &tiles);
+    assert_eq!(score, 47296);
   }
 }
