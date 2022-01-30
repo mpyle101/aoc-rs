@@ -9,6 +9,11 @@ fn main() {
     let doors = part_one(&regex);
     let t2 = Instant::now();
     println!("Part 1: {}  ({:?})", doors, t2 - t1);
+
+    let t1 = Instant::now();
+    let rooms = part_two(&regex);
+    let t2 = Instant::now();
+    println!("Part 2: {}  ({:?})", rooms, t2 - t1);
 }
 
 type Tile  = (i32, i32);
@@ -44,6 +49,34 @@ fn part_one(regex: &[char]) -> usize {
     paths.sort_by(|a, b| b.len().cmp(&a.len()));
 
     paths[0].len() / 2
+}
+
+fn part_two(regex: &[char]) -> usize {
+    use pathfinding::prelude::bfs_reach;
+
+    // Build the map.
+    let mut i = 0;
+    let mut tiles = traverse(&mut i, (0, 0), regex);
+    tiles.insert((0, 0), 'X');
+
+    // BFS to find all reachable paths of at least 999 doors.
+    let rooms = bfs_reach(
+            ((0, 0), 0),
+            |(p, n)| {
+                if *n == 1998 {
+                    vec![]
+                } else {
+                    neighbors(*p, &tiles).iter().map(|(pt, _)| (*pt, n + 1)).collect::<Vec<_>>()
+                }
+            })
+        .collect::<Vec<_>>();
+
+    // Remove all those from the tile list.
+    rooms.iter().for_each(|(p, _)| { tiles.remove(p); });
+
+    // Count the rooms left as they must take passing through
+    // at least 1000 doors to get to.
+    tiles.values().filter(|&v| *v == '.').count()
 }
 
 fn traverse(i: &mut usize, pos: Tile, regex: &[char]) -> Tiles {
@@ -131,5 +164,8 @@ mod tests {
 
         let doors = part_one(&regex);
         assert_eq!(doors, 4018);
+
+        let rooms = part_one(&regex);
+        assert_eq!(doors, 8581);
     }
 }
