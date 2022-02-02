@@ -166,6 +166,6 @@ mod tests {
         assert_eq!(doors, 4018);
 
         let rooms = part_one(&regex);
-        assert_eq!(doors, 8581);
+        assert_eq!(rooms, 8581);
     }
 }
