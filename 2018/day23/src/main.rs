@@ -63,41 +63,38 @@ fn part_one(bots: &[Nanobot]) -> usize {
 }
 
 fn part_two(bots: &[Nanobot]) -> i64 {
-    use std::ops::{Add, Mul, Sub};
-
     let ctx = Context::new(&Config::new());
-    let x = Int::fresh_const(&ctx, "x");
-    let y = Int::fresh_const(&ctx, "y");
-    let z = Int::fresh_const(&ctx, "z");
+    let x = Int::new_const(&ctx, "x");
+    let y = Int::new_const(&ctx, "y");
+    let z = Int::new_const(&ctx, "z");
+
+    let one  = Int::from_i64(&ctx, 1);
+    let zero = Int::from_i64(&ctx, 0);
 
     let mut count = Int::from_i64(&ctx, 0);
     for b in bots {
         let bx = Int::from_i64(&ctx, b.x);
         let by = Int::from_i64(&ctx, b.y);
         let bz = Int::from_i64(&ctx, b.z);
-    
-        let dx = bx.sub(&x);
-        let dx = dx.le(&Int::from_i64(&ctx, 0)).ite(&Int::from_i64(&ctx, -1).mul(&dx), &dx);
-        let dy = by.sub(&y);
-        let dy = dy.le(&Int::from_i64(&ctx, 0)).ite(&Int::from_i64(&ctx, -1).mul(&dy), &dy);
-        let dz = bz.sub(&z);
-        let dz = dz.le(&Int::from_i64(&ctx, 0)).ite(&Int::from_i64(&ctx, -1).mul(&dz), &dz);
-
         let br = Int::from_i64(&ctx, b.r);
-        let md = dx.add(&dy).add(&dz);
-        let in_range = md.le(&br);
-        count = count.add(
-            in_range.ite(&Int::from_i64(&ctx, 1), &Int::from_i64(&ctx, 0))
-        );
+    
+        let dx = bx - &x;
+        let dx = dx.le(&zero).ite(&dx.unary_minus(), &dx);
+        let dy = by - &y;
+        let dy = dy.le(&zero).ite(&dy.unary_minus(), &dy);
+        let dz = bz - &z;
+        let dz = dz.le(&zero).ite(&dz.unary_minus(), &dz);
+        let md = &dx + &dy + &dz;
+        count += md.le(&br).ite(&one, &zero);
     }
 
     let optimizer = Optimize::new(&ctx);
     optimizer.maximize(&count);
 
-    let dx = abs(&ctx, &x);
-    let dy = abs(&ctx, &y);
-    let dz = abs(&ctx, &z);
-    let md = dx.add(&dy).add(&dz);
+    let dx = x.le(&zero).ite(&x.unary_minus(), &x);
+    let dy = y.le(&zero).ite(&y.unary_minus(), &y);
+    let dz = z.le(&zero).ite(&z.unary_minus(), &z);
+    let md = &dx + &dy + &dz;
     optimizer.minimize(&md);
 
     optimizer.check(&[]);
@@ -105,14 +102,6 @@ fn part_two(bots: &[Nanobot]) -> i64 {
     let res = model.eval(&md, true).unwrap();
 
     res.as_i64().unwrap()
-}
-
-fn abs<'a>(ctx: &'a Context, n: &'a Int) -> Int<'a> {
-    use std::ops::Mul;
-
-    let zero = Int::from_i64(ctx, 0);
-    let neg1 = Int::from_i64(ctx, -1);
-    n.le(&zero).ite(&neg1.mul(n), n)
 }
 
 
