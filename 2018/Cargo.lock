@@ -218,7 +218,6 @@ dependencies = [
 name = "day23"
 version = "0.1.0"
 dependencies = [
- "lazy_static",
  "z3",
 ]
 
