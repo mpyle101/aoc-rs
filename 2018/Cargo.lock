@@ -222,6 +222,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "day24"
+version = "0.1.0"
+dependencies = [
+ "bitflags",
+]
+
+[[package]]
 name = "day3"
 version = "0.1.0"
 dependencies = [
