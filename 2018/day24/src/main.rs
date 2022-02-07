@@ -12,30 +12,75 @@ fn main() {
     let t2 = Instant::now();
     println!("Part 1: {}  ({:?})", units, t2 - t1);
 
-    // 21127
+    let t1 = Instant::now();
+    let units = part_two(&immunologers, &infectionists);
+    let t2 = Instant::now();
+    println!("Part 2: {}  ({:?})", units, t2 - t1);
+
+    // 2456
 }
 
 fn part_one(immunologers: &[Group], infectionists: &[Group]) -> i32 {
-    let mut immies = immunologers.iter()
+    if let Some((_, groups)) = battle(immunologers, infectionists) {
+        groups.iter().map(|g| g.units).sum()
+    } else {
+        0
+    }
+}
+
+fn part_two(immunologers: &[Group], infectionists: &[Group]) -> i32 {
+    let mut boost = 34;
+
+    loop {
+        let boosted = immunologers.iter()
+            .map(|g| {
+                let mut group = *g;
+                group.damage += boost;
+                group
+            })
+            .collect::<Vec<_>>();
+
+        if let Some((team, groups)) = battle(&boosted, infectionists) {
+            if let Team::ImmuneSys = team {
+                return groups.iter().map(|g| g.units).sum()
+            }
+        }
+
+        boost += 1;
+    }
+}
+
+fn battle(team1: &[Group], team2: &[Group]) -> Option<(Team, Groups)> {
+    let mut army1 = team1.iter()
         .enumerate().map(|(i, &g)| (i+100, g)).collect::<HashMap<_, _>>();
-    let mut bugs = infectionists.iter()
+    let mut army2 = team2.iter()
         .enumerate().map(|(i, &g)| (i+200, g)).collect::<HashMap<_, _>>();
 
-    while immies.len() > 0 && bugs.len() > 0 {
-        let t1 = select_targets(&immies, &bugs);
-        let t2 = select_targets(&bugs, &immies);
+    while army1.len() > 0 && army2.len() > 0 {
+        let t1 = select_targets(&army1, &army2);
+        let t2 = select_targets(&army2, &army1);
 
         // Gather up target selections, sort by initiative and battle.
         let mut attacks = t1.iter().chain(t2.iter()).collect::<Vec<_>>();
         attacks.sort_by(|a, b| b.initiative.cmp(&a.initiative));
-        attacks.iter().for_each(|t| attack(t, &mut immies, &mut bugs));
+        let killed = attacks.iter()
+            .map(|t| attack(t, &mut army1, &mut army2))
+            .sum::<i32>();
+
+        if killed == 0 {
+            // No units killed, give up
+            return None
+        }
     }
 
-    let winner = if immies.len() > 0 { immies } else { bugs };
-    winner.values().map(|g| g.units).sum()
+    let winner = if army1.len() > 0 { army1 } else { army2 };
+    let mut it = winner.values().take(1).map(|g| g.team);
+    let team = it.next().unwrap();
+
+    Some((team, winner.values().cloned().collect()))
 }
 
-fn attack(target: &Target, immies: &mut Army, bugs: &mut Army) {
+fn attack(target: &Target, immies: &mut Army, bugs: &mut Army) -> i32 {
     let (allies, enemy) = if let Team::ImmuneSys = target.team {
         (immies, bugs)
     } else {
@@ -44,7 +89,7 @@ fn attack(target: &Target, immies: &mut Army, bugs: &mut Army) {
 
     let grp = allies.get(&target.team_key);
     let foe = enemy.get_mut(&target.enemy_key);
-    if grp.is_some() && foe.is_some() {
+    let killed = if grp.is_some() && foe.is_some() {
         let grp = grp.unwrap();
         let foe = foe.unwrap();
         if let Some(damage) = calc_damage(grp, foe) {
@@ -54,8 +99,16 @@ fn attack(target: &Target, immies: &mut Army, bugs: &mut Army) {
             if foe.units <= 0 {
                 enemy.remove(&target.enemy_key);
             }
+
+            killed
+        } else {
+            0
         }
-    }
+    } else {
+        0
+    };
+
+    killed
 }
 
 fn select_targets(allies: &Army, enemy: &Army) -> Vec<Target> {
@@ -285,7 +338,7 @@ fn immune_system() -> Groups {
             inflicts: Damage::FIRE,
             initiative: 16,
             immunities: Damage::BLUDGEONING | Damage::RADIATION,
-            weaknesses: Damage::FIRE,
+            weaknesses: Damage::NONE,
         },
         Group {
             team: Team::ImmuneSys,
@@ -440,14 +493,17 @@ fn infection() -> Groups {
 
 #[cfg(test)]
 mod tests {
-  use super::*;
+    use super::*;
 
-  #[test]
-  fn it_works() {
-    let immunologers  = immune_system();
-    let infectionists = infection();
+    #[test]
+    fn it_works() {
+        let immunologers  = immune_system();
+        let infectionists = infection();
 
-    let units = part_one(&immunologers, &infectionists);
-    assert_eq!(units, 21127);
-  }
+        let units = part_one(&immunologers, &infectionists);
+        assert_eq!(units, 21127);
+
+        let units = part_two(&immunologers, &infectionists);
+        assert_eq!(units, 2456);
+    }
 }
