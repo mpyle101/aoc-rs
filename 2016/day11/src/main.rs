@@ -79,9 +79,7 @@ fn next_states<const N: usize>(state: &[u8;N], isotopes: &[usize]) -> Vec<[u8;N]
     // unprotected microchips on the same floor as generators.
     get_all(state, &objects, &floors)
         .iter()
-        .filter_map(|st| 
-            if invalid(st, isotopes) { None } else { Some(*st) }
-        )
+        .filter_map(|st| invalid(st, isotopes))
         .collect()
 }
 
@@ -113,12 +111,14 @@ fn get_all<const N: usize>(state: &[u8;N], objects: &[usize], floors: &[u8]) -> 
     states
 }
 
-fn invalid(state: &[u8], isotopes: &[usize]) -> bool {
+fn invalid<const N: usize>(state: &[u8;N], isotopes: &[usize]) -> Option<[u8;N]> {
     // A state is invalid if there are unprotected microchips
     // on the same floor as a generator for another isotope.
-    isotopes.iter()
+    let found = isotopes.iter()
         .filter(|&i| state[*i] != state[i + 1])
-        .any(|&i| isotopes.iter().any(|n| state[i] == state[n + 1]))
+        .any(|&i| isotopes.iter().any(|n| state[i] == state[n + 1]));
+
+    if found { None } else { Some(*state) }
 }
 
 #[allow(dead_code)]
