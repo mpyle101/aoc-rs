@@ -3,10 +3,6 @@ use std::collections::HashSet;
 fn main() {
     use std::time::Instant;
 
-    let clay = load(include_str!("./sample.txt"));
-    let water = part_one(&clay);
-    println!("Sample: {}", water);
-
     let clay = load(include_str!("./input.txt"));
 
     let t1 = Instant::now();
@@ -15,7 +11,7 @@ fn main() {
     println!("Part 1: {}  ({:?})", water, t2 - t1);
 }
 
-type Edges = HashSet<(char, i32, i32)>;
+type Edges = HashSet<(char, (i32, i32))>;
 type Clay  = HashSet<(i32, i32)>;
 type Water = HashSet<(i32, i32)>;
 type Stack = Vec<(i32, i32)>;
@@ -73,7 +69,7 @@ fn part_one(clay: &Clay) -> i32 {
         }
     }
 
-    print(clay, &water);
+//    print(clay, &water);
 
     water.len() as i32 - min_y + 1
 }
@@ -121,10 +117,12 @@ fn fill_dir(
         water.insert(p);
 
         let below = (p.0, p.1 + 1);
-        if edges.contains(&(dir, p.0, p.1)) {
-            return false
+        if edges.contains(&(dir, p)) {
+            if !water.contains(&(p.0 + n, p.1 + 1)) {
+                return false
+            }
         } else if !water.contains(&below) && !clay.contains(&below) {
-            edges.insert((dir, p.0, p.1));
+            edges.insert((dir, p));
             stack.push(p);
             return false
         }
