@@ -1,9 +1,15 @@
 fn main() {
-    let len = part_one(&[3,1,1,3,3,2,2,1,1,3]);
-    println!("Part 1: {}", len);
+    use std::time::Instant;
 
+    let t1 = Instant::now();
+    let len = part_one(&[3,1,1,3,3,2,2,1,1,3]);
+    let t2 = Instant::now();
+    println!("Part 1: {} ({:?})", len, t2 - t1);
+
+    let t1 = Instant::now();
     let len = part_two(&[3,1,1,3,3,2,2,1,1,3]);
-    println!("Part 2: {}", len);
+    let t2 = Instant::now();
+    println!("Part 2: {} ({:?})", len, t2 - t1);
 }
 
 fn part_one(digits: &[u8]) -> usize {
