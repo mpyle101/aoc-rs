@@ -10,12 +10,9 @@ fn main() {
     println!("Part 1: {} ({:?})", sectors, t2 - t1);
 
     let t1 = Instant::now();
-    let names = part_two(&rooms);
+    let room = part_two(&rooms);
     let t2 = Instant::now();
-    println!("Part 2: {} ({:?})", names.len(), t2 - t1);
-
-    // names.iter().for_each(|t| println!("{} => {}", t.0, t.1));
-    // 991 => northpole object storage
+    println!("Part 2: {} ({:?})", room, t2 - t1);
 }
 
 #[derive(Debug)]
@@ -42,15 +39,18 @@ fn part_one(rooms: &[Room]) -> i32 {
     rooms.iter().fold(0, |n, r| n + if verify(r) { r.id } else { 0 })
 }
 
-fn part_two(rooms: &[Room]) -> Vec<(i32, String)> {
-    rooms.iter().filter_map(|r|
-        if verify(r) { Some((r.id, decode(r))) } else { None }
-    )
-    .collect()
+fn part_two(rooms: &[Room]) -> i32 {
+    // Gotten by printing out all the decoded names.
+    let north_pole_objects = "northpole object storage";
+    let room = rooms.iter()
+        .find(|r| verify(r) && decode(r) == north_pole_objects)
+        .unwrap();
+
+    room.id
 }
 
 fn verify(room: &Room) -> bool {
-    use std::cmp::Ordering;
+    use std::cmp::Reverse;
     use std::collections::HashMap;
 
     let counts = room.name.chars()
@@ -59,16 +59,7 @@ fn verify(room: &Room) -> bool {
             map
         });
     let mut order = counts.iter().map(|(c, n)| (n, c)).collect::<Vec<_>>();
-    order.sort_by(|a, b| {
-        // Descending count with alphabetical for ties
-        let ordering = b.0.cmp(a.0);
-        if ordering == Ordering::Equal {
-            a.1.cmp(b.1)
-        } else {
-            ordering
-        }
-    });
-
+    order.sort_by_key(|a| (Reverse(a.0), a.1));
     order.iter().enumerate().take(5)
         .fold(true, |valid, (i, c)| valid && room.checksum[i] == *c.1)
 }
@@ -101,5 +92,21 @@ mod tests {
     
         let sectors = part_one(&rooms);
         assert_eq!(sectors, 409147);
+    
+        let sector_id = part_two(&rooms);
+        assert_eq!(sector_id, 991);
+    }
+
+    #[test]
+    fn decoding() {
+        let room = Room {
+            id: 343,
+            name: "qzmt-zixmtkozy-ivhz",
+            checksum: ['a';5]
+        };
+
+
+        let decoded = decode(&room);
+        assert_eq!(decoded, "very encrypted name");
     }
 }
