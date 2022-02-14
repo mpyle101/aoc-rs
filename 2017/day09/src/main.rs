@@ -21,55 +21,35 @@ fn part_one(input: &str) -> i64 {
     let mut cancel  = false;
     let mut garbage = false;
 
-    input.chars().for_each(|c| {
-        if cancel {
-            cancel = false
-        } else if garbage {
-            if c == '>' {
-                garbage = false
-            } else if c == '!' {
-                cancel = true
-            }
-        } else if c == '!' {
-            cancel = true
-        } else if c == '<' {
-            garbage = true
-        } else if c == '{' {
-            depth += 1
-        } else if c == '}' {
-            score += depth;
-            depth -= 1;
-        }
-    });
-    
+    input.chars().for_each(|c|
+        match c {
+            _ if cancel => cancel = false,
+            '>' => garbage = false,
+            '!' => cancel = true,
+            '<' => garbage = true,
+            '{' if !garbage => depth += 1,
+            '}' if !garbage => { score += depth; depth -= 1 },
+             _  => {}
+       }
+    );
+
     score
 }
 
 fn part_two(input: &str) -> i64 {
-    let mut count = 0;
-
     let mut cancel  = false;
     let mut garbage = false;
 
-    input.chars().for_each(|c| {
-        if cancel {
-            cancel = false
-        } else if garbage {
-            if c == '>' {
-                garbage = false
-            } else if c == '!' {
-                cancel = true
-            } else {
-                count += 1
-            }
-        } else if c == '!' {
-            cancel = true
-        } else if c == '<' {
-            garbage = true
-        }
-    });
-    
-    count
+    input.chars().fold(0, |acc, c|
+        match c {
+            _ if cancel => { cancel = false; acc},
+            '>' => { garbage = false; acc },
+            '!' => { cancel = true; acc },
+            _ if garbage => acc + 1,
+            '<' => { garbage = true; acc },
+            _ => acc
+       }
+    )
 }
 
 
