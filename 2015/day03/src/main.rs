@@ -2,10 +2,10 @@ fn main() {
     let directions = include_str!("./input.txt");
 
     let houses = part_one(directions);
-    println!("Part 1: {}", houses);
+    println!("Part 1: {houses}");
 
     let houses = part_two(directions);
-    println!("Part 2: {}", houses);
+    println!("Part 2: {houses}");
 }
 
 fn part_one(directions: &str) -> usize {
