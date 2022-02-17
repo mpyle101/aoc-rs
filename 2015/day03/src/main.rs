@@ -12,10 +12,7 @@ fn part_one(directions: &str) -> usize {
     use std::collections::HashSet;
 
     let houses: HashSet<_> = directions.chars()
-        .scan((0, 0), |h, c| {
-            *h = step(c, h);
-            Some(*h)
-        })
+        .scan((0, 0), |h, c| { *h = step(c, h); Some(*h) })
         .collect();
 
     houses.len() + 1
