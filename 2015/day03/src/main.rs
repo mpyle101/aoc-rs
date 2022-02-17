@@ -11,12 +11,12 @@ fn main() {
 fn part_one(directions: &str) -> usize {
     use std::collections::HashSet;
 
-    let mut house = (0, 0);
-    let houses: HashSet<_> = directions.chars().map(|c| {
-        house = step(c, &house);
-        house
-    })
-    .collect();
+    let houses: HashSet<_> = directions.chars()
+        .scan((0, 0), |h, c| {
+            *h = step(c, h);
+            Some(*h)
+        })
+        .collect();
 
     houses.len() + 1
 }
