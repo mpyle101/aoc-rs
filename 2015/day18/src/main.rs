@@ -1,45 +1,46 @@
-use pathfinding::matrix::Matrix;
+use pathfinding::matrix::{Matrix, MatrixFormatError};
 
 fn main() {
     use std::time::Instant;
 
-    let map = load(include_str!("./input.txt"));
+    let mat = load(include_str!("./input.txt"));
 
     let t1 = Instant::now();
-    let count = part_one(&map);
+    let count = mat.map_or(0, |m| part_one(&m));
     let t2 = Instant::now();
-    println!("Part 1: {} ({:?})", count, t2 - t1);
+    println!("Part 1: {count} ({:?})", t2 - t1);
+
+    let mat = load(include_str!("./input.txt"));
 
     let t1 = Instant::now();
-    let count = part_two(&map);
+    let count = mat.map_or(0, |m| part_two(&m));
     let t2 = Instant::now();
-    println!("Part 2: {} ({:?})", count, t2 - t1);
+    println!("Part 2: {count} ({:?})", t2 - t1);
 }
 
-fn load(input: &str) -> Matrix<char> {
-    Matrix::from_rows(input.lines().map(|l| l.chars())).unwrap()
+fn load(input: &str) -> Result<Matrix<char>, MatrixFormatError> {
+    Matrix::from_rows(input.lines().map(|l| l.chars()))
 }
 
-fn part_one(map: &Matrix<char>) -> i32 {
+fn part_one(map: &Matrix<char>) -> usize {
     (0..100).fold(map.clone(), |mat, _| {
         let mut m = Matrix::new(mat.rows, mat.columns, '.');
         mat.indices().for_each(|p| {
             let cnt = mat.neighbours(p, true)
-                .filter(|p| *mat.get(*p).unwrap() == '#')
+                .filter_map(|p| mat.get(p).filter(|&v| *v == '#'))
                 .count();
-            if cnt == 3 {
-                *m.get_mut(p).unwrap() = '#';
-            } else if cnt == 2 {
-                if *mat.get(p).unwrap() == '#' {
-                    *m.get_mut(p).unwrap() = '#'
-                }
+            if cnt == 3 || (cnt == 2 && mat.get(p).map_or(false, |v| *v == '#')) {
+                m.get_mut(p).map(|v| *v = '#');
             }
         });
         m
-    }).values().filter(|&c| *c == '#').count() as i32
+    })
+    .values()
+    .filter(|&c| *c == '#')
+    .count()
 }
 
-fn part_two(map: &Matrix<char>) -> i32 {
+fn part_two(map: &Matrix<char>) -> usize {
     let corners = [
         (0, 0),
         (0, map.rows - 1),
@@ -49,27 +50,26 @@ fn part_two(map: &Matrix<char>) -> i32 {
 
     // The lights in the corners are stuck on.
     let mut m0 = map.clone();
-    corners.iter().for_each(|p| *m0.get_mut(*p).unwrap() = '#');
+    corners.iter().for_each(|p| { m0.get_mut(*p).map(|v| *v = '#'); });
 
     (0..100).fold(m0, |m1, _| {
         let mut m = Matrix::new(m1.rows, m1.columns, '.');
         m1.indices().for_each(|p| {
             let cnt = m1.neighbours(p, true)
-                .filter(|p| *m1.get(*p).unwrap() == '#')
+                .filter_map(|p| m1.get(p).filter(|&v| *v == '#'))
                 .count();
-            if cnt == 3 {
-                *m.get_mut(p).unwrap() = '#';
-            } else if cnt == 2 {
-                if *m1.get(p).unwrap() == '#' {
-                    *m.get_mut(p).unwrap() = '#'
-                }
+            if cnt == 3 || (cnt == 2 && m1.get(p).map_or(false, |v| *v == '#')) {
+                m.get_mut(p).map(|v| *v = '#');
             }
         });
 
         // The lights in the corners are stuck on.
-        corners.iter().for_each(|p| *m.get_mut(*p).unwrap() = '#');
+        corners.iter().for_each(|p| { m.get_mut(*p).map(|v| *v = '#'); });
         m
-    }).values().filter(|&c| *c == '#').count() as i32
+    })
+    .values()
+    .filter(|&c| *c == '#')
+    .count()
 }
 
 #[cfg(test)]
@@ -78,12 +78,12 @@ mod tests {
 
   #[test]
   fn it_works() {
-    let map = load(include_str!("./input.txt"));
-
-    let count = part_one(&map);
+    let mat = load(include_str!("./input.txt"));
+    let count = mat.map_or(0, |m| part_one(&m));
     assert_eq!(count, 1061);
 
-    let count = part_two(&map);
+    let mat = load(include_str!("./input.txt"));
+    let count = mat.map_or(0, |m| part_two(&m));
     assert_eq!(count, 1006);
   }
 }
