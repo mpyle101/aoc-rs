@@ -2,10 +2,10 @@ fn main() {
     let input = include_str!("./input.txt");
 
     let floor = part_one(input);
-    println!("Part 1: {}", floor);
+    println!("Part 1: {floor}");
 
     let pos = part_two(input);
-    println!("Part 2: {}", pos);
+    println!("Part 2: {pos}");
 }
 
 fn part_one(input: &str) -> i32 {
@@ -17,7 +17,7 @@ fn part_two(input: &str) -> usize {
     input.chars()
         .enumerate()
         .map(|(i, c)| { floor += if c == '(' { 1 } else { -1 }; (i, floor) })
-        .find_map(|(i, f)| if f < 0 { Some(i+1) } else { None })
+        .find_map(|(i, f)| (f < 0).then(||i+1))
         .unwrap()
 }
 
