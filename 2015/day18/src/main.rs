@@ -50,7 +50,7 @@ fn part_two(map: &Matrix<char>) -> usize {
 
     // The lights in the corners are stuck on.
     let mut m0 = map.clone();
-    corners.iter().for_each(|p| { m0.get_mut(*p).map(|v| *v = '#'); });
+    for p in corners.iter() { m0.get_mut(*p).map(|v| *v = '#'); }
 
     (0..100).fold(m0, |m1, _| {
         let mut m = Matrix::new(m1.rows, m1.columns, '.');
@@ -64,7 +64,7 @@ fn part_two(map: &Matrix<char>) -> usize {
         });
 
         // The lights in the corners are stuck on.
-        corners.iter().for_each(|p| { m.get_mut(*p).map(|v| *v = '#'); });
+        for p in corners.iter() { m.get_mut(*p).map(|v| *v = '#'); }
         m
     })
     .values()
