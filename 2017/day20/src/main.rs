@@ -77,7 +77,7 @@ fn part_one(particles: &[Particle]) -> usize {
     let n = *acc.iter().min().unwrap();
     let v = acc.iter()
         .enumerate()
-        .filter_map(|(i, m)| if *m == n { Some(i) } else { None })
+        .filter_map(|(i, m)| (*m == n).then(||i))
         .collect::<Vec<_>>();
 
     // The closest one to begin with will always be the closest.
@@ -100,8 +100,9 @@ fn part_two(particles: &[Particle]) -> usize {
         dupes.iter().for_each(|p| {
             // Find the indices for each dupe and remove them from
             // back to front.
-            let ix = arr.iter().enumerate()
-                .filter(|(_, q)| p == *q).map(|(i, _)| i)
+            let ix = arr.iter()
+                .enumerate()
+                .filter_map(|(i, q)| (p == q).then(|| i))
                 .collect::<Vec<_>>();
             ix.iter().rev().for_each(|i| { arr.remove(*i); });
         })
