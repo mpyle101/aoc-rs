@@ -8,12 +8,12 @@ fn main() {
     let t1 = Instant::now();
     let dance = part_one(&steps);
     let t2 = Instant::now();
-    println!("Part 1: {:?}  ({:?})", dance, t2 - t1);
+    println!("Part 1: {dance}  ({:?})", t2 - t1);
 
     let t1 = Instant::now();
     let seconds = part_two(&steps);
     let t2 = Instant::now();
-    println!("Part 2: {:?}  ({:?})", seconds, t2 - t1);
+    println!("Part 2: {seconds}  ({:?})", t2 - t1);
 }
 
 fn part_one(steps: &[Step]) -> String {
@@ -66,12 +66,14 @@ fn part_two(steps: &[Step]) -> u32 {
         deps.iter()
             .enumerate()
             .for_each(|(i, &v)| 
-                if available & (1 << i) == 0 && v & available == v {
-                    if workers.len() < 5 && scheduled & (1 << i) == 0 {
-                        let ts = seconds + 61 + i as u32;
-                        workers.push(Reverse((ts, i)));
-                        scheduled |= 1 << i;
-                    }
+                if available & (1 << i) == 0 &&
+                   scheduled & (1 << i) == 0 &&
+                   v & available == v && 
+                   workers.len() < 5
+                {
+                    let ts = seconds + 61 + i as u32;
+                    workers.push(Reverse((ts, i)));
+                    scheduled |= 1 << i;
                 }
             );
         if let Some(Reverse((ts, v))) = workers.pop() {

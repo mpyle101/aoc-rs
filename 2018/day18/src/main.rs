@@ -21,7 +21,7 @@ fn load(input: &str) -> Matrix<char> {
 }
 
 fn part_one(acres: &Matrix<char>) -> i32 {
-    let mut m = update(&acres);
+    let mut m = update(acres);
     for _ in 0..9 { m = update(&m) }
 
     resources(&m)
@@ -74,18 +74,16 @@ fn update(acres: &Matrix<char>) -> Matrix<char> {
         let c = *acres.get(p).unwrap();
         if c == '.' {
             if trees >= 3 {
-                *m.get_mut(p).unwrap() = '|'
+                if let Some(v) = m.get_mut(p) { *v = '|' }
             }
         } else if c == '|' {
             if lumber >= 3 {
-                *m.get_mut(p).unwrap() = '#'
-            } else {
-                *m.get_mut(p).unwrap() = '|'
+                if let Some(v) = m.get_mut(p) { *v = '#' }
+            } else if let Some(v) = m.get_mut(p) {
+                *v = '|'
             }
-        } else {
-            if trees > 0 && lumber > 0 {
-                *m.get_mut(p).unwrap() = '#'
-            }
+        } else if trees > 0 && lumber > 0 {
+            if let Some(v) = m.get_mut(p) { *v = '#' }
         }
     });
 
@@ -97,7 +95,7 @@ fn resources(acres: &Matrix<char>) -> i32 {
         match c {
             '|' => (acc.0 + 1, acc.1),
             '#' => (acc.0, acc.1 + 1),
-                _  => (acc.0, acc.1),  // we don't track open
+             _  => (acc.0, acc.1),  // we don't track open
         });
 
     wooded * lumber

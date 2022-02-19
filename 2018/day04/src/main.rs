@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use chrono::prelude::*;
 
 fn main() {
@@ -22,9 +23,9 @@ fn part_one(events: &[Event]) -> u32 {
     use Event::*;
 
     let mut gids: Vec<_> = events.iter()
-        .filter_map(|e| e.is_guard().then(|| e.get_id()))
+        .filter_map(|e| e.get_id())
         .collect();
-    gids.sort();
+    gids.sort_unstable();
     gids.dedup();
 
     let guards: HashMap<_,_> = gids.iter()
@@ -72,9 +73,9 @@ fn part_two(events: &[Event]) -> u32 {
     use Event::*;
 
     let mut gids: Vec<_> = events.iter()
-        .filter_map(|e| e.is_guard().then(|| e.get_id()))
+        .filter_map(|e| e.get_id())
         .collect();
-    gids.sort();
+    gids.sort_unstable();
     gids.dedup();
 
     let guards: HashMap<_,_> = gids.iter()
@@ -118,7 +119,7 @@ fn load(input: &str) -> Vec<Event> {
                     let id = ev[1][1..].parse::<u32>().unwrap();
                     Event::Guard(dt, id)
                 },
-                  _ => unreachable!(),
+            _ => unreachable!(),
         }
     })
     .collect();
@@ -127,7 +128,7 @@ fn load(input: &str) -> Vec<Event> {
     events
 }
 
-#[derive(Debug, Eq, Ord, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 enum Event {
     Wake(DateTime<Utc>),
     Sleep(DateTime<Utc>),
@@ -135,24 +136,15 @@ enum Event {
 }
 
 impl Event {
-    fn is_guard(&self) -> bool {
-        use Event::*;
+    fn get_id(&self) -> Option<u32> {
         match self {
-            Guard(_,_) => true,
-                     _ => false,
-        }
-    }
-
-    fn get_id(&self) -> u32 {
-        use Event::*;
-        match self {
-            Guard(_, id) => *id,
-                       _ => panic!("Not a guard: {:?}", self)
+            Event::Guard(_, id) => Some(*id),
+            _ => None
         }
     }
 }
-impl PartialOrd for Event {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+impl Ord for Event {
+    fn cmp(&self, other: &Self) -> Ordering {
         use Event::*;
 
         let dt1 = match self {
@@ -162,7 +154,12 @@ impl PartialOrd for Event {
             Wake(dt) | Sleep(dt) | Guard(dt, _) => dt
         };
 
-        dt1.partial_cmp(dt2)
+        dt1.cmp(dt2)
+    }
+}
+impl PartialOrd for Event {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }
 

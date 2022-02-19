@@ -88,8 +88,8 @@ fn do_round(ap: i32, units: &mut Units, tiles: &Tiles) -> Option<bool> {
     let keys = units.keys().cloned().collect::<Vec<_>>();
     for pos in keys {
         if let Some(&actor) = units.get(&pos) {
-            let targets = enemies(&actor, &units);
-            if targets.len() == 0 {
+            let targets = enemies(&actor, units);
+            if targets.is_empty() {
                 return Some(actor.1)
             } else {
                 do_turn(ap, &pos, &actor, &targets, units, tiles)
@@ -97,7 +97,7 @@ fn do_round(ap: i32, units: &mut Units, tiles: &Tiles) -> Option<bool> {
         }
     }
 
-    return None
+    None
 }
 
 fn do_turn(
@@ -121,7 +121,7 @@ fn do_turn(
 
 fn do_attack(ap: i32, pos: &Tile, targets: &[(Tile, i32)], units: &mut Units) -> bool {
     let mut opponents = in_range(pos, targets);
-    if opponents.len() > 0 {
+    if !opponents.is_empty() {
         // Sort by hit points, then row, then column so we get the
         // lowest hit point opponents first in "reading order".
         opponents.sort_by_key(|&((r, c), hp)| (hp, r, c));
@@ -133,7 +133,7 @@ fn do_attack(ap: i32, pos: &Tile, targets: &[(Tile, i32)], units: &mut Units) ->
         }
     }
 
-    opponents.len() > 0
+    !opponents.is_empty()
 }
 
 fn do_move(
@@ -148,7 +148,7 @@ fn do_move(
     // Get the shortest paths to all reachable target adjacent tiles
     // and find the shortest of those to get the nearest tiles.
     let mut paths = find_reachable(pos, &adjacent, units, tiles);
-    if paths.len() > 0 {
+    if !paths.is_empty() {
         paths.sort_by_key(|v| v.len());
         paths[0][1]
     } else {
@@ -176,7 +176,7 @@ fn find_adjacent(targets: &[(Tile, i32)], units: &Units, tiles: &Tiles) -> Vec<T
         .collect::<Vec<_>>();
 
     // Sort so tiles are in "reading order".
-    adjacent.sort();
+    adjacent.sort_unstable();
 
     adjacent
 }

@@ -8,14 +8,12 @@ fn main() {
     let t1 = Instant::now();
     let in_range = part_one(&bots);
     let t2 = Instant::now();
-    println!("Part 1: {}  ({:?})", in_range, t2 - t1);
+    println!("Part 1: {in_range}  ({:?})", t2 - t1);
 
     let t1 = Instant::now();
     let pts = part_two(&bots);
     let t2 = Instant::now();
-    println!("Part 2: {}  ({:?})", pts, t2 - t1);
-
-    // 47141479
+    println!("Part 2: {pts}  ({:?})", t2 - t1);
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -40,7 +38,7 @@ fn load(input: &str) -> Vec<Nanobot> {
         let s = &it.next().unwrap()[5..];
         let r = read(&mut it);
 
-        let mut it = s.split(",");
+        let mut it = s.split(',');
         let x = read(&mut it);
         let y = read(&mut it);
         let z = read(&mut it);
@@ -50,7 +48,7 @@ fn load(input: &str) -> Vec<Nanobot> {
     .collect()
 }
 
-fn read(it: &mut std::str::Split<&str>) -> i64 {
+fn read<'a>(mut it: impl Iterator<Item=&'a str>) -> i64 {
     it.next().map_or(0, |v| v.parse::<i64>().map_or(0, |n| n))
 }
 
@@ -115,5 +113,8 @@ mod tests {
 
     let in_range = part_one(&bots);
     assert_eq!(in_range, 481);
+
+    let pts = part_two(&bots);
+    assert_eq!(pts, 47141479);
   }
 }
