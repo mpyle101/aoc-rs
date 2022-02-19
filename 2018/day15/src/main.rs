@@ -16,12 +16,12 @@ fn main() {
     let t1 = Instant::now();
     let score = part_one(&units, &tiles);
     let t2 = Instant::now();
-    println!("Part 1: {}  ({:?})", score, t2 - t1);
+    println!("Part 1: {score}  ({:?})", t2 - t1);
 
     let t1 = Instant::now();
     let score = part_two(&units, &tiles);
     let t2 = Instant::now();
-    println!("Part 2: {}  ({:?})", score, t2 - t1);
+    println!("Part 2: {score}  ({:?})", t2 - t1);
 }
 
 type Tile = (i32, i32);             // (row, col)
@@ -157,10 +157,9 @@ fn do_move(
 }
 
 fn enemies(actor: &Unit, units: &Units) -> Vec<(Tile, i32)> {
-    units.iter().filter_map(|(k, v)|
-        if v.1 != actor.1 { Some((*k, v.0)) } else { None }
-    )
-    .collect()
+    units.iter()
+        .filter_map(|(k, v)| (v.1 != actor.1).then(|| (*k, v.0)))
+        .collect()
 }
 
 fn in_range(pos: &Tile, targets: &[(Tile, i32)]) -> Vec<(Tile, i32)> {
