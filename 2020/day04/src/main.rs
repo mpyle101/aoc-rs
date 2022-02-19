@@ -77,7 +77,7 @@ fn load<'a>(passports: &'a str, validate: bool) -> Vec<Passport> {
 }
 
 fn parse_year(s: &str, min: u32, max: u32) -> Option<u32> {
-    let check_year = |v, min, max| if v >= min && v <= max { Some(v) } else { None };
+    let check_year = |v, min, max| (v >= min && v <= max).then(|| v);
     if s.len() == 4 {
         s.parse::<u32>().ok().and_then(|v| check_year(v, min, max))
     } else {
@@ -86,7 +86,7 @@ fn parse_year(s: &str, min: u32, max: u32) -> Option<u32> {
 }
 
 fn parse_height(s: &str) -> Option<&str> {
-    let check_height = |v, min, max| if v >= min && v <= max { Some(v) } else { None };
+    let check_height = |v, min, max| (v >= min && v <= max).then(|| v);
     if s.len() >= 4 {
         let amt  = &s[..s.len()-2];
         let unit = &s[s.len()-2..];
@@ -133,7 +133,7 @@ fn parse_passport_id(s: &str) -> Option<&str> {
 }
 
 fn parse_eye_color<'a>(colors: &HashSet<&str>, s: &'a str) -> Option<&'a str> {
-    if colors.contains(s) { Some(s) } else { None } 
+    colors.contains(s).then(|| s) 
 }
 
 
