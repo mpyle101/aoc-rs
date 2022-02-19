@@ -11,11 +11,14 @@ fn main() {
 }
 
 fn load(input: &str) -> HashSet<Point> {
-    input.lines().enumerate().flat_map(|(y, l)| l.as_bytes().iter()
-        .enumerate().filter_map(move |(x, &b)| 
-            if b == b'#' { Some(Point(x as i32, y as i32, 0, 0)) } else { None }
-        )
-    ).collect()
+    input.lines()
+        .enumerate()
+        .flat_map(|(y, l)| l.as_bytes().iter()
+            .enumerate()
+            .filter_map(move |(x, &b)|
+                (b == b'#').then(|| Point(x as i32, y as i32, 0, 0))
+            )
+        ).collect()
 }
 
 fn part_one(cubes: &HashSet<Point>) -> usize {
