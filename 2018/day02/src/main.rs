@@ -57,9 +57,9 @@ fn part_two(boxes: &str) -> String {
     });
 
     let (v1, v2) = m[v.iter().position(|n| *n == 1).unwrap()];
-    v1.iter().zip(v2.iter()).filter_map(|(c1, c2)|
-        if c1 == c2 { Some(*c1 as char) } else { None }
-    ).collect()
+    v1.iter().zip(v2.iter())
+        .filter_map(|(c1, c2)| (c1 == c2).then(|| *c1 as char))
+        .collect()
 }
 
 
