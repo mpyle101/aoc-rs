@@ -71,7 +71,7 @@ fn next_states<const N: usize>(state: &[u8;N], isotopes: &[usize]) -> Vec<[u8;N]
 
     // Get the objects on the current floor (skip the elevator).
     let objects = state.iter().enumerate().skip(1)
-        .filter_map(|(i, &n)| if n == elevator { Some(i) } else { None } )
+        .filter_map(|(i, &n)| (n == elevator).then(|| i))
         .collect::<Vec<_>>();
 
     // Get all possible states of moving one or two objects
@@ -118,7 +118,7 @@ fn invalid<const N: usize>(state: &[u8;N], isotopes: &[usize]) -> Option<[u8;N]>
         .filter(|&i| state[*i] != state[i + 1])
         .any(|&i| isotopes.iter().any(|n| state[i] == state[n + 1]));
 
-    if found { None } else { Some(*state) }
+    (!found).then(|| *state)
 }
 
 #[allow(dead_code)]
