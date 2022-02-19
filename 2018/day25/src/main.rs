@@ -14,7 +14,7 @@ type Point = Vec<i32>;
 fn load(input: &str) -> Vec<Point> {
     input.lines()
         .map(|l| 
-            l.split(",")
+            l.split(',')
                 .map(|s| s.parse::<i32>().unwrap())
                 .collect()
         )
@@ -27,7 +27,7 @@ fn part_one(pts: &[Point]) -> i32 {
     let mut pts = pts.to_vec();
 
     let mut count = 0;
-    while pts.len() > 0 {
+    while !pts.is_empty() {
         let mut q = VecDeque::from([pts.remove(0)]);
         while let Some(a) = q.pop_front() {
             let v = pts.iter()

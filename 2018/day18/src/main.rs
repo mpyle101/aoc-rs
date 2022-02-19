@@ -30,7 +30,7 @@ fn part_one(acres: &Matrix<char>) -> i32 {
 fn part_two(acres: &Matrix<char>) -> i32 {
     use std::collections::HashMap;
 
-    let mut m = update(&acres);
+    let mut m = update(acres);
     let mut seen = HashMap::from([(m.clone(), 1)]);
 
     // Look for a cycle.

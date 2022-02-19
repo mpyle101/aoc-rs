@@ -20,7 +20,7 @@ fn main() {
 }
 
 fn part_one(starting: &[Cart], track: &Track) -> (u32, u32) {
-    let mut carts: Vec<_> = starting.iter().cloned().collect();
+    let mut carts: Vec<_> = starting.to_vec();
     loop {
         let (mut updated, collision) = update_collision(&carts);
         if let Some((x, y)) = collision {
@@ -32,7 +32,7 @@ fn part_one(starting: &[Cart], track: &Track) -> (u32, u32) {
 }
 
 fn part_two(starting: &[Cart], track: &Track) -> (u32, u32) {
-    let mut carts: Vec<_> = starting.iter().cloned().collect();
+    let mut carts: Vec<_> = starting.to_vec();
     loop {
         let updated = update_crashed(&carts);
         if updated.len() == 1 {
@@ -57,7 +57,7 @@ fn update_collision(carts: &[Cart]) -> (Vec<Cart>, Option<(u32, u32)>) {
         }
     }
 
-    (updated.iter().map(|c| *c).collect(), None)
+    (updated.iter().copied().collect(), None)
 }
 
 fn update_crashed(carts: &[Cart]) -> Vec<Cart> {
@@ -76,7 +76,7 @@ fn update_crashed(carts: &[Cart]) -> Vec<Cart> {
         }
     }
 
-    convoy.iter().filter(|c| !c.crashed).map(|c| *c).collect()
+    convoy.iter().filter(|c| !c.crashed).copied().collect()
 }
 
 fn update_carts(carts: &[Cart], track: &Track) -> Vec<Cart> {

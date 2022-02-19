@@ -58,7 +58,7 @@ fn load(input: &str) -> Vec<Claim> {
         .map(|s| s.split(' ').collect::<Vec<_>>())
         .map(|v| {
             let id = to_usize(&v[0][1..]);
-            let lt: Vec<_> = v[2].split(',').map(decolon).map(to_usize).collect();
+            let lt: Vec<_> = v[2].split(',').map(decolonize).map(to_usize).collect();
             let wh: Vec<_> = v[3].split('x').map(to_usize).collect();
 
             let br = [lt[1] + wh[1], lt[0] + wh[0]];
@@ -71,8 +71,8 @@ fn to_usize(n: &str) -> usize {
     usize::from_str(n).unwrap()
 }
 
-fn decolon(s: &str) -> &str {
-    if s.ends_with(':') { &s[..s.len()-1] } else { s }
+fn decolonize(s: &str) -> &str {
+    if let Some(stripped) = s.strip_suffix(':') { stripped } else { s }
 }
 
 struct Claim {

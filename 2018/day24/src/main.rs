@@ -40,10 +40,8 @@ fn part_two(immunologers: &[Group], infectionists: &[Group]) -> i32 {
             })
             .collect::<Vec<_>>();
 
-        if let Some((team, groups)) = battle(&boosted, infectionists) {
-            if let Team::ImmuneSys = team {
-                return groups.iter().map(|g| g.units).sum()
-            }
+        if let Some((Team::ImmuneSys, groups)) = battle(&boosted, infectionists) {
+            return groups.iter().map(|g| g.units).sum()
         }
 
         boost += 1;
@@ -56,7 +54,7 @@ fn battle(team1: &[Group], team2: &[Group]) -> Option<(Team, Groups)> {
     let mut army2 = team2.iter()
         .enumerate().map(|(i, &g)| (i+200, g)).collect::<HashMap<_, _>>();
 
-    while army1.len() > 0 && army2.len() > 0 {
+    while !army1.is_empty() && !army2.is_empty() {
         let t1 = select_targets(&army1, &army2);
         let t2 = select_targets(&army2, &army1);
 
@@ -73,7 +71,7 @@ fn battle(team1: &[Group], team2: &[Group]) -> Option<(Team, Groups)> {
         }
     }
 
-    let winner = if army1.len() > 0 { army1 } else { army2 };
+    let winner = if !army1.is_empty() { army1 } else { army2 };
     let mut it = winner.values().take(1).map(|g| g.team);
     let team = it.next().unwrap();
 
@@ -89,9 +87,7 @@ fn attack(target: &Target, immies: &mut Army, bugs: &mut Army) -> i32 {
 
     let grp = allies.get(&target.team_key);
     let foe = enemy.get_mut(&target.enemy_key);
-    let killed = if grp.is_some() && foe.is_some() {
-        let grp = grp.unwrap();
-        let foe = foe.unwrap();
+    if let (Some(grp), Some(foe)) = (grp, foe) {
         if let Some(damage) = calc_damage(grp, foe) {
             let killed = (damage / foe.hp).min(foe.units);
             foe.units -= killed;
@@ -106,17 +102,15 @@ fn attack(target: &Target, immies: &mut Army, bugs: &mut Army) -> i32 {
         }
     } else {
         0
-    };
-
-    killed
+    }
 }
 
 fn select_targets(allies: &Army, enemy: &Army) -> Vec<Target> {
-    let mut targets = order_units(&enemy);
-    order_units(&allies).iter()
+    let mut targets = order_units(enemy);
+    order_units(allies).iter()
         .filter_map(|k| {
             let v = allies.get(k).unwrap();
-            pick_target(v, &targets, &enemy).map(|target| {
+            pick_target(v, &targets, enemy).map(|target| {
                 let pos = targets.iter().position(|v| *v == target).unwrap();
                 targets.remove(pos);
 
@@ -135,18 +129,15 @@ fn pick_target(group: &Group, targets: &[usize], army: &Army) -> Option<usize> {
     let mut damage = targets.iter()
         .filter_map(|k| {
             let enemy = army.get(k).unwrap();
-            calc_damage(group, &enemy).map(|damage|
-                (damage, enemy.power(), enemy.initiative, *k)
-            )
+            calc_damage(group, enemy)
+                .map(|damage|
+                    (damage, enemy.power(), enemy.initiative, *k)
+                )
         })
         .collect::<Vec<_>>();
 
-    damage.sort_by(|a, b| b.cmp(&a));
-    if damage.len() > 0 {
-        Some(damage[0].3)
-    } else {
-        None
-    }
+    damage.sort_by(|a, b| b.cmp(a));
+    (!damage.is_empty()).then(||damage[0].3)
 }
 
 fn calc_damage(a: &Group, b: &Group) -> Option<i32> {

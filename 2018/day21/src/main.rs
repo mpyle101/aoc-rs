@@ -21,7 +21,7 @@ fn part_one(program: &[Opcode]) -> i32 {
     // for ip == 28 then match the first value in
     // reg 3 => 3909249.
     let mut reg: [Reg;6] = [0;6];
-    reg[0] = 3909249 as Reg;
+    reg[0] = 3909249;
 
     let ipr = program.remove(0).eval();
     let mut ip = 0;
@@ -70,7 +70,7 @@ fn load(input: &str) -> Program {
     use Opcode::*;
 
     input.lines().map(|s| {
-        let mut it = s.split(" ");
+        let mut it = s.split(' ');
         let opc = it.next().unwrap();
         let a = read_n(&mut it);
         let b = read_n(&mut it);
@@ -100,7 +100,7 @@ fn load(input: &str) -> Program {
     .collect::<Vec<_>>()
 }
 
-fn read_n(it: &mut std::str::Split<&str>) -> Reg {
+fn read_n(it: &mut std::str::Split<char>) -> Reg {
     it.next().map_or(0, |v| v.parse::<u32>().map_or(0, |n| n as u32)) as Reg
 }
 

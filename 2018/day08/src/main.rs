@@ -48,7 +48,7 @@ fn add_node(arena: &mut Arena<Meta>, iter: &mut impl Iterator<Item = u32>) -> No
 
 fn calc_node(nid: &NodeId, arena: &Arena<Meta>) -> u32 {
     let children: Vec<_> = nid.children(arena).collect();
-    if children.len() == 0 {
+    if children.is_empty() {
         arena.get(*nid).unwrap().get().sum()
     } else {
         let node = arena.get(*nid).unwrap();

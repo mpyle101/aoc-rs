@@ -6,12 +6,12 @@ fn main() {
     let t1 = Instant::now();
     let value = part_one(ipr, &program);
     let t2 = Instant::now();
-    println!("Part 1: {}  ({:?})", value, t2 - t1);
+    println!("Part 1: {value}  ({:?})", t2 - t1);
 
     let t1 = Instant::now();
     let value = part_two();
     let t2 = Instant::now();
-    println!("Part 2: {}  ({:?})", value, t2 - t1);
+    println!("Part 2: {value}  ({:?})", t2 - t1);
 }
 
 type Registers = [i32;6];
@@ -22,35 +22,39 @@ fn load(input: &str) -> (usize, Program) {
 
     let mut it = input.lines();
     let line = it.next().unwrap();
-    let mut iter = line.split(" ");
+    let mut iter = line.split(' ');
     iter.next();
     let ipr = iter.next().unwrap().parse::<usize>().unwrap();
 
     let program = it.map(|s| {
-        let mut iter = s.split(" ");
-        let opc = iter.next().unwrap();
-        let a = iter.next().unwrap().parse::<i32>().unwrap();
-        let b = iter.next().unwrap().parse::<i32>().unwrap();
-        let c = iter.next().unwrap().parse::<i32>().unwrap();
+        let mut iter = s.split(' ');
+        let opc  = iter.next();
+        let opta = iter.next().and_then(|s| s.parse::<i32>().ok());
+        let optb = iter.next().and_then(|s| s.parse::<i32>().ok());
+        let optc = iter.next().and_then(|s| s.parse::<i32>().ok());
 
-        match opc {
-            "setr" => setr(a, b, c),
-            "seti" => seti(a, b, c),
-            "addr" => addr(a, b, c),
-            "addi" => addi(a, b, c),
-            "mulr" => mulr(a, b, c),
-            "muli" => muli(a, b, c),
-            "banr" => banr(a, b, c),
-            "bani" => bani(a, b, c),
-            "boor" => borr(a, b, c),
-            "bori" => bori(a, b, c),
-            "gtir" => gtir(a, b, c),
-            "gtri" => gtri(a, b, c),
-            "gtrr" => gtrr(a, b, c),
-            "eqir" => eqir(a, b, c),
-            "eqri" => eqri(a, b, c),
-            "eqrr" => eqrr(a, b, c),
-            _ => panic!("Unknown opcode: {}", opc)
+        if let (Some(a), Some(b), Some(c)) = (opta, optb, optc) {
+            match opc {
+                Some("setr") => setr(a, b, c),
+                Some("seti") => seti(a, b, c),
+                Some("addr") => addr(a, b, c),
+                Some("addi") => addi(a, b, c),
+                Some("mulr") => mulr(a, b, c),
+                Some("muli") => muli(a, b, c),
+                Some("banr") => banr(a, b, c),
+                Some("bani") => bani(a, b, c),
+                Some("boor") => borr(a, b, c),
+                Some("bori") => bori(a, b, c),
+                Some("gtir") => gtir(a, b, c),
+                Some("gtri") => gtri(a, b, c),
+                Some("gtrr") => gtrr(a, b, c),
+                Some("eqir") => eqir(a, b, c),
+                Some("eqri") => eqri(a, b, c),
+                Some("eqrr") => eqrr(a, b, c),
+                _ => panic!("Unknown opcode: {opc:?}")
+            }
+        } else {
+            panic!("Invalid value: {opta:?} {optb:?} {optc:?}")
         }
     })
     .collect::<Vec<_>>();

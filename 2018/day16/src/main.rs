@@ -37,7 +37,7 @@ fn load(input: &str) -> (Samples, Program) {
     let program = sections[1].lines()
         .map(|s| {
             let mut inst = [0i32;4];
-            let it = s.split(" ");
+            let it = s.split(' ');
             fill(it, &mut inst);
             inst
         })
@@ -81,7 +81,7 @@ fn part_two(samples: &Samples, program: &Program) -> i32 {
 
     // Find the samples where only one opcode works and widdle
     // down the number of opcodes and samples as we find the singles.
-    while opcodes.len() > 0 {
+    while !opcodes.is_empty() {
         let mut used_opcodes = vec![];
         let mut used_samples = vec![];
 
@@ -111,7 +111,7 @@ fn part_two(samples: &Samples, program: &Program) -> i32 {
             }
         }
 
-        used_samples.sort();
+        used_samples.sort_unstable();
         for i in used_samples.iter().rev() { 
             samples.remove(*i);
         }
@@ -132,7 +132,7 @@ fn make_sample(v: &[&str]) -> Sample {
 
     let it = v[0][9..19].split(", ");
     fill(it, &mut reg_a);
-    let it = v[1].split(" ");
+    let it = v[1].split(' ');
     fill(it, &mut inst);
     let it = v[2][9..19].split(", ");
     fill(it, &mut reg_b);
@@ -140,11 +140,8 @@ fn make_sample(v: &[&str]) -> Sample {
     Sample { inst, reg_a, reg_b }
 }
 
-fn fill(it: std::str::Split<&str>, buf: &mut [i32;4]) {
-    it.enumerate().for_each(|(i, s)| {
-        let n = s.parse::<i32>().unwrap();
-        buf[i] = n
-    });
+fn fill<'a>(it: impl Iterator<Item=&'a str>, buf: &mut [i32;4]) {
+    it.enumerate().for_each(|(i, s)| buf[i] = s.parse().unwrap());
 }
 
 #[allow(non_camel_case_types)]

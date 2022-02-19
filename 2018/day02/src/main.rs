@@ -4,14 +4,14 @@ fn main() {
     let input = include_str!("./input.txt");
 
     let t1 = Instant::now();
-    let checksum = part_one(&input);
+    let checksum = part_one(input);
     let t2 = Instant::now();
-    println!("Part 1: {} ({:?})", checksum, t2 - t1);
+    println!("Part 1: {checksum} ({:?})", t2 - t1);
 
     let t1 = Instant::now();
-    let letters = part_two(&input);
+    let letters = part_two(input);
     let t2 = Instant::now();
-    println!("Part 2: {} ({:?})", letters, t2 - t1);
+    println!("Part 2: {letters} ({:?})", t2 - t1);
 }
 
 fn part_one(boxes: &str) -> u32 {

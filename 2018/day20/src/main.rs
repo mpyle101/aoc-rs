@@ -25,6 +25,7 @@ fn load(input: &str) -> Vec<char> {
 }
 
 fn part_one(regex: &[char]) -> usize {
+    use std::cmp::Reverse;
     use pathfinding::prelude::bfs;
 
     // Build the map.
@@ -46,8 +47,7 @@ fn part_one(regex: &[char]) -> usize {
         .collect::<Vec<_>>();
 
     // Sort to get the longest.
-    paths.sort_by(|a, b| b.len().cmp(&a.len()));
-
+    paths.sort_by_key(|v| Reverse(v.len()));
     paths[0].len() / 2
 }
 
@@ -120,11 +120,7 @@ const DELTAS: [Tile;4] = [(0, -1), (0, 1), (1, 0), (-1, 0)];
 fn neighbors((x, y): Tile, tiles: &Tiles) -> Vec<(Tile, char)> {
     DELTAS.iter().filter_map(|(dx, dy)| {
         let p = (x + dx, y + dy);
-        if let Some(c) = tiles.get(&p) {
-            Some((p, *c))
-        } else {
-            None
-        }
+        tiles.get(&p).map(|c| (p, *c))
     })
     .collect()
 }
@@ -143,11 +139,8 @@ fn print(tiles: &Tiles) {
 
     for y in min_y..=max_y {
         for x in min_x..=max_x {
-            if let Some(c) = tiles.get(&(x, y)) {
-                print!("{}", c)
-            } else {
-                print!("#")
-            }
+            let c = tiles.get(&(x, y)).map_or('#', |c| *c);
+            print!("{c}");
         }
         println!()
     }
@@ -165,7 +158,7 @@ mod tests {
         let doors = part_one(&regex);
         assert_eq!(doors, 4018);
 
-        let rooms = part_one(&regex);
+        let rooms = part_two(&regex);
         assert_eq!(rooms, 8581);
     }
 }

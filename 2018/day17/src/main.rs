@@ -25,14 +25,14 @@ type Stack = Vec<(i32, i32)>;
 fn load(input: &str) -> Clay {
     let clay = input.lines().map(|l| {
         let v = l.split(", ")
-            .map(|s| s.split("=").collect::<Vec<_>>())
+            .map(|s| s.split('=').collect::<Vec<_>>())
             .collect::<Vec<_>>();
 
         let r  = v[1][1].split("..").collect::<Vec<_>>();
         let r1 = r[0].parse::<i32>().unwrap();
         let r2 = r[1].parse::<i32>().unwrap();
 
-        let axis = v[0][0].chars().nth(0).unwrap();
+        let axis = v[0][0].chars().next().unwrap();
         let av   = v[0][1].parse::<i32>().unwrap();
 
         if axis == 'x' {
