@@ -66,7 +66,7 @@ impl Cuboid {
             Cuboid::new(b.x1, b.x2, b.y1, b.y2, b.z2, a.z2),
         ]
         .iter()
-        .filter_map(|c| if c.is_valid() { Some(*c) } else { None })
+        .filter_map(|c| c.is_valid().then(|| *c))
         .collect()
     }
 }

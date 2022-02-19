@@ -10,7 +10,7 @@ fn main() {
     let t1 = Instant::now();
     let steps = part_one(&cucumbers);
     let t2 = Instant::now();
-    println!("Part 1: {} {:?}", steps, t2 - t1);
+    println!("Part 1: {steps} {:?}", t2 - t1);
 }
 
 fn load(input: &str) -> Matrix<char> {
@@ -25,15 +25,8 @@ fn part_one(cucumbers: &Matrix<char>) -> i32 {
 
     while moved { 
         steps += 1;
-        moved = false;
-        if let Some(m1) = step_east(&m) {
-            m = m1;
-            moved = true;
-        }
-        if let Some(m1) = step_south(&m) {
-            m = m1;
-            moved = true
-        }
+        moved = step_east(&m).map_or(false, |m1| { m = m1; true });
+        moved = step_south(&m).map_or(moved, |m1| { m = m1; true });
     }
     
     steps
@@ -44,17 +37,17 @@ fn step_east(mat: &Matrix<char>) -> Option<Matrix<char>> {
 
     let mut moved = false;
     mat.indices()
-        .filter(|&rc| *mat.get(rc).unwrap() == '>')
+        .filter(|&rc| mat.get(rc).map_or(false, |v| *v == '>'))
         .for_each(|rc| {
             let rc1 = (rc.0, (rc.1 + 1) % m.columns);
-            if *mat.get(rc1).unwrap() == '.' { 
+            if mat.get(rc1).map_or(false, |v| *v == '.') { 
                 moved = true;
-                *m.get_mut(rc).unwrap()  = '.';
-                *m.get_mut(rc1).unwrap() = '>';
+                m.get_mut(rc).map(|v| *v = '.');
+                m.get_mut(rc1).map(|v| *v = '>');
             }
         });
 
-    if moved { Some(m) } else { None }
+    moved.then(|| m)
 }
 
 fn step_south(mat: &Matrix<char>) -> Option<Matrix<char>> {
@@ -62,17 +55,17 @@ fn step_south(mat: &Matrix<char>) -> Option<Matrix<char>> {
 
     let mut moved = false;
     mat.indices()
-        .filter(|&rc| *mat.get(rc).unwrap() == 'v')
+        .filter(|&rc| mat.get(rc).map_or(false, |v| *v == 'v'))
         .for_each(|rc| {
             let rc1 = ((rc.0 + 1) % m.rows, rc.1);
-            if *mat.get(rc1).unwrap() == '.' { 
+            if mat.get(rc1).map_or(false, |v| *v == '.') { 
                 moved = true;
-                *m.get_mut(rc).unwrap()  = '.';
-                *m.get_mut(rc1).unwrap() = 'v';
+                m.get_mut(rc).map(|v| *v = '.');
+                m.get_mut(rc1).map(|v| *v = 'v');
             }
         });
 
-    if moved { Some(m) } else { None }
+    moved.then(|| m)
 }
 
 #[allow(dead_code)]
