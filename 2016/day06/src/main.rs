@@ -28,7 +28,7 @@ fn part_one(input: &str) -> String {
         v.iter().enumerate()
             .max_by_key(|(_, n)| *n).map(|(i, _)| i).unwrap()
     )
-    .map(|n| (n as u8 + 'a' as u8) as char)
+    .map(|n| (n as u8 + b'a') as char)
     .collect()
 }
 
@@ -45,7 +45,7 @@ fn part_two(input: &str) -> String {
         v.iter().enumerate()
             .min_by_key(|(_, n)| *n).map(|(i, _)| i).unwrap()
     )
-    .map(|n| (n as u8 + 'a' as u8) as char)
+    .map(|n| (n as u8 + b'a') as char)
     .collect()
 }
 

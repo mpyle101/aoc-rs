@@ -31,6 +31,7 @@ enum Action {
 
 impl Action {
     fn encode(&self, arr: &mut [char]) {
+        use std::cmp::Ordering;
         use Action::*;
 
         match self {
@@ -52,16 +53,10 @@ impl Action {
             MovePositions(a, b) => {
                 let c = arr[*a];
                 let mut i = *a;
-                if a > b {
-                    while i > *b {
-                        arr[i] = arr[i-1];
-                        i -= 1;
-                    }
-                } else if b > a {
-                    while i < *b {
-                        arr[i] = arr[i+1];
-                        i += 1;
-                    }
+                match a.cmp(b) {
+                    Ordering::Greater => while i > *b { arr[i] = arr[i-1]; i -= 1; },
+                    Ordering::Less    => while i < *b { arr[i] = arr[i+1]; i += 1; },
+                    Ordering::Equal   => {}
                 }
                 arr[*b] = c
             },
@@ -136,7 +131,7 @@ fn part_two(actions: &[Action], password: &str) -> String {
 }
 
 fn letter(s: &str) -> char {
-    s.chars().nth(0).unwrap()
+    s.chars().next().unwrap()
 }
 
 fn number<T>(s: &str) -> T 

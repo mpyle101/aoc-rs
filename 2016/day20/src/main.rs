@@ -27,13 +27,13 @@ fn load(input: &str) -> Vec<(u32, u32)> {
 
 fn part_one(excluded: &[(u32, u32)]) -> u32 {
     let mut v = excluded.to_vec();
-    v.sort();
+    v.sort_unstable();
 
     let mut n = v[0].1 + 1;
     for (start, end) in v.iter().skip(1) {
         if *start > n {
             return n
-        } if *end >= n {
+        } else if *end >= n {
             n = end + 1
         }
     }
@@ -43,7 +43,7 @@ fn part_one(excluded: &[(u32, u32)]) -> u32 {
 
 fn part_two(excluded: &[(u32, u32)]) -> u32 {
     let mut v = excluded.to_vec();
-    v.sort();
+    v.sort_unstable();
 
     let mut n = v[0].1 + 1;
     let mut count = 0;
@@ -51,7 +51,7 @@ fn part_two(excluded: &[(u32, u32)]) -> u32 {
         if *start > n {
             count += *start - n;
             n = if *end < u32::MAX { end + 1 } else { u32::MAX }
-        } if *end >= n {
+        } else if *end >= n {
             n = if *end < u32::MAX { end + 1 } else { u32::MAX }
         }
     }

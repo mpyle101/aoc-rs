@@ -22,7 +22,7 @@ fn calc_checksum(state: &str, len: usize) -> String {
         data.extend(b);
     }
 
-    let mut cs = data[0..len].iter().cloned().collect::<Vec<_>>();
+    let mut cs = data[0..len].to_vec();
     while cs.len() % 2 == 0 {
         cs = checksum(&cs);
     }

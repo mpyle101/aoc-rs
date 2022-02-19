@@ -40,7 +40,7 @@ fn part_one(discs: &[(i64, i64)]) -> i64 {
 }
 
 fn part_two(discs: &[(i64, i64)]) -> i64 {
-    let mut discs2 = discs.iter().cloned().collect::<Vec<_>>();
+    let mut discs2 = discs.to_vec();
     discs2.push((11, 0));
 
     let mut time = discs2[0].0 - discs2[0].1 - 1;

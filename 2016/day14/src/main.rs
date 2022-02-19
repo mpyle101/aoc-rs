@@ -43,7 +43,7 @@ fn get_keys(salt: &str, n: i32) -> usize {
 
         index += 1;
     }
-    keys.sort();
+    keys.sort_unstable();
 
     keys[63]
 }

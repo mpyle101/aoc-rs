@@ -15,14 +15,12 @@ fn main() {
     let t1 = Instant::now();
     let path = part_one("veumntbg");
     let t2 = Instant::now();
-    println!("Part 1: {} ({:?})", path, t2 - t1);
+    println!("Part 1: {path} ({:?})", t2 - t1);
 
     let t1 = Instant::now();
     let steps = part_two("veumntbg");
     let t2 = Instant::now();
-    println!("Part 2: {} ({:?})", steps, t2 - t1);
-
-    // 536
+    println!("Part 2: {steps} ({:?})", t2 - t1);
 }
 
 type State = ((i32, i32), String);
@@ -31,13 +29,9 @@ fn part_one(passcode: &str) -> String {
     use pathfinding::prelude::bfs;
     
     let goal = (3, 3);
-    let steps = bfs(
-        &((0, 0), passcode.to_string()),
-        |st| doors(st),
-        |st| st.0 == goal
-    );
-
+    let steps = bfs(&((0, 0), passcode.to_string()), doors, |st| st.0 == goal);
     let s = steps.unwrap().last().unwrap().1.clone();
+    
     s[passcode.len()..].to_string()
 }
 
@@ -53,7 +47,7 @@ fn part_two(passcode: &str) -> usize {
     );
 
     let mut paths = steps.iter().map(|v| v.0.last().unwrap().1.clone()).collect::<Vec<_>>();
-    paths.sort_by(|a, b| a.len().cmp(&b.len()));
+    paths.sort_by_key(|a| a.len());
     let longest = paths.last().unwrap().len() - passcode.len();
 
     longest
@@ -65,8 +59,8 @@ fn doors(((x, y), passcode): &State) -> Vec<State> {
 
     DELTA.iter().enumerate()
         .filter_map(|(i, ((dx, dy), c))| {
-            let d = doors[i] - 'a' as u8;
-            if d > 0 && d < 'g' as u8 {
+            let d = doors[i] - b'a';
+            if d > 0 && d < b'g' {
                 let pt = (x + dx, y + dy);
                 if pt.0 >= 0 && pt.0 < 4 && pt.1 >= 0 && pt.1 < 4 {
                     Some((pt, format!("{}{}", passcode, c)))
@@ -89,5 +83,8 @@ mod tests {
     fn it_works() {
         let path = part_one("veumntbg");
         assert_eq!(path, "DDRRULRDRD");
+        
+        let steps = part_two("veumntbg");
+        assert_eq!(steps, 536);
     }
 }

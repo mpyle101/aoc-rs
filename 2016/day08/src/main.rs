@@ -56,7 +56,7 @@ fn load(input: &str) -> Vec<Action> {
 
 fn part_one(actions: &[Action]) -> [usize;300] {
     actions.iter().fold([0usize;300], |g, action| {
-        let mut lcd = g.clone();
+        let mut lcd = g;
         match action {
             Action::Row(y, n) => {
                 (0..50).for_each(|x| lcd[y*50+x] = 0);

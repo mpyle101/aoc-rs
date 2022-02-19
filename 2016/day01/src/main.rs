@@ -24,7 +24,7 @@ enum Action {
 fn load(input: &str) -> Vec<Action> {
     input.split(", ").map(|v| {
         let blocks = v[1..].parse::<i32>().unwrap();
-        match v.chars().nth(0) {
+        match v.chars().next() {
             Some('L') => Action::Left(blocks),
             Some('R') => Action::Right(blocks),
             _ => panic!("Unknown action: {:?}", v)

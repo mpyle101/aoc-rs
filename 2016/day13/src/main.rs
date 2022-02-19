@@ -27,11 +27,10 @@ fn part_two(input: i32) -> usize {
     use pathfinding::prelude::bfs_reach;
 
     let mut steps = HashMap::from([((1, 1), 0)]);
-    let nodes = bfs_reach((1, 1), |p| reachable(p, &mut steps, input))
-        .collect::<Vec<_>>();
+    let nodes = bfs_reach((1, 1), |p| reachable(p, &mut steps, input));
 
     // The vector contains the initial state.
-    nodes.len()
+    nodes.count()
 }
 
 fn neighbors((x, y): &(i32, i32), input: i32) -> Vec<(i32, i32)> {

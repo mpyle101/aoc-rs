@@ -35,7 +35,7 @@ impl Bot {
             self.chips[0] = n;
         } else {
             self.chips[1] = n;
-            self.chips.sort();
+            self.chips.sort_unstable();
         };
     }
 }
@@ -46,13 +46,13 @@ fn load(input: &str) -> HashMap<i32, Bot> {
         if v[0] == "value" {
             let n = v[1].parse::<i32>().unwrap();
             let b = v[5].parse::<i32>().unwrap();
-            let bot = bots.entry(b).or_insert(Bot::new(b));
+            let bot = bots.entry(b).or_insert_with(|| Bot::new(b));
             bot.add_chip(n);
         } else {
             let b = v[1].parse::<i32>().unwrap();
             let l = v[6].parse::<i32>().unwrap();
             let h = v[11].parse::<i32>().unwrap();
-            let bot = bots.entry(b).or_insert(Bot::new(b));
+            let bot = bots.entry(b).or_insert_with(|| Bot::new(b));
             bot.low  = if  v[5] == "output" { -l } else { l };
             bot.high = if v[10] == "output" { -h } else { h };
         }

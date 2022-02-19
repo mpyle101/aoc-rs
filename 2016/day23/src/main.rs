@@ -12,7 +12,7 @@ impl Value {
         match self {
             Value::Number(_)   => panic!("Can only 'inc' register"),
             Value::Register(c) => {
-                let r = (*c as u8 - 'a' as u8) as usize;
+                let r = (*c as u8 - b'a') as usize;
                 reg[r] += 1
             }
         }
@@ -22,7 +22,7 @@ impl Value {
         match self {
             Value::Number(_)   => panic!("Can only 'dec' register"),
             Value::Register(c) => {
-                let r = (*c as u8 - 'a' as u8) as usize;
+                let r = (*c as u8 - b'a') as usize;
                 reg[r] -= 1
             }
         }
@@ -32,7 +32,7 @@ impl Value {
         match self {
             Value::Number(_)   => panic!("Can only 'set' register"),
             Value::Register(c) => {
-                let r = (*c as u8 - 'a' as u8) as usize;
+                let r = (*c as u8 - b'a') as usize;
                 reg[r] = n
             }
         }
@@ -42,7 +42,7 @@ impl Value {
         match self {
             Value::Number(n)   => *n,
             Value::Register(c) => {
-                let r = (*c as u8 - 'a' as u8) as usize;
+                let r = (*c as u8 - b'a') as usize;
                 reg[r]
             }
         }
@@ -159,7 +159,7 @@ fn get_value(s: &str) -> Value {
     if let Ok(n) = s.parse::<i32>() {
         Value::Number(n)
     } else {
-        Value::Register(s.chars().nth(0).unwrap())
+        Value::Register(s.chars().next().unwrap())
     }
 }
 

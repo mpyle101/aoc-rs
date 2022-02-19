@@ -41,7 +41,7 @@ fn load(input: &str) -> State0 {
         .flatten()
         .collect::<HashSet<_>>();
 
-    wires.sort();
+    wires.sort_unstable();
 
     (wires, open)
 }
@@ -118,7 +118,7 @@ fn neighbors(p: &Point, open: &Points) -> Vec<Point> {
     let pts = delta.iter()
         .filter_map(|d| {
             let pt = (p.0 + d.0, p.1 + d.1);
-            open.get(&pt).map(|v| *v)
+            open.get(&pt).copied()
         })
         .collect();
 

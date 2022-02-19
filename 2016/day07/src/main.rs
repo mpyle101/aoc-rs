@@ -7,12 +7,12 @@ fn main() {
     let t1 = Instant::now();
     let tls = part_one(&input);
     let t2 = Instant::now();
-    println!("Part 1: {} ({:?})", tls, t2 - t1);
+    println!("Part 1: {tls} ({:?})", t2 - t1);
 
     let t1 = Instant::now();
     let ssl = part_two(&input);
     let t2 = Instant::now();
-    println!("Part 2: {} ({:?})", ssl, t2 - t1);
+    println!("Part 2: {ssl} ({:?})", t2 - t1);
 }
 
 fn part_one(input: &str) -> i32 {
@@ -21,9 +21,9 @@ fn part_one(input: &str) -> i32 {
         let mut in_hyper = false;
         let mut tls = false;
         for i in 0..bytes.len() - 4 {
-            if bytes[i] == '[' as u8 {
+            if bytes[i] == b'[' {
                 in_hyper = true
-            } else if bytes[i] == ']' as u8 {
+            } else if bytes[i] == b']' {
                 in_hyper = false
             }
 
@@ -51,9 +51,9 @@ fn part_two(input: &str) -> i32 {
         let bytes = s.as_bytes();
         let mut in_hyper = false;
         for i in 0..bytes.len() - 2 {
-            if bytes[i] == '[' as u8 {
+            if bytes[i] == b'[' {
                 in_hyper = true
-            } else if bytes[i] == ']' as u8 {
+            } else if bytes[i] == b']' {
                 in_hyper = false
             }
 

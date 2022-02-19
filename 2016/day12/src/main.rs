@@ -57,23 +57,23 @@ fn load(input: &str) -> Vec<Cmd> {
         let reg = it.next().unwrap();
         match cmd {
             "cpy" => {
-                let y = it.next().unwrap().chars().nth(0).unwrap();
-                let r = (y as u8 - 'a' as u8) as usize;
+                let y = it.next().unwrap().chars().next().unwrap();
+                let r = (y as u8 - b'a') as usize;
                 if let Ok(x) = reg.parse::<i32>() {
                     cpy(x, r, true)
                 } else {
-                    let x = reg.chars().nth(0).unwrap();
+                    let x = reg.chars().next().unwrap();
                     cpy(x as i32 - 'a' as i32, r, false)
                 }
             },
             "inc" => {
-                let x = reg.chars().nth(0).unwrap();
-                let r = (x as u8 - 'a' as u8) as usize;
+                let x = reg.chars().next().unwrap();
+                let r = (x as u8 - b'a') as usize;
                 inc(r)
             },
             "dec" => {
-                let x = reg.chars().nth(0).unwrap();
-                let r = (x as u8 - 'a' as u8) as usize;
+                let x = reg.chars().next().unwrap();
+                let r = (x as u8 - b'a') as usize;
                 dec(r)
             },
             "jnz" => {
@@ -81,7 +81,7 @@ fn load(input: &str) -> Vec<Cmd> {
                 if let Ok(x) = reg.parse::<i32>() {
                     jnz(x, y, true)
                 } else {
-                    let x = reg.chars().nth(0).unwrap();
+                    let x = reg.chars().next().unwrap();
                     jnz(x as i32 - 'a' as i32, y, false)
                 }
             }
