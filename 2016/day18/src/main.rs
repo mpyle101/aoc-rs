@@ -28,7 +28,7 @@ fn safe_tiles(input: &str, rows: usize) -> usize {
     let cols = input.len();
     let row0 = input.chars()
         .enumerate()
-        .filter_map(|(i, c)| if c == '^' { Some(i as i32) } else { None })
+        .filter_map(|(i, c)| (c == '^').then(||i as i32))
         .collect::<HashSet<_>>();
 
     let n = row0.len();
@@ -39,7 +39,7 @@ fn safe_tiles(input: &str, rows: usize) -> usize {
                 row.get(&x).is_some() as i32,
                 row.get(&(x + 1)).is_some() as i32,
             ];
-            if TRAPPED.contains(&t) { Some(x) } else { None }
+            TRAPPED.contains(&t).then(||x)
         })
         .collect::<HashSet<_>>();
 
