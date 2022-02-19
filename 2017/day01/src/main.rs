@@ -16,7 +16,7 @@ fn main() {
 }
 
 fn load(input: &str) -> Vec<u8> {
-    input.chars().map(|c| c as u8 - '0' as u8).collect()
+    input.chars().map(|c| c as u8 - b'0').collect()
 }
 
 fn part_one(digits: &[u8]) -> i32 {

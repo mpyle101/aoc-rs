@@ -36,7 +36,7 @@ fn load(input: &str) -> Rules {
 
         vec![
             (m,  n.clone()), (r1, n.clone()), (r2, n.clone()), (r3, n.clone()),
-            (lr, n.clone()), (r4, n.clone()), (r5, n.clone()), (r6, n.clone()),
+            (lr, n.clone()), (r4, n.clone()), (r5, n.clone()), (r6, n),
         ]
     })
     .flatten()

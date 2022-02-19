@@ -58,7 +58,7 @@ fn part_two(name: &str, tower: &Tower) -> i32 {
         .map(|n| tower.get(n).unwrap())
         .map(|p| p.total.get())
         .collect::<Vec<_>>();
-    weights.sort();
+    weights.sort_unstable();
     
     // A little cheating, we know the bottom only has 3 children.
     let delta = if weights[0] == weights[1] {
@@ -90,7 +90,7 @@ fn find_unbalanced<'a>(name: &'a str, tower: &'a Tower) -> &'a Program<'a> {
         .map(|n| tower.get(n).unwrap())
         .collect::<Vec<_>>();
 
-    if children.len() == 0 {
+    if children.is_empty() {
         // If I don't have any children, I'm the odd one.
         program
     } else {

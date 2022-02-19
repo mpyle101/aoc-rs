@@ -42,7 +42,7 @@ fn load(input: &str) -> Vec<Move> {
     use Move::*;
 
     input.split(',').map(|s|
-        match s.chars().nth(0).unwrap() {
+        match s.chars().next().unwrap() {
             's' => { 
                 let n = s[1..].parse::<usize>().unwrap();
                 Spin(n % 16)

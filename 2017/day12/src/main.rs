@@ -40,7 +40,7 @@ fn part_two(pipes: &HashMap<i32, Vec<i32>>) -> usize {
 
     let mut groups = 0;
 
-    while keys.len() > 0 {
+    while !keys.is_empty() {
         let n = *keys[0];
         get_group(n, pipes).iter().for_each(|v| {
             let i = keys.iter().position(|x| *x == v).unwrap();

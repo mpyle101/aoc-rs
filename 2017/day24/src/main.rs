@@ -89,7 +89,9 @@ fn part_two(ports: &[[i32;2]]) -> i32 {
                 }
             )
             .collect::<Vec<_>>();
-        if v.len() > 0 {
+        if v.is_empty() {
+            bridges.push(st)
+        } else {
             v.iter().for_each(|i| {
                 let mut components = st.components.clone();
                 let ports = components.remove(*i);
@@ -98,8 +100,6 @@ fn part_two(ports: &[[i32;2]]) -> i32 {
                 let state = State { port, score, components, length: st.length + 1 };
                 q.push_back(state)
             })
-        } else {
-            bridges.push(st)
         }
     }
     

@@ -102,18 +102,15 @@ fn part_two(path: &Segments) -> i32 {
 
         if let Some(seg) = path.get(&(x, y)) {
             steps += 1;
-            match seg {
-                Corner => {
-                    if dir > 1 {
-                        // turn north / south
-                        let south = (x + dxdy[1].0, y + dxdy[1].1);
-                        dir = path.contains_key(&south) as usize;
-                    } else {
-                        let east = (x + dxdy[3].0, y + dxdy[3].1);
-                        dir = 2 + path.contains_key(&east) as usize;
-                    }
-                },
-                _ => { /* ignore lines & letters */ },
+            if let Corner = seg {
+                if dir > 1 {
+                    // turn north / south
+                    let south = (x + dxdy[1].0, y + dxdy[1].1);
+                    dir = path.contains_key(&south) as usize;
+                } else {
+                    let east = (x + dxdy[3].0, y + dxdy[3].1);
+                    dir = 2 + path.contains_key(&east) as usize;
+                }
             }
         } else {
             break

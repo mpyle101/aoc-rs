@@ -39,10 +39,10 @@ fn step(s: &str, (x, y): (i32, i32)) -> (i32, i32) {
     // https://www.gamedev.net/forums/topic/701811-hexagonal-movement/5404943/
     match s {
         "n"  => (x + 2, y + 2),
-        "ne" => (x + 4, y + 0),
+        "ne" => (x + 4, y),
         "se" => (x + 2, y - 2),
         "s"  => (x - 2, y - 2),
-        "sw" => (x - 4, y - 0),
+        "sw" => (x - 4, y),
         "nw" => (x - 2, y + 2),
         _ => panic!("Unknown direction: {}", s)
     }

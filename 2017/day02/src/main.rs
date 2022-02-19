@@ -19,7 +19,7 @@ fn part_one(input: &str) -> i32 {
         let mut v: Vec<_> = l.split_whitespace()
             .map(|s| s.parse::<i32>().unwrap())
             .collect();
-        v.sort();
+        v.sort_unstable();
         v.last().unwrap() - v.first().unwrap()
     })
     .sum()
@@ -32,7 +32,7 @@ fn part_two(input: &str) -> i32 {
         let mut v: Vec<_> = l.split_whitespace()
             .map(|s| s.parse::<i32>().unwrap())
             .collect();
-        v.sort();
+        v.sort_unstable();
 
         // After sorting, combinations will always have the higher
         // value as the second value in the pair.

@@ -4,19 +4,19 @@ fn main() {
     let t1 = Instant::now();
     let used = part_one("ffayrhll");
     let t2 = Instant::now();
-    println!("Part 1: {} {:?}", used, t2 - t1);
+    println!("Part 1: {used} {:?}", t2 - t1);
 
     let t1 = Instant::now();
     let regions = part_two("ffayrhll");
     let t2 = Instant::now();
-    println!("Part 2: {} {:?}", regions, t2 - t1);
+    println!("Part 2: {regions} {:?}", t2 - t1);
 }
 
 fn part_one(key: &str) -> i32 {
     (0..128).fold(0, |used, row| {
         let hash = knot(&format!("{}-{}", key, row));
         let bits = hash.bytes().map(|c| {
-            let mut n = if c <= '9' as u8 { c - '0' as u8 } else { c - 'a' as u8 + 10 };
+            let mut n = if c <= b'9' { c - b'0' } else { c - b'a' + 10 };
             let mut bits = 0;
             while n > 0 { bits += n & 1; n /= 2; }
             bits as i32
@@ -34,7 +34,7 @@ fn part_two(key: &str) -> i32 {
     (0..128).for_each(|y| {
         let hash = knot(&format!("{}-{}", key, y));
         let bits = hash.bytes().map(|c| {
-                let n = if c <= '9' as u8 { c - '0' as u8 } else { c - 'a' as u8 + 10 };
+                let n = if c <= b'9' { c - b'0' } else { c - b'a' + 10 };
                 format!("{:04b}", n)
             })
             .collect::<Vec<_>>()

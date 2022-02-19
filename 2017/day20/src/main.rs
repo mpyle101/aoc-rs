@@ -89,7 +89,7 @@ fn part_one(particles: &[Particle]) -> usize {
 fn part_two(particles: &[Particle]) -> usize {
     use std::collections::HashSet;
 
-    let mut arr = particles.iter().cloned().collect::<Vec<_>>();
+    let mut arr = particles.to_vec();
 
     (0..50).for_each(|_| {
         arr.iter_mut().for_each(|p| p.update());

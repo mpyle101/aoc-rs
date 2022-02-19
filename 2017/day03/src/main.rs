@@ -43,7 +43,7 @@ fn part_two(square: i32) -> i32 {
     while value < square {
         for sq in spiral(x, y) {
             value = neighbors(sq).iter()
-                .filter_map(|pt| squares.get(&pt))
+                .filter_map(|pt| squares.get(pt))
                 .sum();
 
             if value > square { break }
