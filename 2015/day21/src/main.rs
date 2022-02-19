@@ -99,7 +99,7 @@ fn part_one(boss: &Player) -> i32 {
             let won = if let Some(result) = cache.get(&(armor, damage)) {
                 *result
             } else {
-                let result = fight(&player, &boss);
+                let result = fight(&player, boss);
                 cache.insert((armor, damage), result);
                 result
             };
@@ -132,7 +132,7 @@ fn part_two(boss: &Player) -> i32 {
             let won = if let Some(result) = cache.get(&(armor, damage)) {
                 *result
             } else {
-                let result = fight(&player, &boss);
+                let result = fight(&player, boss);
                 cache.insert((armor, damage), result);
                 result
             };

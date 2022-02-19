@@ -36,7 +36,7 @@ fn part_two(containers: &[i32]) -> i32 {
             .map(|v| v.len())
             .collect::<Vec<_>>()
     ).collect::<Vec<_>>();
-    seqs.sort();
+    seqs.sort_unstable();
 
     seqs.iter().filter(|&n| *n == seqs[0]).count() as i32
 }

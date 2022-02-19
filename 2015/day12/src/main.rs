@@ -6,14 +6,14 @@ fn main() {
     let input = include_str!("./input.txt");
 
     let t1 = Instant::now();
-    let sum = part_one(&input);
+    let sum = part_one(input);
     let t2 = Instant::now();
-    println!("Part 1: {} ({:?})", sum, t2 - t1);
+    println!("Part 1: {sum} ({:?})", t2 - t1);
 
     let t1 = Instant::now();
-    let sum = part_two(&input);
+    let sum = part_two(input);
     let t2 = Instant::now();
-    println!("Part 2: {} ({:?})", sum, t2 - t1);
+    println!("Part 2: {sum} ({:?})", t2 - t1);
 }
 
 fn part_one(s: &str) -> i32 {

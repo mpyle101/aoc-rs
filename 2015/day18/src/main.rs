@@ -30,7 +30,7 @@ fn part_one(map: &Matrix<char>) -> usize {
                 .filter_map(|p| mat.get(p).filter(|&v| *v == '#'))
                 .count();
             if cnt == 3 || (cnt == 2 && mat.get(p).map_or(false, |v| *v == '#')) {
-                m.get_mut(p).map(|v| *v = '#');
+                if let Some(v) = m.get_mut(p) { *v = '#' };
             }
         });
         m
@@ -50,7 +50,7 @@ fn part_two(map: &Matrix<char>) -> usize {
 
     // The lights in the corners are stuck on.
     let mut m0 = map.clone();
-    for p in corners.iter() { m0.get_mut(*p).map(|v| *v = '#'); }
+    for p in corners.iter() { if let Some(v) = m0.get_mut(*p) { *v = '#' } }
 
     (0..100).fold(m0, |m1, _| {
         let mut m = Matrix::new(m1.rows, m1.columns, '.');
@@ -59,12 +59,12 @@ fn part_two(map: &Matrix<char>) -> usize {
                 .filter_map(|p| m1.get(p).filter(|&v| *v == '#'))
                 .count();
             if cnt == 3 || (cnt == 2 && m1.get(p).map_or(false, |v| *v == '#')) {
-                m.get_mut(p).map(|v| *v = '#');
+                if let Some(v) = m.get_mut(p) { *v = '#' };
             }
         });
 
         // The lights in the corners are stuck on.
-        for p in corners.iter() { m.get_mut(*p).map(|v| *v = '#'); }
+        for p in corners.iter() { if let Some(v) = m.get_mut(*p) { *v = '#' } }
         m
     })
     .values()

@@ -75,7 +75,7 @@ impl Spell {
     fn cast(&self, state: &State) -> State {
         use Effect::*;
     
-        let mut st = (*state).clone();
+        let mut st = *state;
         match self {
             Spell::Drain(n) => {
                 st.mana += n;

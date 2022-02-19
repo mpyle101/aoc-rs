@@ -52,7 +52,7 @@ fn load(input: &str) -> Vec<Cmd> {
             let offset = reg.parse::<i32>().unwrap();
             jmp(offset)
         } else {
-            let reg = if reg.chars().nth(0) == Some('a') { 0 } else { 1 };
+            let reg = if reg.starts_with('a') { 0 } else { 1 };
             if cmd == "jie" || cmd == "jio" {
                 let offset = it.next().unwrap().parse::<i32>().unwrap();
                 if cmd == "jie" { jie(reg, offset) } else { jio(reg, offset) }

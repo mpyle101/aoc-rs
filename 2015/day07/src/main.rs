@@ -23,8 +23,7 @@ fn part_two(wires: &mut HashMap<&str, Wire>) -> u32 {
 
 fn process(wires: &HashMap<&str, Wire>) -> u32 {
     let mut signals = HashMap::new();
-    let mut q = Vec::new();
-    q.push("a");
+    let mut q = vec!["a"];
 
     while let Some(w) = q.pop() {
         let wire = wires.get(w).unwrap();
@@ -54,8 +53,8 @@ fn process(wires: &HashMap<&str, Wire>) -> u32 {
             Wire::Or(a, b) => {
                     let w_a = signals.get(a).cloned();
                     let w_b = signals.get(b).cloned();
-                    if w_a.is_some() && w_b.is_some() {
-                        signals.insert(w, w_a.unwrap() | w_b.unwrap());
+                    if let (Some(s1), Some(s2)) = (w_a, w_b) {
+                        signals.insert(w, s1 | s2);
                     } else {
                         q.push(w);
                         if w_a.is_none() { q.push(a); }
@@ -65,8 +64,8 @@ fn process(wires: &HashMap<&str, Wire>) -> u32 {
             Wire::And(a, b) =>{
                     let w_a = signals.get(a).cloned();
                     let w_b = signals.get(b).cloned();
-                    if w_a.is_some() && w_b.is_some() {
-                        signals.insert(w, w_a.unwrap() & w_b.unwrap());
+                    if let (Some(s1), Some(s2)) = (w_a, w_b) {
+                        signals.insert(w, s1 & s2);
                     } else {
                         q.push(w);
                         if w_a.is_none() { q.push(a); }
@@ -115,8 +114,7 @@ fn load(input: &str) -> HashMap<&str, Wire> {
             (_, "AND")    => (v[4], Wire::And(v[0], v[2])),
             (_, "LSHIFT") => (v[4], Wire::LShift(v[0], v[2].parse::<u32>().unwrap())),
             (_, "RSHIFT") => (v[4], Wire::RShift(v[0], v[2].parse::<u32>().unwrap())),
-                        _ => (v[2], v[0].parse::<u32>().map_or(
-                                Wire::SetW(v[0]), |v| Wire::Set(v))),
+                        _ => (v[2], v[0].parse::<u32>().map_or(Wire::SetW(v[0]), Wire::Set)),
         })
         .collect()
 }

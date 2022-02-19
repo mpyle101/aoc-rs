@@ -20,7 +20,7 @@ fn generate(pword: &str) -> String {
     let mut password = [0u8;8];
     pword.as_bytes().iter()
         .enumerate()
-        .for_each(|(i, b)| password[i] = *b - ('a' as u8));
+        .for_each(|(i, b)| password[i] = *b - b'a');
 
     increment(&mut password);
     while !is_valid(&password) {
@@ -28,7 +28,7 @@ fn generate(pword: &str) -> String {
     }
 
     // Rehydrate back into 'a' based characters.
-    password.iter().map(|b| (b + 'a' as u8) as char).collect::<String>()
+    password.iter().map(|b| (b + b'a') as char).collect::<String>()
 }
 
 fn increment(s: &mut [u8;8]) {

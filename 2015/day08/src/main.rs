@@ -29,15 +29,14 @@ fn part_one(strings: &str) -> usize {
 fn part_two(strings: &str) -> usize {
     strings.lines().fold(0, |acc, s| {
         let bytes = s.as_bytes();
-        let chars: Vec<_> = bytes.iter().flat_map(|&b| 
+        let chars = bytes.iter().flat_map(|&b| 
             match b as char {
                 '"'  => vec!['\\', '"'],
                 '\\' => vec!['\\', '\\'],
                   c  => vec![c]
-            })
-            .collect();
+            });
 
-        acc + chars.len() - bytes.len() + 2
+        acc + chars.count() - bytes.len() + 2
     })
 }
 
