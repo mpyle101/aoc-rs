@@ -8,12 +8,12 @@ fn main() {
     let t1 = Instant::now();
     let guard = part_one(&events);
     let t2 = Instant::now();
-    println!("Part 1: {}  ({:?})", guard, t2 - t1);
+    println!("Part 1: {guard}  ({:?})", t2 - t1);
 
     let t1 = Instant::now();
     let guard = part_two(&events);
     let t2 = Instant::now();
-    println!("Part 2: {}  ({:?})", guard, t2 - t1);
+    println!("Part 2: {guard}  ({:?})", t2 - t1);
 }
 
 fn part_one(events: &[Event]) -> u32 {
@@ -22,8 +22,7 @@ fn part_one(events: &[Event]) -> u32 {
     use Event::*;
 
     let mut gids: Vec<_> = events.iter()
-        .filter(|e| e.is_guard())
-        .map(|e| e.get_id())
+        .filter_map(|e| e.is_guard().then(|| e.get_id()))
         .collect();
     gids.sort();
     gids.dedup();
@@ -51,17 +50,18 @@ fn part_one(events: &[Event]) -> u32 {
 
     let row = heatmap.sum_axis(Axis(1)).iter()
         .enumerate()
-        .max_by(|x, y| x.1.cmp(y.1))
+        .max_by_key(|a| a.1)
         .map(|(i, _)| i)
         .unwrap();
     let col = heatmap.row(row).iter()
         .enumerate()
-        .max_by(|x, y| x.1.cmp(y.1))
+        .max_by_key(|a| a.1)
         .map(|(i, _)| i)
         .unwrap();
 
     let gid = *guards.iter()
-        .find_map(|(k, &v)| if v == row { Some(k) } else { None }).unwrap();
+        .find_map(|(k, &v)| (v == row).then(||k))
+        .unwrap();
 
     col as u32 * gid
 }
@@ -72,8 +72,7 @@ fn part_two(events: &[Event]) -> u32 {
     use Event::*;
 
     let mut gids: Vec<_> = events.iter()
-        .filter(|e| e.is_guard())
-        .map(|e| e.get_id())
+        .filter_map(|e| e.is_guard().then(|| e.get_id()))
         .collect();
     gids.sort();
     gids.dedup();
@@ -102,7 +101,8 @@ fn part_two(events: &[Event]) -> u32 {
     let ((row, col), _) = heatmap.indexed_iter()
         .fold(((0, 0), &0), |acc, g| if *g.1 > *acc.1 { g } else { acc });
     let gid = *guards.iter()
-        .find_map(|(k, &v)| if v == row { Some(k) } else { None }).unwrap();
+        .find_map(|(k, &v)| (v == row).then(||k))
+        .unwrap();
 
     col as u32 * gid
 }
@@ -169,16 +169,16 @@ impl PartialOrd for Event {
 
 #[cfg(test)]
 mod tests {
-  use super::*;
+    use super::*;
 
-  #[test]
-  fn it_works() {
-    let events = load(include_str!("./input.txt"));
+    #[test]
+    fn it_works() {
+        let events = load(include_str!("./input.txt"));
 
-    let guard = part_one(&events);
-    assert_eq!(guard, 104764);
+        let guard = part_one(&events);
+        assert_eq!(guard, 104764);
 
-    let guard = part_two(&events);
-    assert_eq!(guard, 128617);
-  }
+        let guard = part_two(&events);
+        assert_eq!(guard, 128617);
+    }
 }
