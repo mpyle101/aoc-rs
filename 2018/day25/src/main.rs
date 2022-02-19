@@ -32,7 +32,7 @@ fn part_one(pts: &[Point]) -> i32 {
         while let Some(a) = q.pop_front() {
             let v = pts.iter()
                 .enumerate()
-                .filter_map(|(i, b)| if md(&a, b) <= 3 { Some(i) } else { None })
+                .filter_map(|(i, b)| (md(&a, b) <= 3).then(|| i))
                 .collect::<Vec<_>>();
             v.iter().rev().for_each(|i| q.push_back(pts.remove(*i)));
         }
