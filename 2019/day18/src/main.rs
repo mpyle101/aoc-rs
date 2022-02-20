@@ -1,14 +1,15 @@
 use std::cmp::Ordering;
+use std::hash::{Hash, Hasher};
 use std::collections::{BinaryHeap, HashMap, HashSet};
 
 fn main() {
     use std::time::Instant;
 
-    let map = load(include_str!("./samples/sample5.txt"));
+    let map = load(include_str!("./input/part1.txt"));
     let t1 = Instant::now();
     let steps = part_one(&map);
     let t2 = Instant::now();
-    println!("Part 1: {steps} {:?}", t2 - t1);
+    println!("Part 1: {steps} ({:?})", t2 - t1);
 }
 
 fn part_one(map: &Map) -> u32 {
@@ -20,32 +21,45 @@ fn part_one(map: &Map) -> u32 {
         if st.keys_left.is_empty() {
             return st.steps
         } else {
-            // Get the shortest paths from the current position to any
-            // keys we don't have. Filter out the blocked ones, create a
-            // new state incorporating the new segment and put it on the
-            // heap. The heap garuntees we'll always get the shortest path
-            // with the most keys to work on next.
-            let robot = st.robot;
-            for tile in st.keys_left.values() {
-                let pts = if robot < *tile { (robot, *tile) } else { (*tile, robot) }; 
-                let cache_key = (st.found, pts);
-                if let Some((steps, keys)) = cache.get(&cache_key) {
-                    heap.push(st.extend(tile, *steps, *keys))
-                } else if let Some(path) = bfs(tile, &st, map) {
-                    let keys = path.iter()
-                        .skip(1)
-                        .filter_map(|t| map.keys.get(t))
-                        .filter_map(|c| st.needs(c))
-                        .fold(0u32, |n, k| n | k);
-                    let steps = path.len() as u32 - 1;
-                    cache.insert(cache_key, (steps, keys));
-                    heap.push(st.extend(tile, steps, keys))
+            let states = if let Some(steps) = cache.get(&st) {
+                if st.steps < *steps {
+                    cache.insert(st.clone(), st.steps);
+                    update(&st, map)
+                } else {
+                    vec![]
                 }
-            }
+            } else {
+                cache.insert(st.clone(), st.steps);
+                update(&st, map)
+            };
+
+            states.iter().for_each(|st| heap.push(st.clone()))
         }
     }
 
     0
+}
+
+fn update(st: &State, map: &Map) -> Vec<State> {
+    // Get the shortest paths from the current position to any
+    // keys we don't have. Filter out the blocked ones, create a
+    // new state incorporating the new segment and put it on the
+    // heap. The heap garuntees we'll always get the shortest path
+    // with the most keys to work on next.
+    st.keys_left.values().filter_map(|tile|
+        if let Some(path) = bfs(tile, st, map) {
+            let keys = path.iter().skip(1)
+                .enumerate()
+                .filter_map(|(i, t)| map.keys.get(t).map(|c| (t, i as u32 +1, c)))
+                .filter_map(|(t, s, c)| st.needs(c).map(|k| (t, s, k)))
+                .collect::<Vec<_>>();
+            let (tile, steps, key) = keys[0];
+            Some(st.update(tile, steps, key))
+        } else {
+            None
+        }
+    )
+    .collect()
 }
 
 fn load(input: &str) -> Map {
@@ -104,7 +118,7 @@ type Tile = (i32, i32);
 type Keys = HashMap<Tile, char>;
 type Tiles = HashSet<Tile>;
 type Doors = HashMap<Tile, char>;
-type Cache = HashMap<(u32, (Tile, Tile)), (u32, u32)>;
+type Cache = HashMap<State, u32>;
 
 struct Map {
     keys: Keys,
@@ -139,20 +153,21 @@ impl State {
         (self.found & key == 0).then(|| key)
     }
 
-    fn extend(&self, robot: &Tile, steps: u32, keys: u32) -> State {
+    fn update(&self, robot: &Tile, steps: u32, key: u32) -> State {
         let mut st = self.clone();
         st.robot = *robot;
         st.steps += steps;
-        st.found |= keys;
-
-        let mut keys = keys;
-        while keys > 0 {
-            let i = keys.trailing_zeros();
-            keys ^= 1 << i;
-            st.keys_left.remove(&(1 << i));
-        }
+        st.found |= key;
+        st.keys_left.remove(&key);
 
         st
+    }
+}
+
+impl Hash for State {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.found.hash(state);
+        self.robot.hash(state);
     }
 }
 
@@ -175,8 +190,8 @@ impl PartialOrd for State {
 
 impl PartialEq for State {
     fn eq(&self, other: &Self) -> bool {
-        self.steps == other.steps &&
-        self.keys_left.len() == other.keys_left.len()
+        self.found == other.found &&
+        self.robot == other.robot
     }
 }
 
