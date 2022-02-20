@@ -4,7 +4,7 @@ use std::collections::{BinaryHeap, HashMap, HashSet};
 fn main() {
     use std::time::Instant;
 
-    let map = load(include_str!("./samples/sample4.txt"));
+    let map = load(include_str!("./samples/sample5.txt"));
     let t1 = Instant::now();
     let steps = part_one(&map);
     let t2 = Instant::now();
@@ -12,30 +12,26 @@ fn main() {
 }
 
 fn part_one(map: &Map) -> usize {
-    let state = State::new(map.robot);
+    let state = State::new(map);
     let mut heap = BinaryHeap::from([state]);
 
-    loop {
-        if let Some(mut st) = heap.pop() {
-            map.keys.get(&st.robot()).map(|c| st.keys.push(*c));
-            if st.keys.len() == map.keys.len() {
-                return st.path.len() - 1
-            } else {
-                // Get the shortest paths from the current position to any
-                // keys we don't have. Filter out the blocked ones, create a
-                // new state incorporating the new segment and put it on the
-                // heap. The heap garuntees we'll always get the shortest path
-                // with the most keys to work on next.
-                map.keys.iter()
-                    .filter(|(_, v)| !st.keys.contains(v))
-                    .filter_map(|(k, _)| bfs(k, &st, map))
-                    .map(|v| st.extend(&v))
-                    .for_each(|st| heap.push(st))
-            }
+    while let Some(st) = heap.pop() {
+        if st.keys.is_empty() {
+            return st.path.len() - 1
         } else {
-            return 0
+            // Get the shortest paths from the current position to any
+            // keys we don't have. Filter out the blocked ones, create a
+            // new state incorporating the new segment and put it on the
+            // heap. The heap garuntees we'll always get the shortest path
+            // with the most keys to work on next.
+            st.keys.iter()
+                .filter_map(|k| bfs(k, &st, map))
+                .map(|v| st.extend(&v, &map.keys))
+                .for_each(|st| heap.push(st))
         }
     }
+
+    0
 }
 
 fn load(input: &str) -> Map {
@@ -72,7 +68,7 @@ fn load(input: &str) -> Map {
 fn bfs(goal: &Tile, st: &State, map: &Map) -> Option<Vec<Tile>> {
     pathfinding::prelude::bfs(
         &st.robot(),
-        |p| open_tiles(p, &map.tiles, &map.doors, &st.keys),
+        |p| open_tiles(p, &map.tiles, &map.doors, &st.found),
         |p| p == goal
     )
 }
@@ -103,22 +99,35 @@ struct Map {
 #[derive(Clone, Debug, Eq)]
 struct State {
     path: Vec<Tile>,
-    keys: Vec<char>,
+    keys: Tiles,
+    found: Vec<char>,
 }
 
 impl State {
-    fn new(robot: Tile) -> State {
-        State { path: vec![robot], keys: vec![] }
+    fn new(map: &Map) -> State {
+        State { 
+            path: vec![map.robot], 
+            keys: map.keys.keys().copied().collect(),
+            found: vec![]
+        }
     }
 
     fn robot(&self) -> Tile {
         *self.path.last().unwrap()
     }
 
-    fn extend(&self, path: &[Tile]) -> State {
+    fn extend(&self, path: &[Tile], keys: &Keys) -> State {
         let mut st = self.clone();
         st.path.extend(&path[1..]);
+        path.iter()
+            .filter_map(|t| keys.get(t).map(|c| (t, c)))
+            .for_each(|(t, c)| st.add_key(t, c));
+
         st
+    }
+
+    fn add_key(&mut self, tile: &Tile, c: &char) {
+        if self.keys.remove(tile) { self.found.push(*c) }
     }
 }
 
