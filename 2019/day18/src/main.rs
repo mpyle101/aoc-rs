@@ -2,6 +2,13 @@ use std::cmp::Ordering;
 use std::hash::{Hash, Hasher};
 use std::collections::{BinaryHeap, HashMap, HashSet};
 
+type Tile = (i32, i32);
+type Keys = HashMap<Tile, char>;
+type Paths = HashMap<u32, (u32, u32)>;
+type Tiles = HashSet<Tile>;
+type Doors = HashMap<Tile, char>;
+type Cache = HashMap<State, u32>;
+
 fn main() {
     use std::time::Instant;
 
@@ -10,42 +17,6 @@ fn main() {
     let steps = part_one(&map);
     let t2 = Instant::now();
     println!("Part 1: {steps} ({:?})", t2 - t1);
-}
-
-fn part_one(map: &Map) -> u32 {
-    let state = State::new(map);
-    let mut heap = BinaryHeap::from([state]);
-    let mut cache: Cache = HashMap::new();
-
-    while let Some(st) = heap.pop() {
-        if st.keys_left.is_empty() {
-            return st.steps
-        } else if cache.get(&st).is_none() {
-            cache.insert(st.clone(), st.steps);
-            update(&st, map).iter()
-                .for_each(|st| heap.push(st.clone()))
-        }
-    }
-
-    0
-}
-
-fn update(st: &State, map: &Map) -> Vec<State> {
-    // Get the shortest paths from the current position to any
-    // keys we don't have. Filter out the blocked ones, create a
-    // new state incorporating the new segment.
-    st.keys_left.values()
-        .filter_map(|tile| bfs(tile, st, map))
-        .map(|path| {
-            let keys = path.iter().skip(1)
-                .enumerate()
-                .filter_map(|(i, t)| map.keys.get(t).map(|c| (t, i + 1, c)))
-                .filter_map(|(t, s, c)| st.needs(c).map(|k| (t, s, k)))
-                .collect::<Vec<_>>();
-            let (tile, steps, key) = keys[0];
-            st.update(tile, steps as u32, key)
-        })
-        .collect()
 }
 
 fn load(input: &str) -> Map {
@@ -79,32 +50,103 @@ fn load(input: &str) -> Map {
     Map { keys, doors, tiles, robot }
 }
 
-fn bfs(goal: &Tile, st: &State, map: &Map) -> Option<Vec<Tile>> {
-    pathfinding::prelude::bfs(
-        &st.robot,
-        |p| open_tiles(p, &map.tiles, &map.doors, st.found),
-        |p| p == goal
-    )
+fn part_one(map: &Map) -> u32 {
+    let paths = calc_paths(map);
+    let mut heap = init_heap(map);
+    let mut cache = Cache::new();
+
+    while let Some(st) = heap.pop() {
+        if st.keys == 0 {
+            return st.steps
+        } else if cache.get(&st).is_none() {
+            cache.insert(st.clone(), st.steps);
+            for state in update(&st, &paths) { heap.push(state) }
+        }
+    }
+
+    0
+}
+
+fn update(st: &State, paths: &Paths) -> Vec<State> {
+    // Get the shortest paths from the current position to any
+    // keys we don't have. Filter out the blocked ones, create a
+    // new state incorporating the new segment.
+    let mut keys = st.keys;
+    let mut states = vec![];
+
+    while keys > 0 {
+        let key = 1 << keys.trailing_zeros();
+
+        let route = st.robot | key;
+        if let Some((steps, doors)) = paths.get(&route) {
+            if st.found & doors == *doors {
+                states.push(st.update(key, *steps))
+            }
+        }
+
+        keys ^= key;
+    }
+
+    states
 }
 
 const DELTA: [Tile;4] = [(0, -1), (0, 1), (-1, 0), (1, 0)];
 
-fn open_tiles((x, y): &Tile, tiles: &Tiles, doors: &Doors, keys: u32) -> Vec<Tile> {
-    let found = |c: &char| keys & 1 << *c as u8 - b'a' > 0;
+fn calc_paths(map: &Map) -> HashMap<u32, (u32, u32)> {
+    use itertools::Itertools;
+    use pathfinding::prelude::bfs;
 
-    DELTA.iter()
+    let open = |(x, y): &Tile| DELTA.iter()
         .map(|(dx, dy)| (x + dx, y + dy))
-        .filter(|p| 
-            tiles.contains(&p) && doors.get(&p).map_or(true, found)
-        )
+        .filter(|p| map.tiles.contains(p))
+        .collect::<Vec<_>>();
+
+    // Calculate the shortest path between any two keys along
+    // with the number of steps it takes and the keys needed.
+    map.keys.iter()
+        .combinations(2)
+        .filter_map(|v| {
+            bfs(v[0].0, |p| open(p), |p| p == v[1].0)
+                .map(|path| {
+                    let doors = find_doors(&path, map);
+                    let steps = path.len() as u32 - 1;
+                    let keys  = v.iter().fold(0u32, |n, (_, &c)| n | 1 << c as u8 - b'a');
+                    (keys, (steps, doors))
+                })
+        })
         .collect()
 }
 
-type Tile = (i32, i32);
-type Keys = HashMap<Tile, char>;
-type Tiles = HashSet<Tile>;
-type Doors = HashMap<Tile, char>;
-type Cache = HashMap<State, u32>;
+fn init_heap(map: &Map) -> BinaryHeap<State> {
+    use pathfinding::prelude::bfs;
+
+    let open = |(x, y): &Tile| DELTA.iter()
+        .map(|(dx, dy)| (x + dx, y + dy))
+        .filter(|p| map.tiles.contains(p))
+        .collect::<Vec<_>>();
+        
+    // Initialize a binary heap with states representing the robot
+    // moving from it's initial position to keys with no intermediate
+    // doors.
+    let keys = map.keys.values().fold(0u32, |n, c| n | 1 << *c as u8 - b'a');
+    map.keys.iter()
+        .filter_map(|(goal, c)| 
+            bfs(&map.robot, |p| open(p), |p| p == goal).map(|path| (path, c))
+        )
+        .filter_map(|(path, c)| {
+            let doors = find_doors(&path, map);
+            let steps = path.len() as u32 - 1;
+            (doors == 0).then(|| (steps, 1 << *c as u8 - b'a'))
+        })
+        .map(|(steps, k)| State { steps, found: k, robot: k, keys: keys & !k } )
+        .collect()
+}
+
+fn find_doors(path: &[(i32, i32)], map: &Map) -> u32 {
+    path.iter()
+        .filter_map(|p| map.doors.get(p))
+        .fold(0u32, |n, c| n | 1 << *c as u8 - b'a')
+}
 
 struct Map {
     keys: Keys,
@@ -115,38 +157,20 @@ struct Map {
 
 #[derive(Clone, Debug, Eq)]
 struct State {
-    steps: u32,
-    found: u32,
-    robot: Tile,
-    keys_left: HashMap<u32, Tile>,
+    keys:  u32,     // bits representing keys left to find
+    found: u32,     // bits representing found keys
+    robot: u32,     // bit representing location as current key
+    steps: u32,     // number of steps take so far
 }
 
 impl State {
-    fn new(map: &Map) -> State {
+    fn update(&self, key: u32, steps: u32) -> State {
         State { 
-            steps: 0,
-            found: 0,
-            robot: map.robot,
-            keys_left: map.keys.iter()
-                .map(|(k, c)| (0u32 | 1 << *c as u8 - b'a', *k))
-                .collect(),
-
+            keys:  self.keys & !key,
+            found: self.found | key,
+            robot: key,
+            steps: self.steps + steps,
         }
-    }
-
-    fn needs(&self, c: &char) -> Option<u32> {
-        let key = 1 << *c as u8 - b'a';
-        (self.found & key == 0).then(|| key)
-    }
-
-    fn update(&self, robot: &Tile, steps: u32, key: u32) -> State {
-        let mut st = self.clone();
-        st.robot = *robot;
-        st.steps += steps;
-        st.found |= key;
-        st.keys_left.remove(&key);
-
-        st
     }
 }
 
