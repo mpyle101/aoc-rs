@@ -11,23 +11,37 @@ fn main() {
     println!("Part 1: {steps} {:?}", t2 - t1);
 }
 
-fn part_one(map: &Map) -> usize {
+fn part_one(map: &Map) -> u32 {
     let state = State::new(map);
     let mut heap = BinaryHeap::from([state]);
+    let mut cache: Cache = HashMap::new();
 
     while let Some(st) = heap.pop() {
-        if st.keys.is_empty() {
-            return st.path.len() - 1
+        if st.keys_left.is_empty() {
+            return st.steps
         } else {
             // Get the shortest paths from the current position to any
             // keys we don't have. Filter out the blocked ones, create a
             // new state incorporating the new segment and put it on the
             // heap. The heap garuntees we'll always get the shortest path
             // with the most keys to work on next.
-            st.keys.iter()
-                .filter_map(|k| bfs(k, &st, map))
-                .map(|v| st.extend(&v, &map.keys))
-                .for_each(|st| heap.push(st))
+            let robot = st.robot;
+            for tile in st.keys_left.values() {
+                let pts = if robot < *tile { (robot, *tile) } else { (*tile, robot) }; 
+                let cache_key = (st.found, pts);
+                if let Some((steps, keys)) = cache.get(&cache_key) {
+                    heap.push(st.extend(tile, *steps, *keys))
+                } else if let Some(path) = bfs(tile, &st, map) {
+                    let keys = path.iter()
+                        .skip(1)
+                        .filter_map(|t| map.keys.get(t))
+                        .filter_map(|c| st.needs(c))
+                        .fold(0u32, |n, k| n | k);
+                    let steps = path.len() as u32 - 1;
+                    cache.insert(cache_key, (steps, keys));
+                    heap.push(st.extend(tile, steps, keys))
+                }
+            }
         }
     }
 
@@ -67,19 +81,21 @@ fn load(input: &str) -> Map {
 
 fn bfs(goal: &Tile, st: &State, map: &Map) -> Option<Vec<Tile>> {
     pathfinding::prelude::bfs(
-        &st.robot(),
-        |p| open_tiles(p, &map.tiles, &map.doors, &st.found),
+        &st.robot,
+        |p| open_tiles(p, &map.tiles, &map.doors, st.found),
         |p| p == goal
     )
 }
 
 const DELTA: [Tile;4] = [(0, -1), (0, 1), (-1, 0), (1, 0)];
 
-fn open_tiles((x, y): &Tile, tiles: &Tiles, doors: &Doors, keys: &[char]) -> Vec<Tile> {
+fn open_tiles((x, y): &Tile, tiles: &Tiles, doors: &Doors, keys: u32) -> Vec<Tile> {
+    let found = |c: &char| keys & 1 << *c as u8 - b'a' > 0;
+
     DELTA.iter()
         .map(|(dx, dy)| (x + dx, y + dy))
         .filter(|p| 
-            tiles.contains(&p) && doors.get(&p).map_or(true, |v| keys.contains(v))
+            tiles.contains(&p) && doors.get(&p).map_or(true, found)
         )
         .collect()
 }
@@ -88,6 +104,7 @@ type Tile = (i32, i32);
 type Keys = HashMap<Tile, char>;
 type Tiles = HashSet<Tile>;
 type Doors = HashMap<Tile, char>;
+type Cache = HashMap<(u32, (Tile, Tile)), (u32, u32)>;
 
 struct Map {
     keys: Keys,
@@ -98,46 +115,54 @@ struct Map {
 
 #[derive(Clone, Debug, Eq)]
 struct State {
-    path: Vec<Tile>,
-    keys: Tiles,
-    found: Vec<char>,
+    steps: u32,
+    found: u32,
+    robot: Tile,
+    keys_left: HashMap<u32, Tile>,
 }
 
 impl State {
     fn new(map: &Map) -> State {
         State { 
-            path: vec![map.robot], 
-            keys: map.keys.keys().copied().collect(),
-            found: vec![]
+            steps: 0,
+            found: 0,
+            robot: map.robot,
+            keys_left: map.keys.iter()
+                .map(|(k, c)| (0u32 | 1 << *c as u8 - b'a', *k))
+                .collect(),
+
         }
     }
 
-    fn robot(&self) -> Tile {
-        *self.path.last().unwrap()
+    fn needs(&self, c: &char) -> Option<u32> {
+        let key = 1 << *c as u8 - b'a';
+        (self.found & key == 0).then(|| key)
     }
 
-    fn extend(&self, path: &[Tile], keys: &Keys) -> State {
+    fn extend(&self, robot: &Tile, steps: u32, keys: u32) -> State {
         let mut st = self.clone();
-        st.path.extend(&path[1..]);
-        path.iter()
-            .filter_map(|t| keys.get(t).map(|c| (t, c)))
-            .for_each(|(t, c)| st.add_key(t, c));
+        st.robot = *robot;
+        st.steps += steps;
+        st.found |= keys;
+
+        let mut keys = keys;
+        while keys > 0 {
+            let i = keys.trailing_zeros();
+            keys ^= 1 << i;
+            st.keys_left.remove(&(1 << i));
+        }
 
         st
-    }
-
-    fn add_key(&mut self, tile: &Tile, c: &char) {
-        if self.keys.remove(tile) { self.found.push(*c) }
     }
 }
 
 impl Ord for State {
     fn cmp(&self, other: &Self) -> Ordering {
         // Reverse ordering for min-heap
-        if self.path.len() == other.path.len() {
-            self.keys.len().cmp(&other.keys.len())
+        if self.steps == other.steps {
+            other.keys_left.len().cmp(&self.keys_left.len())
         } else {
-            other.path.len().cmp(&self.path.len())
+            other.steps.cmp(&self.steps)
         }
     }
 }
@@ -150,8 +175,8 @@ impl PartialOrd for State {
 
 impl PartialEq for State {
     fn eq(&self, other: &Self) -> bool {
-        self.path.len() == other.path.len() &&
-        self.keys.len() == other.keys.len()
+        self.steps == other.steps &&
+        self.keys_left.len() == other.keys_left.len()
     }
 }
 
