@@ -20,20 +20,10 @@ fn part_one(map: &Map) -> u32 {
     while let Some(st) = heap.pop() {
         if st.keys_left.is_empty() {
             return st.steps
-        } else {
-            let states = if let Some(steps) = cache.get(&st) {
-                if st.steps < *steps {
-                    cache.insert(st.clone(), st.steps);
-                    update(&st, map)
-                } else {
-                    vec![]
-                }
-            } else {
-                cache.insert(st.clone(), st.steps);
-                update(&st, map)
-            };
-
-            states.iter().for_each(|st| heap.push(st.clone()))
+        } else if cache.get(&st).is_none() {
+            cache.insert(st.clone(), st.steps);
+            update(&st, map).iter()
+                .for_each(|st| heap.push(st.clone()))
         }
     }
 
@@ -43,23 +33,19 @@ fn part_one(map: &Map) -> u32 {
 fn update(st: &State, map: &Map) -> Vec<State> {
     // Get the shortest paths from the current position to any
     // keys we don't have. Filter out the blocked ones, create a
-    // new state incorporating the new segment and put it on the
-    // heap. The heap garuntees we'll always get the shortest path
-    // with the most keys to work on next.
-    st.keys_left.values().filter_map(|tile|
-        if let Some(path) = bfs(tile, st, map) {
+    // new state incorporating the new segment.
+    st.keys_left.values()
+        .filter_map(|tile| bfs(tile, st, map))
+        .map(|path| {
             let keys = path.iter().skip(1)
                 .enumerate()
-                .filter_map(|(i, t)| map.keys.get(t).map(|c| (t, i as u32 +1, c)))
+                .filter_map(|(i, t)| map.keys.get(t).map(|c| (t, i + 1, c)))
                 .filter_map(|(t, s, c)| st.needs(c).map(|k| (t, s, k)))
                 .collect::<Vec<_>>();
             let (tile, steps, key) = keys[0];
-            Some(st.update(tile, steps, key))
-        } else {
-            None
-        }
-    )
-    .collect()
+            st.update(tile, steps as u32, key)
+        })
+        .collect()
 }
 
 fn load(input: &str) -> Map {
@@ -175,7 +161,7 @@ impl Ord for State {
     fn cmp(&self, other: &Self) -> Ordering {
         // Reverse ordering for min-heap
         if self.steps == other.steps {
-            other.keys_left.len().cmp(&self.keys_left.len())
+            self.found.count_ones().cmp(&other.found.count_ones())
         } else {
             other.steps.cmp(&self.steps)
         }
