@@ -19,70 +19,69 @@ use std::collections::{HashMap, VecDeque};
 
 #[derive(Debug)]
 struct Orbit<'a> {
-  name: &'a str,
-  count: u32,
+    name: &'a str,
+    count: u32,
 }
 
 fn main() {
-  let mut map = HashMap::new();
+    let mut map = HashMap::new();
 
-  let data = include_str!("./orbits.txt");
-  data.lines()
-    .map(|o| o.split(')').collect())
-    .for_each(|v: Vec<&str>| insert(&mut map, &v) );
+    let data = include_str!("./orbits.txt");
+    data.lines()
+        .map(|o| o.split(')').collect::<Vec<_>>())
+        .for_each(|v| insert(&mut map, &v) );
 
-  let mut q: VecDeque<Orbit> = VecDeque::new();
-  map.get("COM").unwrap().iter()
-    .for_each(|&name| q.push_back(Orbit { name, count: 1 }));
+    let mut q = VecDeque::new();
+    map.get("COM").unwrap().iter()
+        .for_each(|&name| q.push_back(Orbit { name, count: 1 }));
 
-  let mut orbits: Vec<Orbit> = Vec::new();
-  while let Some(o) = q.pop_front() {
-    match map.get(o.name) {
-      Some(v) => v.iter().for_each(|&name| q.push_back(Orbit { name, count: o.count + 1 })),
-      None => ()
-    }
-    orbits.push(o);
-  };
+    let mut orbits = Vec::new();
+    while let Some(o) = q.pop_front() {
+        if let Some(v) = map.get(o.name) { 
+            v.iter().for_each(|&name| q.push_back(Orbit { name, count: o.count + 1 }))
+        }
+        orbits.push(o);
+    };
 
-  let checksum: u32 = orbits.into_iter().map(|o| o.count).sum();
-  println!("Checksum: {}", checksum);
+    let checksum: u32 = orbits.into_iter().map(|o| o.count).sum();
+    println!("Checksum: {}", checksum);
 
-  let mut xfers = HashMap::new();
-  data.lines()
-    .map(|o| o.split(')').collect())
-    .for_each(|v: Vec<&str>| { xfers.insert(v[1], v[0]); } );
+    let mut xfers = HashMap::new();
+    data.lines()
+        .map(|o| o.split(')').collect::<Vec<_>>())
+        .for_each(|v| { xfers.insert(v[1], v[0]); } );
 
-  let you = to_com("YOU", &mut xfers);
-  let san = to_com("SAN", &mut xfers);
-  let idx = walk_back(&you, &san);
-  let min_xfers = (you.len() - idx) + (san.len() - idx);
+    let you = to_com("YOU", &xfers);
+    let san = to_com("SAN", &xfers);
+    let idx = walk_back(&you, &san);
+    let min_xfers = (you.len() - idx) + (san.len() - idx);
 
-  println!("Minimum xfers: {}", min_xfers);
+    println!("Minimum xfers: {}", min_xfers);
 }
 
 fn insert<'a>(map: &mut HashMap<&'a str, Vec<&'a str>>, orbit: &[&'a str]) {
-  match map.get_mut(orbit[0]) {
-    Some(v) => v.push(orbit[1]),
-    None => { map.insert(orbit[0], vec![orbit[1]]); }
-  };
+    match map.get_mut(orbit[0]) {
+        Some(v) => v.push(orbit[1]),
+        None => { map.insert(orbit[0], vec![orbit[1]]); }
+    };
 }
 
 fn to_com<'a>(start: &str, map: &HashMap<&str, &'a str>) -> Vec<&'a str> {
-  let mut path: Vec<&str> = Vec::new();
-  let mut name = start;
-  while let Some(&o) = map.get(name) {
-    path.push(o);
-    name = o;
-  }
+    let mut path = Vec::new();
+    let mut name = start;
+    while let Some(&o) = map.get(name) {
+        path.push(o);
+        name = o;
+    }
 
-  path.reverse();
-  path
+    path.reverse();
+    path
 }
 
 fn walk_back(v1: &[&str], v2: &[&str]) -> usize {
-  for (idx, &v) in v1.iter().enumerate() {
-    if v != v2[idx] { return idx }
-  }
+    for (idx, &v) in v1.iter().enumerate() {
+        if v != v2[idx] { return idx }
+    }
 
-  0
+    0
 }
