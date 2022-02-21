@@ -39,12 +39,12 @@ fn load(input: &str) -> Map {
                 '.' => { tiles.insert(tile); },
                 'a'..='z' => {
                     tiles.insert(tile);
-                    keys.insert(tile, 1 << c as u8 - b'a');
+                    keys.insert(tile, 1 << (c as u8 - b'a'));
                 },
                 'A'..='Z' => {
                     let c = c.to_ascii_lowercase();
                     tiles.insert(tile);
-                    doors.insert(tile, 1 << c as u8 - b'a');
+                    doors.insert(tile, 1 << (c as u8 - b'a'));
                 },
                 '@' => {
                     tiles.insert(tile);

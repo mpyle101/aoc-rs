@@ -26,7 +26,7 @@ fn part_one(nic: &str) -> i64 {
                 if nic == 255 {
                     return y
                 }
-                packets.entry(nic).or_insert(Vec::new()).push((x, y));
+                packets.entry(nic).or_insert_with(Vec::new).push((x, y));
             }
         };
         process_packets(&mut packets, &mut network);
@@ -47,11 +47,11 @@ fn part_two(nic: &str) -> i64 {
                 if nic == 255 {
                     nat = (x, y);
                 } else {
-                    packets.entry(nic).or_insert(Vec::new()).push((x, y));
+                    packets.entry(nic).or_insert_with(Vec::new).push((x, y));
                 }
             }
         };
-        if packets.len() == 0 {
+        if packets.is_empty() {
             if last_y == nat.1 {
                 return last_y
             } else {

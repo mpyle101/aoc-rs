@@ -90,7 +90,7 @@ fn calc_fuel_step(available: u64, step: u64, specs: &mut SpecMap) -> Result<u64,
     while needed < available {
         let phantom = specs.get_mut(PHANTOM).ok_or("Phantom not found")?;
         phantom.rsrcs[0].count += step;
-        needed = calc_min_ore(PHANTOM, &specs)?;
+        needed = calc_min_ore(PHANTOM, specs)?;
     }
 
     let phantom = specs.get_mut(PHANTOM).ok_or("Phantom not found")?;

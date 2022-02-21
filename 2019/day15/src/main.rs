@@ -69,13 +69,12 @@ fn part_two(board: &str) -> Result<i32, &str> {
         .ok_or("no oxygen")?;
 
     let mut steps  = 0;
-    let mut spread = open_tiles(&oxygen, &tiles);
-    while spread.len() > 0 {
+    let mut spread = open_tiles(oxygen, &tiles);
+    while !spread.is_empty() {
         steps += 1;
         spread.iter().for_each(|&pos| { tiles.insert(pos, Tile::Oxygen); });
         spread = spread.iter().flat_map(|p| open_tiles(p, &tiles)).collect();
     };
-
 
     Ok(steps)
 }

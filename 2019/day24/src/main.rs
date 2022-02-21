@@ -57,9 +57,9 @@ fn draw(state: &MapState) {
             let c = if state.contains(&(row, col)) { '#' } else { '.' };
             print!("{}", c);
         });
-        println!("");
+        println!();
     });
-    println!("");
+    println!();
 }
 
 #[derive(Clone, Eq, PartialEq)]
@@ -69,15 +69,15 @@ impl MapState {
         self.0.contains(tile)
     }
 }
+
 impl Hash for MapState {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.0.iter().for_each(|t| t.hash(state))
     }
 }
 
-const DELTAS: [Tile;4] = [
-    (-1, 0), (0, -1), (1, 0), (0, 1)
-];
+const DELTAS: [Tile;4] = [(-1, 0), (0, -1), (1, 0), (0, 1)];
+
 fn cycle(bugs: &MapState) -> MapState {
     use std::collections::VecDeque;
 

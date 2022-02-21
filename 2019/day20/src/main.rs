@@ -67,6 +67,8 @@ fn load(maze: &str) -> Maze {
     Maze { aa: (aa, 0), zz: (zz, 0), walls, portals }
 }
 
+type Gates = Vec<((Loc, Loc, i32), [char;2])>;
+
 fn make_gate(
     x: i32,
     y: i32,
@@ -76,7 +78,7 @@ fn make_gate(
     prev: &[char;2],
     walls: &HashSet<(i32, i32)>,
     doors: &mut HashMap<i32, char>,
-    gates: &mut Vec<((Loc, Loc, i32), [char;2])>,
+    gates: &mut Gates,
 ) {
     match prev {
         [_, ' '] => if let Some(g) = doors.remove(&x) {
