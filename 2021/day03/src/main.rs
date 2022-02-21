@@ -40,7 +40,7 @@ fn part_two(nums: &[u32]) -> u32 {
         let b_cnt = get_counts(&oxygen);
         let mcb = (b_cnt[11 - i] >= 0) as u32;
         oxygen = oxygen.iter().cloned().filter(|&n| (n >> i) & 1 == mcb).collect();
-        i -= 1;
+        i = i.wrapping_sub(1);
     }
 
     i = 11;

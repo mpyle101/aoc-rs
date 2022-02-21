@@ -76,14 +76,14 @@ fn print(m: &[u32]) {
 fn neighbors(m: &[u32], pos: usize) -> [(usize, u32);8] {
     const XDIM: usize = 10;
 
-    let top = pos - XDIM;
-    let bot = pos + XDIM;
+    let top = pos.wrapping_sub(XDIM);
+    let bot = pos.wrapping_add(XDIM);
     let pre = if pos % XDIM == 0 { 1000 } else { 1 };
     let pst = if (pos + 1) % XDIM == 0 { 1000 } else { 1 };
     let mut arr = [
-        (top - pre, u32::MAX), (top, u32::MAX), (top + pst, u32::MAX),
-        (pos - pre, u32::MAX),                  (pos + pst, u32::MAX),
-        (bot - pre, u32::MAX), (bot, u32::MAX), (bot + pst, u32::MAX)
+        (top.wrapping_sub(pre), u32::MAX), (top, u32::MAX), (top.wrapping_add(pst), u32::MAX),
+        (pos.wrapping_sub(pre), u32::MAX),                  (pos.wrapping_add(pst), u32::MAX),
+        (bot.wrapping_sub(pre), u32::MAX), (bot, u32::MAX), (bot.wrapping_add(pst), u32::MAX)
     ];
 
     arr.iter_mut().for_each(|(i, n)| if *i < 100 { *n = m[*i] });
