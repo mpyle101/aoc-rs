@@ -14,17 +14,24 @@ fn main() {
 
     let map = load(include_str!("./input/part1.txt"));
     let t1 = Instant::now();
-    let steps = part_one(&map);
+    let steps = solver(&map);
     let t2 = Instant::now();
     println!("Part 1: {steps} ({:?})", t2 - t1);
+
+    let map = load(include_str!("./input/part2.txt"));
+    let t1 = Instant::now();
+    let steps = solver(&map);
+    let t2 = Instant::now();
+    println!("Part 2: {steps} ({:?})", t2 - t1);
 }
 
 fn load(input: &str) -> Map {
     let mut keys  = Keys::new();
     let mut doors = Doors::new();
     let mut tiles = Tiles::new();
-    let mut robots = vec![];
+    let mut robots = Keys::new();
 
+    let mut robot = 28;
     for (y, s) in input.lines().enumerate() {
         for (x, c) in s.chars().enumerate() {
             let tile = (x as i32, y as i32);
@@ -41,7 +48,8 @@ fn load(input: &str) -> Map {
                 },
                 '@' => {
                     tiles.insert(tile);
-                    robots.push(tile);
+                    robots.insert(tile, 1 << robot);
+                    robot += 1;
                 },
                 _ => { /* ignore walls */ }
             }
@@ -51,7 +59,7 @@ fn load(input: &str) -> Map {
     Map { keys, doors, tiles, robots }
 }
 
-fn part_one(map: &Map) -> u32 {
+fn solver(map: &Map) -> u32 {
     let paths = calc_paths(map);
     let mut heap = init_heap(map);
     let mut cache = Cache::new();
@@ -78,11 +86,13 @@ fn update(st: &State, paths: &Paths) -> Vec<State> {
     while keys > 0 {
         let key = 1 << keys.trailing_zeros();
 
-        let route = st.robot | key;
-        if let Some((steps, doors)) = paths.get(&route) {
-            if st.found & doors == *doors {
-                states.push(st.update(key, *steps))
-            }
+        for i in 0..st.count {
+            let route = st.robots[i] | key;
+            if let Some((steps, doors)) = paths.get(&route) {
+                if st.found & doors == *doors {
+                    states.push(st.update(i, key, *steps))
+                }
+            }    
         }
 
         keys ^= key;
@@ -105,8 +115,7 @@ fn calc_paths(map: &Map) -> HashMap<u32, (u32, u32)> {
     // Calculate the shortest path between any two keys along
     // with the number of steps it takes and the keys needed
     // including the starting locations of the robots.
-    let robots = map.robots.iter().map(|p| (*p, 0u32)).collect::<HashMap<_,_>>();
-    map.keys.iter().chain(robots.iter())
+    map.keys.iter().chain(map.robots.iter())
         .combinations(2)
         .filter_map(|v| {
             bfs(v[0].0, |p| open(p), |p| p == v[1].0)
@@ -122,7 +131,16 @@ fn calc_paths(map: &Map) -> HashMap<u32, (u32, u32)> {
 
 fn init_heap(map: &Map) -> BinaryHeap<State> {
     let keys = map.keys.values().fold(0u32, |n, k| n | k);
-    let state = State { keys, found: 0, robot: 0, steps: 0 };
+    let mut robots = [0;4];
+    map.robots.values().enumerate().for_each(|(i, k)| robots[i] = *k);
+
+    let state = State { 
+        keys,
+        robots,
+        found: 0,
+        steps: 0,
+        count: map.robots.len(),
+    };
 
     BinaryHeap::from([state])
 }
@@ -133,28 +151,34 @@ fn find_doors(path: &[(i32, i32)], map: &Map) -> u32 {
         .fold(0u32, |n, k| n | k)
 }
 
+#[derive(Debug)]
 struct Map {
     keys: Keys,
     doors: Doors,
     tiles: Tiles,
-    robots: Vec<Tile>,
+    robots: Keys,
 }
 
 #[derive(Clone, Debug, Eq)]
 struct State {
-    keys:  u32,     // bits representing keys left to find
-    found: u32,     // bits representing found keys
-    robot: u32,     // bit representing location as current key
-    steps: u32,     // number of steps take so far
+    keys:  u32,         // bits representing keys left to find
+    found: u32,         // bits representing found keys
+    steps: u32,         // number of steps take so far
+    count: usize,       // number of robots
+    robots: [u32;4],    // bit representing location as current key
 }
 
 impl State {
-    fn update(&self, key: u32, steps: u32) -> State {
-        State { 
+    fn update(&self, robot: usize, key: u32, steps: u32) -> State {
+        let mut robots = self.robots;
+        robots[robot] = key;
+
+        State {
+            robots,
             keys:  self.keys & !key,
             found: self.found | key,
-            robot: key,
             steps: self.steps + steps,
+            count: self.count,
         }
     }
 }
@@ -162,7 +186,7 @@ impl State {
 impl Hash for State {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.found.hash(state);
-        self.robot.hash(state);
+        self.robots.hash(state);
     }
 }
 
@@ -186,7 +210,7 @@ impl PartialOrd for State {
 impl PartialEq for State {
     fn eq(&self, other: &Self) -> bool {
         self.found == other.found &&
-        self.robot == other.robot
+        self.robots == other.robots
     }
 }
 
@@ -198,46 +222,46 @@ mod tests {
     #[test]
     fn it_works() {
         let map = load(include_str!("./input/part1.txt"));
-        let steps = part_one(&map);
+        let steps = solver(&map);
         assert_eq!(steps, 5450);
 
-        // let map = load(include_str!("./part2.txt"));
-        // let steps = part_two(&map);
-        // assert_eq!(steps, 2020);
+        let map = load(include_str!("./input/part2.txt"));
+        let steps = solver(&map);
+        assert_eq!(steps, 2020);
     }
 
     #[test]
     fn sample1() {
         let map = load(include_str!("./samples/sample1.txt"));
-        let steps = part_one(&map);
+        let steps = solver(&map);
         assert_eq!(steps, 8);
     }
 
     #[test]
     fn sample2() {
         let map = load(include_str!("./samples/sample2.txt"));
-        let steps = part_one(&map);
+        let steps = solver(&map);
         assert_eq!(steps, 86);
     }
 
     #[test]
     fn sample3() {
         let map = load(include_str!("./samples/sample3.txt"));
-        let steps = part_one(&map);
+        let steps = solver(&map);
         assert_eq!(steps, 132);
     }
 
     #[test]
     fn sample4() {
         let map = load(include_str!("./samples/sample4.txt"));
-        let steps = part_one(&map);
+        let steps = solver(&map);
         assert_eq!(steps, 136);
     }
 
     #[test]
     fn sample5() {
         let map = load(include_str!("./samples/sample5.txt"));
-        let steps = part_one(&map);
+        let steps = solver(&map);
         assert_eq!(steps, 81);
     }
 }
