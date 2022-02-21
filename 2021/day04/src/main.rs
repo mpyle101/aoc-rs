@@ -8,8 +8,8 @@ fn main() {
     let (winner, squid) = doit(&cards, &mut boards);
     let t2 = Instant::now();
 
-    println!("Part 1: {}", winner);
-    println!("Part 2: {}", squid);
+    println!("Part 1: {winner}");
+    println!("Part 2: {squid}");
     println!("{:?}", t2 - t1);
 }
 
@@ -41,11 +41,11 @@ fn doit(cards: &[i32], boards: &mut Vec<Vec<(i32, bool)>>) -> (i32, i32) {
     let mut card = iter.next().unwrap();
     mark(card, boards);
 
-    let mut found = boards.iter().position(bingo);
+    let mut found = boards.iter().position(|v| bingo(v));
     while found.is_none() {
         card = iter.next().unwrap();
         mark(card, boards);
-        found = boards.iter().position(bingo);
+        found = boards.iter().position(|v| bingo(v));
     }
     let idx = found.unwrap();
     let board = boards.get(idx).unwrap();
@@ -56,7 +56,7 @@ fn doit(cards: &[i32], boards: &mut Vec<Vec<(i32, bool)>>) -> (i32, i32) {
     let mut squid = 0;
     for card in iter {
         mark(card, boards);
-        while let Some(idx) = boards.iter().position(bingo) {
+        while let Some(idx) = boards.iter().position(|v| bingo(v)) {
             let board = boards.get(idx).unwrap();
             let unmarked: i32 = board.iter().filter(|t| !t.1).map(|t| t.0).sum();
             squid = unmarked * card;
@@ -73,7 +73,7 @@ fn mark(n: &i32, boards: &mut [Vec<(i32, bool)>]) {
     })
 }
 
-fn bingo(tab: &Vec<(i32, bool)>) -> bool {
+fn bingo(tab: &[(i32, bool)]) -> bool {
     tab.chunks(5).any(|row| row.iter().all(|v| v.1))
         || (0..5).any(|col| get_col(col, tab).all(|v| v.1))
 }

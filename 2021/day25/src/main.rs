@@ -42,8 +42,8 @@ fn step_east(mat: &Matrix<char>) -> Option<Matrix<char>> {
             let rc1 = (rc.0, (rc.1 + 1) % m.columns);
             if mat.get(rc1).map_or(false, |v| *v == '.') { 
                 moved = true;
-                m.get_mut(rc).map(|v| *v = '.');
-                m.get_mut(rc1).map(|v| *v = '>');
+                if let Some(v) = m.get_mut(rc)  { *v = '.' };
+                if let Some(v) = m.get_mut(rc1) { *v = '>' };
             }
         });
 
@@ -60,8 +60,8 @@ fn step_south(mat: &Matrix<char>) -> Option<Matrix<char>> {
             let rc1 = ((rc.0 + 1) % m.rows, rc.1);
             if mat.get(rc1).map_or(false, |v| *v == '.') { 
                 moved = true;
-                m.get_mut(rc).map(|v| *v = '.');
-                m.get_mut(rc1).map(|v| *v = 'v');
+                if let Some(v) = m.get_mut(rc)  { *v = '.' };
+                if let Some(v) = m.get_mut(rc1) { *v = 'v' };
             }
         });
 

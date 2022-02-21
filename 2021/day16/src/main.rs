@@ -18,10 +18,10 @@ fn main() {
 }
 
 fn load(input: &str) -> Vec<u8> {
-    let offset = 'A' as u8 - 10;
+    let offset = b'A' - 10;
 
     input.as_bytes().iter().map(|&b| {
-        let v = if b < 'A' as u8 { b - '0' as u8 } else { b - offset };
+        let v = if b < b'A' { b - b'0' } else { b - offset };
         (0..4).rev().map(move |n| (v & (1 << n) != 0) as u8)
     }).flatten().collect::<Vec<_>>()
 }
@@ -169,7 +169,7 @@ fn parse_value(bits: &[u8]) -> u16 {
     let b = bits.len() - 1;
     bits.iter().enumerate()
         .filter(|(_, &n)| n == 1)
-        .fold(0u16, |v, (i, _)| v | (1 << b - i))
+        .fold(0u16, |v, (i, _)| v | 1 << (b - i))
 }
 
 

@@ -7,17 +7,20 @@ fn main() {
     let t1 = Instant::now();
     let fuel = part_one(&crabs);
     let t2 = Instant::now();
-    println!("Part 1: {} {:?}", fuel, t2 - t1);
+    println!("Part 1: {fuel} {:?}", t2 - t1);
 
     let t1 = Instant::now();
     let fuel = part_two(&crabs);
     let t2 = Instant::now();
-    println!("Part 2: {} {:?}", fuel, t2 - t1);
+    println!("Part 2: {fuel} {:?}", t2 - t1);
 }
 
 fn load(input: &str) -> Vec<i32> {
-    let mut v: Vec<_> = input.split(',').map(|s| s.parse::<i32>().unwrap()).collect();
-    v.sort();
+    let mut v = input.split(',')
+        .map(|s| s.parse::<i32>().unwrap())
+        .collect::<Vec<_>>();
+    v.sort_unstable();
+
     v
 }
 
@@ -41,7 +44,7 @@ fn fuel(from: i32, to: i32) -> i32 {
     // Each change of 1 step cost 1 more than the previous; the
     // first step costs 1, the second step costs 2, the third
     // steps costs 3, etc.
-    (1..=(from - to).abs()).fold(0, |acc, n| acc + n)
+    (1..=(from - to).abs()).sum()
 }
 
 

@@ -22,7 +22,7 @@ fn load(input: &str) -> Vec<Cmd> {
     input.lines().map(|s| {
         let mut it = s.split(' ');
         let cmd = it.next().unwrap();
-        let c = it.next().unwrap().chars().nth(0).unwrap();
+        let c = it.next().unwrap().chars().next().unwrap();
         match cmd {
             "inp" => Inp(c),
             "add" => Add(c, parse(it.next())),
@@ -36,11 +36,11 @@ fn load(input: &str) -> Vec<Cmd> {
     .collect()
 }
 
-fn parse<'a >(opt: Option<&'a str>) -> Value {
+fn parse(opt: Option<&str>) -> Value {
     let s = opt.unwrap();
     s.parse().map_or_else(
-        |_| Value::Variable(s.chars().nth(0).unwrap()),
-        |v| Value::Number(v),
+        |_| Value::Variable(s.chars().next().unwrap()),
+        Value::Number,
     )
 }
 
@@ -149,10 +149,9 @@ impl Monad {
         use Cmd::*;
 
         let mut i = 0;
-
         self.vars = [0;4];
 
-        let cmds = self.cmds.iter().cloned().collect::<Vec<_>>();
+        let cmds = self.cmds.to_vec();
         cmds.iter().for_each(|cmd| {
             match cmd {
                 Inp(a) => {

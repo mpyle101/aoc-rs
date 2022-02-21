@@ -53,31 +53,31 @@ fn add(a: &str, b: &str) -> String {
     reduce(&format!("[{},{}]", a, b))
 }
 
-fn magnitude(s: &String) -> i64 {
+fn magnitude(s: &str) -> i64 {
     let n = Number::new(&mut s[1..].chars());
     n.magnitude()
 }
 
-fn reduce(s: &String) -> String {
-    let mut sc = s.clone();
-    while let Some(n) = explode(&sc).or(split(&sc)) {
+fn reduce(s: &str) -> String {
+    let mut sc = s.to_string();
+    while let Some(n) = explode(&sc).or_else(|| split(&sc)) {
         sc = n
     }
 
     sc
 }
 
-fn explode(s: &String) -> Option<String> {
+fn explode(s: &str) -> Option<String> {
     // We have to play the games below because regex doesn't
     // support overlapping matches so we can't include the
     // regular numbers to the left and right in the re.
-    for cap in RE1.captures_iter(&s) {
+    for cap in RE1.captures_iter(s) {
         let m0 = &cap.get(0).unwrap();
-        if get_depth(&s.as_str()[..m0.start()]) == 4 {
-            let mut sc = s.clone();
+        if get_depth(&s[..m0.start()]) == 4 {
+            let mut sc = s.to_string();
 
             // Shrapnel to the right
-            if let Some(m) = RE2.find(&s.as_str()[m0.end()..]) {
+            if let Some(m) = RE2.find(&s[m0.end()..]) {
                 let b = cap["b"].parse::<u32>().unwrap();
                 let n = m.as_str().parse::<u32>().unwrap();
                 let i = m.start() + m0.end();
@@ -89,7 +89,7 @@ fn explode(s: &String) -> Option<String> {
             sc.replace_range(m0.range(), "0");
 
             // Shrapnel to the left (search backwards)
-            let r = s.as_str()[..m0.start()].chars().rev().collect::<String>();
+            let r = s[..m0.start()].chars().rev().collect::<String>();
             if let Some(m) = RE2.find(&r) {
                 let v = m.as_str().chars().rev().collect::<String>();
                 let b = cap["a"].parse::<u32>().unwrap();
@@ -106,13 +106,13 @@ fn explode(s: &String) -> Option<String> {
     None
 }
 
-fn split(s: &String) -> Option<String> {
+fn split(s: &str) -> Option<String> {
     for m in RE2.find_iter(s) {
         if m.as_str().len() > 1 {
             let n = m.as_str().parse::<u32>().unwrap();
             let a = n / 2;
             let b = (n + 1) / 2;
-            let mut s2 = s.clone();
+            let mut s2 = s.to_string();
             s2.replace_range(m.start()..m.end(), &format!("[{},{}]", a, b));
             return Some(s2)
         }

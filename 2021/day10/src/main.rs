@@ -9,12 +9,12 @@ fn main() {
     let t1 = Instant::now();
     let (score, inc) = part_one(&lines);
     let t2 = Instant::now();
-    println!("Part 1: {} {:?}", score, t2 - t1);
+    println!("Part 1: {score} {:?}", t2 - t1);
 
     let t1 = Instant::now();
     let score = part_two(&inc);
     let t2 = Instant::now();
-    println!("Part 2: {} {:?}", score, t2 - t1);
+    println!("Part 2: {score} {:?}", t2 - t1);
 }
 
 fn load(input: &str) -> Vec<&str> {
@@ -41,7 +41,8 @@ fn part_one(lines: &[&str]) -> (i32, Vec<Vec<char>>) {
                 stack.push(c);
             }
         };
-        if stack.len() > 0 { inc.push(stack) }
+        if !stack.is_empty() { inc.push(stack) }
+
         0
     })
     .sum();
@@ -58,7 +59,7 @@ fn part_two(lines: &[Vec<char>]) -> i64 {
     )
     .collect::<Vec<i64>>();
 
-    scores.sort();
+    scores.sort_unstable();
     scores[scores.len() / 2]
 }
 

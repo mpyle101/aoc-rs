@@ -58,7 +58,7 @@ fn polymerize(steps: u8, template: &[u8], rules: &Rules) -> i64 {
     });
     
     let mut v = counts.values().cloned().collect::<Vec<_>>();
-    v.sort();
+    v.sort_unstable();
     
     v[v.len() - 1] - v[0]
 }

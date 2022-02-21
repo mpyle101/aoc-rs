@@ -9,12 +9,12 @@ fn main() {
     let t1 = Instant::now();
     let risk = part_one(&heights);
     let t2 = Instant::now();
-    println!("Part 1: {} {:?}", risk, t2 - t1);
+    println!("Part 1: {risk} {:?}", t2 - t1);
 
     let t1 = Instant::now();
     let basins = part_two(&heights);
     let t2 = Instant::now();
-    println!("Part 2: {} {:?}", basins, t2 - t1);
+    println!("Part 2: {basins} {:?}", t2 - t1);
 }
 
 fn load(input: &str) -> Vec<u32> {
@@ -25,7 +25,7 @@ fn load(input: &str) -> Vec<u32> {
 
 fn part_one(heights: &[u32]) -> u32 {
     heights.iter().enumerate()
-        .filter_map(|(i, n)| is_lowest(&heights, i).then(|| n+1))
+        .filter_map(|(i, n)| is_lowest(heights, i).then(|| n+1))
         .sum()
 }
 

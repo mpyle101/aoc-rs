@@ -68,9 +68,9 @@ fn get_index((r, c): (usize, usize), image: &Matrix<u32>, default: u32) -> usize
     .enumerate()
     .fold(0u32, |n, (i, &rc)|
         if let Some(&v) = image.get(rc) { 
-            n | (v << 8 - i)
+            n | v << (8 - i)
         } else { 
-            n | (default << 8 - i)
+            n | default << (8 - i)
         }
     ) as usize
 }

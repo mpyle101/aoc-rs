@@ -54,7 +54,7 @@ fn step(m: &mut [u32]) -> u32 {
     let mut flashes = 0;
     while let Some(pos) = q.pop_front() {
         flashes += 1;
-        neighbors(&m, pos).iter().for_each(|(i, n)|
+        neighbors(m, pos).iter().for_each(|(i, n)|
             if *n > 0 && *n < 10 {
                 m[*i] = (*n + 1) % 10;
                 if m[*i] == 0 { q.push_back(*i) }
@@ -70,7 +70,7 @@ fn print(m: &[u32]) {
     m.iter().enumerate().for_each(|(i, n)|
         if (i + 1) % 10 == 0 { println!("{}", *n); } else { print!("{}", *n); }
     );
-    println!("");
+    println!();
 }
 
 fn neighbors(m: &[u32], pos: usize) -> [(usize, u32);8] {

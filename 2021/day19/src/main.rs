@@ -50,12 +50,14 @@ fn main() {
 }
 
 type Beacon = Point3<i32>;
+type Delta = (i32, usize, usize);
+type Correlation<'a> = (&'a Scanner, Vec<((usize, usize), i32)>);
 
 #[derive(Debug)]
 #[allow(dead_code)]
 struct Report {
     id: i32,
-    deltas: Vec<(i32, usize, usize)>,
+    deltas: Vec<Delta>,
     beacons: Vec<Beacon>,
 }
 
@@ -64,7 +66,7 @@ struct Report {
 struct Scanner {
     id: i32,
     origin: (i32, i32, i32),
-    deltas: Vec<(i32, usize, usize)>,
+    deltas: Vec<Delta>,
     beacons: Vec<Beacon>,
 }
 
@@ -85,13 +87,16 @@ fn load(input: &str) -> Vec<Report> {
                 point![x, y, z]
             }).collect::<Vec<_>>();
 
-        let mut deltas = beacons.iter().enumerate()
-            .map(|(i, p1)| beacons[i+1..].iter().enumerate()
-                .map(|(j, p2)| (delta(p1, p2), i, j+i+1)).collect::<Vec<_>>()
+        let mut deltas = beacons.iter()
+            .enumerate()
+            .map(|(i, p1)| beacons[i+1..].iter()
+                .enumerate()
+                .map(|(j, p2)| (delta(p1, p2), i, j+i+1))
+                .collect::<Vec<_>>()
             )
             .flatten()
             .collect::<Vec<_>>();
-        deltas.sort();
+        deltas.sort_unstable();
 
         Report { id, deltas, beacons }
     }).collect()
@@ -155,14 +160,14 @@ fn part_one(reports: &[Report]) -> (i32, Vec<Scanner>) {
                 );
                 if pts.len() == 1 {
                     let (dx, dy, dz) = scanner.origin;
-                    let pt = *pts.iter().nth(0).unwrap();
+                    let pt = *pts.iter().next().unwrap();
                     let origin = (pt.0 + dx, pt.1 + dy, pt.2 + dz);
                     let v = report.beacons.iter()
                         .map(|b| rot * b)
                         .collect::<Vec<_>>();
                     let s = Scanner {
+                        origin,
                         id: report.id,
-                        origin: origin,
                         deltas: report.deltas.clone(),
                         beacons: v.clone(),
                     };
@@ -207,36 +212,19 @@ fn delta(b1: &Beacon, b2: &Beacon) -> i32 {
     (b1.z - b2.z).abs()
 }
 
-fn find_matches<'a>(scanners: &'a [Scanner], report: &Report)
-    -> Option<(&'a Scanner, Vec<((usize, usize), i32)>)>
+fn find_matches<'a>(scanners: &'a [Scanner], report: &Report) -> Option<Correlation<'a>>
 {
     // Look for matches of at least 12 correlated points
     // based on 7 or more deltas and return them along
     // with the correlations.
-    let mut correlations = None;
-
-    let scanner = scanners.iter().find(|s| {
+    scanners.iter().find_map(|s| {
         let matches = get_matches(&s.deltas, &report.deltas);
         let v = correlate(&matches, 6);
-        if v.len() > 11 {
-            correlations = Some(v);
-            true
-        } else {
-            false
-        }
-    });
-
-    if let Some(s) = scanner {
-        Some((s, correlations.unwrap()))
-    } else {
-        None
-    }
+        (v.len() > 11).then(|| (s, v))
+    })
 }
 
-fn get_matches(
-    d1: &Vec<(i32, usize, usize)>,
-    d2: &Vec<(i32, usize, usize)>
-) -> Vec<((i32, usize, usize), (i32, usize, usize))>
+fn get_matches(d1: &[Delta], d2: &[Delta]) -> Vec<(Delta, Delta)>
 {
     // Look for deltas between points in each point cloud
     // that are the same. Since both are sorted we only need
@@ -258,13 +246,10 @@ fn get_matches(
     matching
 }
 
-fn correlate(
-    matches: &Vec<((i32, usize, usize), (i32, usize, usize))>,
-    threshold: i32
-) -> Vec<((usize, usize), i32)>
+fn correlate(matches: &[(Delta, Delta)], threshold: i32) -> Vec<((usize, usize), i32)>
 {
     // Creating a map of the number of times a match contains
-    // a beacon from point cloud to another and return any
+    // a beacon from one point cloud to another and return any
     // which show up more than specified threshold. These represent
     // a beacon in A which we think is the same one in B.
     use std::collections::HashMap;
@@ -278,12 +263,8 @@ fn correlate(
     });
 
     let mut counts = map.iter()
-        .filter_map(|e| 
-            if *e.1 > threshold {
-                Some((*e.0, *e.1))
-            } else {
-                 None
-        }).collect::<Vec<_>>();
+        .filter_map(|e| (*e.1 > threshold).then(|| (*e.0, *e.1)))
+        .collect::<Vec<_>>();
     counts.sort_by(|a, b| b.1.cmp(&a.1));
 
     counts

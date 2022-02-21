@@ -58,9 +58,7 @@ fn read_value(chars: &mut Chars) -> Value {
     if let Some(c) = chars.next() {
         if c == '[' {
             Value::Complex(Box::from(Number::new(chars)))
-        } else if c == ',' {
-            read_value(chars)
-        } else if c == ']' {
+        } else if c == ',' || c == ']' {
             read_value(chars)
         } else {
             Value::Regular(c.to_digit(10).unwrap())

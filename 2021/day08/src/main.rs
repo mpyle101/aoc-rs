@@ -48,13 +48,13 @@ fn part_two(signals: &[(Vec<&str>, Vec<&str>)]) -> i32 {
     ]);
 
     signals.iter().map(|(wires, outputs)| {
-        let one   = find_by_length(&wires, 2);
-        let four  = find_by_length(&wires, 4);
-        let seven = find_by_length(&wires, 3);
-        let eight = find_by_length(&wires, 7);
+        let one   = find_by_length(wires, 2);
+        let four  = find_by_length(wires, 4);
+        let seven = find_by_length(wires, 3);
+        let eight = find_by_length(wires, 7);
 
         let abcdf = &four | &seven;
-        let fives = filter_by_length(&wires, 5);
+        let fives = filter_by_length(wires, 5);
         let two   = fives.iter()
             .filter(|v| (*v - &abcdf).len() == 2)
             .collect::<Vec<_>>();
@@ -98,7 +98,7 @@ fn split(line: &str) -> Vec<&str> {
 
 fn decode(key: &HashMap<char, char>, s: &str) -> String {
     let mut chars = s.chars().map(|c| *key.get(&c).unwrap()).collect::<Vec<char>>();
-    chars.sort();
+    chars.sort_unstable();
     String::from_iter(chars)
 }
 

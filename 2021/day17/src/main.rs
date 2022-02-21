@@ -127,7 +127,7 @@ fn fire(vel: (i32, i32), target: &Target) -> Option<(Probe, i32)> {
     let mut probe = Probe::new(vel);
 
     let mut max_y = 0;
-    let res = loop {
+    loop {
         probe.step();
         max_y = max_y.max(probe.y());
 
@@ -136,9 +136,7 @@ fn fire(vel: (i32, i32), target: &Target) -> Option<(Probe, i32)> {
         } else if probe.missed(target) {
             break None
         }
-    };
-
-    res
+    }
 }
 
 

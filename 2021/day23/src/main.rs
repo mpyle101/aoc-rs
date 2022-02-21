@@ -70,7 +70,7 @@ fn states(s: &Shrimp, state: &State, goal: &State, bottom: i32) -> Option<Vec<(S
 
     if row(s) > 1 {
         // In a room, get the genus for that room.
-        let c = get(&goal, row(s), col(s)).unwrap();
+        let c = get(goal, row(s), col(s)).unwrap();
 
         // In the right room and the same genus in the slots
         // below (if any). Don't move.
@@ -115,7 +115,7 @@ fn states(s: &Shrimp, state: &State, goal: &State, bottom: i32) -> Option<Vec<(S
         .map(|(rc, n)| {
             let mut v = s2.clone();
             v.push((rc, s.1));
-            v.sort();
+            v.sort_unstable();
             (v, n)
         })
         .collect())
