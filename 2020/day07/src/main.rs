@@ -34,7 +34,7 @@ fn part_two(bags: &Bags2) -> u32 {
     use std::collections::VecDeque;
 
     let sg = bags.get(&("shiny", "gold")).unwrap();
-    let mut q: VecDeque<_> = sg.iter().map(|b| *b).collect();
+    let mut q: VecDeque<_> = sg.iter().copied().collect();
     let mut total_bags = 0;
 
     while let Some(b) = q.pop_front() {
@@ -57,7 +57,7 @@ fn load_one(input: &str) -> Bags1 {
         .for_each(|(b, v)| v.iter().for_each(|&s| {
             let b = b.split(' ').collect::<Vec<_>>();
             let c = s.split(' ').collect::<Vec<_>>();
-            bags.entry((c[1], c[2])).or_insert(Vec::new()).push((b[0], b[1]));
+            bags.entry((c[1], c[2])).or_insert_with(Vec::new).push((b[0], b[1]));
         }));
 
     bags
@@ -72,7 +72,7 @@ fn load_two(input: &str) -> Bags2 {
             let b = b.split(' ').collect::<Vec<_>>();
             let c = s.split(' ').collect::<Vec<_>>();
             if c[0] != "no" {
-                bags.entry((b[0], b[1])).or_insert(Vec::new()).push(
+                bags.entry((b[0], b[1])).or_insert_with(Vec::new).push(
                     ((c[1], c[2]), c[0].parse::<u32>().unwrap())
                 );
             }

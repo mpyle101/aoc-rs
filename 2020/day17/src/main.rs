@@ -3,11 +3,11 @@ use std::collections::HashSet;
 fn main() {
     let cubes = load(include_str!("./cubes.txt"));
 
-    let active_count = part_one(&cubes);
-    println!("Part 1: {}", active_count);
+    let active = part_one(&cubes);
+    println!("Part 1: {active}");
 
-    let active_count = part_two(&cubes);
-    println!("Part 2: {}", active_count);
+    let active = part_two(&cubes);
+    println!("Part 2: {active}");
 }
 
 fn load(input: &str) -> HashSet<Point> {
@@ -24,13 +24,11 @@ fn load(input: &str) -> HashSet<Point> {
 fn part_one(cubes: &HashSet<Point>) -> usize {
     use itertools::Itertools;
 
-    let mut deltas: Vec<_> = (-1..=1).map(|_| -1..=1)
+    let mut deltas = (-1..=1)
+        .map(|_| -1..=1)
         .multi_cartesian_product()
-        .map(|v| { 
-            let mut w = v.clone();
-            w.push(0);
-            w
-        }).collect();
+        .map(|mut v| { v.push(0); v })
+        .collect::<Vec<_>>();
     let home = deltas.iter().find_position(|v| is_home(v)).unwrap().0;
     deltas.remove(home);
 
@@ -40,22 +38,20 @@ fn part_one(cubes: &HashSet<Point>) -> usize {
 fn part_two(cubes: &HashSet<Point>) -> usize {
     use itertools::Itertools;
 
-    let mut deltas: Vec<_> = (-1..=1).flat_map(|w| 
-        (-1..=1).map(|_| -1..=1)
+    let mut deltas = (-1..=1)
+        .flat_map(|w| (-1..=1)
+            .map(|_| -1..=1)
             .multi_cartesian_product()
-            .map(|p| { 
-                let mut v = p.clone();
-                v.push(w);
-                v
-            }).collect::<Vec<_>>()
-        ).collect();
+            .map(|mut v| { v.push(w); v })
+            .collect::<Vec<_>>()
+        ).collect::<Vec<_>>();
     let home = deltas.iter().find_position(|v| is_home(v)).unwrap().0;
     deltas.remove(home);
 
     (0..6).fold(cubes.clone(), |acc, _| cycle(&acc, &deltas)).len()
 }
 
-fn is_home(v: &Vec<i32>) -> bool {
+fn is_home(v: &[i32]) -> bool {
     v.iter().all(|&n| n == 0)
 }
 
@@ -66,15 +62,17 @@ fn cycle(cubes: &HashSet<Point>, deltas: &[Vec<i32>]) -> HashSet<Point> {
     use std::collections::VecDeque;
 
     let mut active = HashSet::new();
-    let mut queue: VecDeque<_> = cubes.iter().cloned().collect();
+    let mut queue = cubes.iter().cloned().collect::<VecDeque<_>>();
     while let Some(pt) = queue.pop_back() {
-        let nearby: Vec<_> = deltas.iter().map(|v|
+        let nearby = deltas.iter().map(|v|
             Point(pt.0 + v[0], pt.1 + v[1], pt.2 + v[2], pt.3 + v[3])
-        ).collect();
+        ).collect::<Vec<_>>();
 
         let count = nearby.iter().filter(|&p| cubes.contains(p)).count();
         if cubes.contains(&pt) {
-            nearby.iter().for_each(|p| if !cubes.contains(p) { queue.push_back(*p)});
+            nearby.iter()
+                .filter(|p| !cubes.contains(p))
+                .for_each(|p| queue.push_back(*p));
  
             if count == 2 || count == 3 {
                 active.insert(pt);
@@ -90,16 +88,16 @@ fn cycle(cubes: &HashSet<Point>, deltas: &[Vec<i32>]) -> HashSet<Point> {
 
 #[cfg(test)]
 mod tests {
-  use super::*;
+    use super::*;
 
-  #[test]
-  fn it_works() {
-    let cubes = load(include_str!("./cubes.txt"));
+    #[test]
+    fn it_works() {
+        let cubes = load(include_str!("./cubes.txt"));
 
-    let active_count = part_one(&cubes);
-    assert_eq!(active_count, 319);
+        let active_count = part_one(&cubes);
+        assert_eq!(active_count, 319);
 
-    let active_count = part_two(&cubes);
-    assert_eq!(active_count, 2324);
-  }
+        let active_count = part_two(&cubes);
+        assert_eq!(active_count, 2324);
+    }
 }

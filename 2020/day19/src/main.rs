@@ -92,8 +92,8 @@ fn clause(rules: &Rules, id: u32, depth: u32) -> String {
     let rule = rules.get(&id).unwrap();
 
     match rule {
-        Rule::Literal(s) => format!("{}", s),
-        Rule::Concat(v) => v.iter().map(|&r| clause(rules, r, depth + 1)).collect(),
+        Rule::Concat(v)  => v.iter().map(|&r| clause(rules, r, depth + 1)).collect(),
+        Rule::Literal(s) => s.to_string(),
         Rule::Either(v1, v2) => 
             format!(
                 "({}|{})",

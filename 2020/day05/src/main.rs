@@ -23,7 +23,7 @@ fn part_two(passes: &[&str]) -> u32 {
     let rows: Vec<_> = passes.iter().map(|s| find_row(&s[0..7])).collect();
     let cols: Vec<_> = passes.iter().map(|s| find_col(&s[7..])).collect();
     let mut sids: Vec<_> = rows.iter().zip(cols.iter()).map(|(r, c)| r * 8 + c).collect();
-    sids.sort();
+    sids.sort_unstable();
 
     let mut prev = sids[0];
     for &id in sids.iter().skip(1) {
@@ -37,7 +37,7 @@ fn part_two(passes: &[&str]) -> u32 {
 }
 
 fn find_row(pass: &str) -> u32 {
-    let mut rows = (0..128).map(|r| r).collect::<Vec<u32>>();
+    let mut rows = (0..128).collect::<Vec<u32>>();
 
     for &c in pass.as_bytes() {
         let zones = rows.split_at(rows.len()/2);
@@ -48,7 +48,7 @@ fn find_row(pass: &str) -> u32 {
 }
 
 fn find_col(pass: &str) -> u32 {
-    let mut cols = (0..8).map(|r| r).collect::<Vec<u32>>();
+    let mut cols = (0..8).collect::<Vec<u32>>();
 
     for &c in pass.as_bytes() {
         let zones = cols.split_at(cols.len()/2);
@@ -61,16 +61,16 @@ fn find_col(pass: &str) -> u32 {
 
 #[cfg(test)]
 mod tests {
-  use super::*;
+    use super::*;
 
-  #[test]
-  fn it_works() {
-    let passes = load(include_str!("./passes.txt"));
-    
-    let ticket = part_one(&passes).unwrap();
-    assert_eq!(ticket, 998);
+    #[test]
+    fn it_works() {
+        let passes = load(include_str!("./passes.txt"));
+        
+        let ticket = part_one(&passes).unwrap();
+        assert_eq!(ticket, 998);
 
-    let ticket = part_two(&passes);
-    assert_eq!(ticket, 676);
-  }
+        let ticket = part_two(&passes);
+        assert_eq!(ticket, 676);
+    }
 }

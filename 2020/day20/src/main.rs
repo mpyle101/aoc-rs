@@ -105,7 +105,7 @@ fn solve(
     }
 
     let used = image.used();
-    for (tile, _) in tiles {
+    for tile in tiles.keys() {
         if used.contains(&tile.id) {
             continue;
         }
@@ -190,7 +190,7 @@ fn combine(t1: &Matrix<char>, t2: &Matrix<char>) -> Matrix<char> {
     let iter2 = t2.iter();
 
     Matrix::from_rows(
-        iter1.zip(iter2).map(|(r1, r2)| r1.iter().chain(r2).map(|c| *c))
+        iter1.zip(iter2).map(|(r1, r2)| r1.iter().chain(r2).copied())
     ).unwrap()
 }
 

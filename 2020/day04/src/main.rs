@@ -31,11 +31,11 @@ impl<'a> Passport<'a> {
             byr: data.get("byr").and_then(|v| v.parse::<u32>().ok()),
             iyr: data.get("iyr").and_then(|v| v.parse::<u32>().ok()),
             eyr: data.get("eyr").and_then(|v| v.parse::<u32>().ok()),
-            hgt: data.get("hgt").and_then(|v| Some(*v)),
-            hcl: data.get("hcl").and_then(|v| Some(*v)),
-            ecl: data.get("ecl").and_then(|v| Some(*v)),
-            pid: data.get("pid").and_then(|v| Some(*v)),
-            cid: data.get("cid").and_then(|v| Some(*v)),
+            hgt: data.get("hgt").copied(),
+            hcl: data.get("hcl").copied(),
+            ecl: data.get("ecl").copied(),
+            pid: data.get("pid").copied(),
+            cid: data.get("cid").copied(),
         }
     }
 
@@ -52,7 +52,7 @@ impl<'a> Passport<'a> {
             hcl: data.get("hcl").and_then(|&v| parse_hair_color(v)),
             ecl: data.get("ecl").and_then(|&v| parse_eye_color(&colors, v)),
             pid: data.get("pid").and_then(|&v| parse_passport_id(v)),
-            cid: data.get("cid").and_then(|&v| Some(v)),
+            cid: data.get("cid").copied(),
         }
     }
 
@@ -104,7 +104,7 @@ fn parse_height(s: &str) -> Option<&str> {
 }
 
 fn parse_hair_color(s: &str) -> Option<&str> {
-    if s.len() == 7 && s.bytes().nth(0) == Some(b'#') {
+    if s.len() == 7 && s.as_bytes().get(0) == Some(&b'#') {
         for c in s.bytes().skip(1) {
             match c {
                 b'a'..=b'f' => {},

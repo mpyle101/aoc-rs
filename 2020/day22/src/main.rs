@@ -12,10 +12,10 @@ fn main() {
     let decks = load(include_str!("./input.txt"));
 
     let score = part_one(&decks);
-    println!("Part 1: {}", score);
+    println!("Part 1: {score}");
 
     let score = part_two(&decks);
-    println!("Part 2: {}", score);
+    println!("Part 2: {score}");
 }
 
 fn load(input: &str) -> Vec<Vec<usize>> {
@@ -31,7 +31,7 @@ fn part_one(decks: &[Vec<usize>]) -> usize {
     let mut deck1: Deck = decks[0].iter().cloned().collect();
     let mut deck2: Deck = decks[1].iter().cloned().collect();
 
-    while deck1.len() > 0 && deck2.len() > 0 {
+    while !deck1.is_empty() && !deck2.is_empty() {
         let card1 = deck1.pop_front().unwrap();
         let card2 = deck2.pop_front().unwrap();
 
@@ -46,7 +46,7 @@ fn part_one(decks: &[Vec<usize>]) -> usize {
         }
     }
 
-    let winner = if deck1.len() > 0 { deck1 } else { deck2 };
+    let winner = if !deck1.is_empty() { deck1 } else { deck2 };
     winner.iter()
         .rev()
         .enumerate()
@@ -73,7 +73,7 @@ fn play(deck1: &mut Deck, deck2: &mut Deck) -> Player {
     let mut winner = None;
     while winner.is_none() {
         let round = Round (deck1.clone(), deck2.clone());
-        if rounds.iter().find(|&r| *r == round).is_some() {
+        if rounds.iter().any(|r| *r == round) {
             winner = Some(Player::One)
         } else {
             let card1 = deck1.pop_front().unwrap();
@@ -83,8 +83,10 @@ fn play(deck1: &mut Deck, deck2: &mut Deck) -> Player {
                 let mut d1: Deck = deck1.iter().take(card1).cloned().collect();
                 let mut d2: Deck = deck2.iter().take(card2).cloned().collect();
                 play(&mut d1, &mut d2)
-            } else {
-                if card1 > card2 { Player::One } else { Player::Two }
+            } else if card1 > card2 { 
+                Player::One 
+            } else { 
+                Player::Two
             };
 
             if round_winner == Player::One {
@@ -96,9 +98,9 @@ fn play(deck1: &mut Deck, deck2: &mut Deck) -> Player {
             }
             rounds.push(round);
 
-            if deck1.len() == 0 {
+            if deck1.is_empty() {
                 winner = Some(Player::Two)
-            } else if deck2.len() == 0 {
+            } else if deck2.is_empty() {
                 winner = Some(Player::One)
             }
         }
@@ -113,27 +115,27 @@ struct Round (Deck, Deck);
 
 #[cfg(test)]
 mod tests {
-  use super::*;
+    use super::*;
 
-  #[test]
-  fn it_works() {
-    let decks = load(include_str!("./input.txt"));
+    #[test]
+    fn it_works() {
+        let decks = load(include_str!("./input.txt"));
 
-    let score = part_one(&decks);
-    assert_eq!(score, 35818);
+        let score = part_one(&decks);
+        assert_eq!(score, 35818);
 
-    let score = part_two(&decks);
-    assert_eq!(score, 34771);
-  }
+        let score = part_two(&decks);
+        assert_eq!(score, 34771);
+    }
 
-  #[test]
-  fn small() {
-    let decks = load(include_str!("./test.txt"));
+    #[test]
+    fn small() {
+        let decks = load(include_str!("./test.txt"));
 
-    let score = part_one(&decks);
-    assert_eq!(score, 306);
+        let score = part_one(&decks);
+        assert_eq!(score, 306);
 
-    let score = part_two(&decks);
-    assert_eq!(score, 291);
-  }
+        let score = part_two(&decks);
+        assert_eq!(score, 291);
+    }
 }

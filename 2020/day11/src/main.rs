@@ -122,37 +122,37 @@ fn draw(seats: &HashSet<Pos>, taken: &HashSet<Pos>, rows: usize, cols: usize) {
                 _ if seats.contains(&seat) => 'L',
                 _ => '.'
             };
-            print!("{}", c);
+            print!("{c}");
         });
-        println!("");
+        println!();
     })
 }
 
 
 #[cfg(test)]
 mod tests {
-  use super::*;
+    use super::*;
 
-  #[test]
-  fn it_works() {
-    let (seats, rows, cols) = load(include_str!("./seats.txt"));
-    
-    let taken = part_one(&seats);
-    assert_eq!(taken, 2344);
-    
-    let taken = part_two(&seats, rows, cols);
-    assert_eq!(taken, 2076);
-  }
+    #[test]
+    fn it_works() {
+        let (seats, rows, cols) = load(include_str!("./seats.txt"));
+        
+        let taken = part_one(&seats);
+        assert_eq!(taken, 2344);
+        
+        let taken = part_two(&seats, rows, cols);
+        assert_eq!(taken, 2076);
+    }
 
 
-  #[test]
-  fn small_works() {
-    let (seats, rows, cols) = load(include_str!("./test_s.txt"));
-    
-    let taken = part_one(&seats);
-    assert_eq!(taken, 37);
-    
-    let taken = part_two(&seats, rows, cols);
-    assert_eq!(taken, 26);
-  }
+    #[test]
+    fn small_works() {
+        let (seats, rows, cols) = load(include_str!("./test_s.txt"));
+        
+        let taken = part_one(&seats);
+        assert_eq!(taken, 37);
+        
+        let taken = part_two(&seats, rows, cols);
+        assert_eq!(taken, 26);
+    }
 }

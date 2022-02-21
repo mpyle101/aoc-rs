@@ -5,10 +5,10 @@ fn main() {
     let allergens = find_allergens(&recipes);
 
     let count = part_one(&recipes, &allergens);
-    println!("Part 1: {}", count);
+    println!("Part 1: {count}");
 
     let ingredients = part_two(&allergens);
-    println!("Part 2: {}", ingredients);
+    println!("Part 2: {ingredients}");
 }
 
 fn part_one(recipes: &[Recipe], allergens: &HashMap<&str, &str>) -> usize {
@@ -19,35 +19,36 @@ fn part_one(recipes: &[Recipe], allergens: &HashMap<&str, &str>) -> usize {
 
 fn part_two(allergens: &HashMap<&str, &str>) -> String {
     let mut values: Vec<_> = allergens.iter().map(|(&k, &v)| (v, k)).collect();
-    values.sort();
+    values.sort_unstable();
     values.iter().map(|(_, k)| *k).collect::<Vec<_>>().join(",")
 }
 
 fn find_allergens<'a>(recipes: &'a [Recipe]) -> HashMap<&'a str, &'a str> {
     let mut allergens: HashMap<&str, HashSet<&str>> = HashMap::new();
     for r in recipes {
-        let i: HashSet<_> = r.ingredients.iter().map(|e| *e).collect();
+        let i = r.ingredients.iter().copied().collect::<HashSet<_>>();
         for a in r.allergens.clone() {
             let mut s = allergens.get(a).unwrap_or(&i).clone();
-            s = s.intersection(&i).map(|e| *e).collect();
+            s = &s & &i;
             allergens.insert(a, s);
         }
     }
 
     let mut found: HashMap<&str, &str> = HashMap::new();
 
-    while allergens.len() > 0 {
+    while !allergens.is_empty() {
         let mut remove = Vec::new();
         let mut insert = Vec::new();
 
         for (&k, v) in allergens.iter() {
             if v.len() == 1 {
-                found.insert(v.iter().nth(0).unwrap(), k);
+                found.insert(v.iter().next().unwrap(), k);
                 remove.push(k);
             } else {
-                let l: HashSet<_> = v.iter()
-                    .filter(|&&e| !found.contains_key(e))
-                    .map(|e| *e).collect();
+                let l = v.iter()
+                    .filter(|e| !found.contains_key(*e))
+                    .copied()
+                    .collect::<HashSet<_>>();
                 insert.push((k, l));
             }
         }
@@ -80,17 +81,17 @@ struct Recipe<'a> {
 
 #[cfg(test)]
 mod tests {
-  use super::*;
+    use super::*;
 
-  #[test]
-  fn it_works() {
-    let recipes = load(include_str!("./input.txt"));
-    let allergens = find_allergens(&recipes);
+    #[test]
+    fn it_works() {
+        let recipes = load(include_str!("./input.txt"));
+        let allergens = find_allergens(&recipes);
 
-    let count = part_one(&recipes, &allergens);
-    assert_eq!(count, 2125);
+        let count = part_one(&recipes, &allergens);
+        assert_eq!(count, 2125);
 
-    let ingredients = part_two(&allergens);
-    assert_eq!(ingredients, "phc,spnd,zmsdzh,pdt,fqqcnm,lsgqf,rjc,lzvh");
-  }
+        let ingredients = part_two(&allergens);
+        assert_eq!(ingredients, "phc,spnd,zmsdzh,pdt,fqqcnm,lsgqf,rjc,lzvh");
+    }
 }

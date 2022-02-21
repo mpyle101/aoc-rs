@@ -2,14 +2,14 @@ fn main() {
     let input = [1,3,5,4,6,8,7,2,9];
 
     let labels = part_one(&input, 100);
-    println!("Part 1: {}", labels);
+    println!("Part 1: {labels}");
 
     let stars = part_two(&input);
-    println!("Part 2: {}", stars);
+    println!("Part 2: {stars}");
 }
 
 fn part_one(input: &[i32;9], moves: u32) -> String {
-    let mut cups: Vec<_> = input.iter().cloned().collect();
+    let mut cups: Vec<_> = input.to_vec();
 
     (0..moves).fold(0, |cup, _| do_move(cup, &mut cups));
 
@@ -85,7 +85,7 @@ fn take_three(pos: usize, cups: &mut Vec<i32>) -> Vec<i32> {
 
     let mut slots = [(pos + 1) % l, (pos + 2) % l, (pos + 3) % l];
     let picks: Vec<_> = slots.iter().map(|i| cups[*i]).collect();
-    slots.sort();
+    slots.sort_unstable();
     cups.remove(slots[2]);
     cups.remove(slots[1]);
     cups.remove(slots[0]);
@@ -106,30 +106,30 @@ fn find_dest(label: i32, cups: &[i32], picks: &[i32], max: i32) -> usize {
 
 #[cfg(test)]
 mod tests {
-  use super::*;
+    use super::*;
 
-  #[test]
-  fn it_works() {
-    let input = [1,3,5,4,6,8,7,2,9];
+    #[test]
+    fn it_works() {
+        let input = [1,3,5,4,6,8,7,2,9];
 
-    let labels = part_one(&input, 100);
-    assert_eq!(labels, "32897654");
+        let labels = part_one(&input, 100);
+        assert_eq!(labels, "32897654");
 
-    let stars = part_two(&input);
-    assert_eq!(stars, 186715244496);
-  }
+        let stars = part_two(&input);
+        assert_eq!(stars, 186715244496);
+    }
 
-  #[test]
-  fn small() {
-    let input = [3,8,9,1,2,5,4,6,7];
+    #[test]
+    fn small() {
+        let input = [3,8,9,1,2,5,4,6,7];
 
-    let labels = part_one(&input, 10);
-    assert_eq!(labels, "92658374");
+        let labels = part_one(&input, 10);
+        assert_eq!(labels, "92658374");
 
-    let labels = part_one(&input, 100);
-    assert_eq!(labels, "67384529");
+        let labels = part_one(&input, 100);
+        assert_eq!(labels, "67384529");
 
-    let stars = part_two(&input);
-    assert_eq!(stars, 149245887792);
-  }
+        let stars = part_two(&input);
+        assert_eq!(stars, 149245887792);
+    }
 }

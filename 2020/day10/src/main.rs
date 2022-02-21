@@ -4,16 +4,16 @@ fn main() {
     let adapters = load(include_str!("./adapters.txt"));
 
     let jolts = part_one(&adapters);
-    println!("Part1: {}", jolts);
+    println!("Part 1: {jolts}");
 
     let jolts = part_two(&adapters);
-    println!("Part2: {}", jolts);
+    println!("Part 2: {jolts}");
 }
 
 fn load(adapters: &str) -> Vec<u32> {
     let mut v: Vec<_> = adapters.lines().map(|v| v.parse::<u32>().unwrap())
         .collect();
-    v.sort();
+    v.sort_unstable();
 
     let last = *v.last().unwrap();
     v.insert(0, 0);
@@ -52,38 +52,38 @@ fn part_two(adapters: &[u32]) -> i64 {
 
 #[cfg(test)]
 mod tests {
-  use super::*;
+    use super::*;
 
-  #[test]
-  fn it_works() {
-    let adapters = load(include_str!("./adapters.txt"));
-    
-    let jolts = part_one(&adapters);
-    assert_eq!(jolts, 2574);
-    
-    let jolts = part_two(&adapters);
-    assert_eq!(jolts, 2644613988352);
-  }
+    #[test]
+    fn it_works() {
+        let adapters = load(include_str!("./adapters.txt"));
+        
+        let jolts = part_one(&adapters);
+        assert_eq!(jolts, 2574);
+        
+        let jolts = part_two(&adapters);
+        assert_eq!(jolts, 2644613988352);
+    }
 
-  #[test]
-  fn small_works() {
-    let adapters = load(include_str!("./test_s.txt"));
-    
-    let jolts = part_one(&adapters);
-    assert_eq!(jolts, 35);
+    #[test]
+    fn small_works() {
+        let adapters = load(include_str!("./test_s.txt"));
+        
+        let jolts = part_one(&adapters);
+        assert_eq!(jolts, 35);
 
-    let count = part_two(&adapters);
-    assert_eq!(count, 8);
-  }
+        let count = part_two(&adapters);
+        assert_eq!(count, 8);
+    }
 
-  #[test]
-  fn medium_works() {
-    let adapters = load(include_str!("./test_m.txt"));
-    
-    let jolts = part_one(&adapters);
-    assert_eq!(jolts, 220);
+    #[test]
+    fn medium_works() {
+        let adapters = load(include_str!("./test_m.txt"));
+        
+        let jolts = part_one(&adapters);
+        assert_eq!(jolts, 220);
 
-    let count = part_two(&adapters);
-    assert_eq!(count, 19208);
-  }
+        let count = part_two(&adapters);
+        assert_eq!(count, 19208);
+    }
 }

@@ -3,11 +3,11 @@ fn main() {
     let (ts, shuttles) = load_notes(include_str!("./notes.txt"));
 
     let bus = part_one(ts, &shuttles);
-    println!("Part1: {}", bus);
+    println!("Part 1: {bus}");
 
     let shuttles = load_shuttles(include_str!("./notes.txt"));
     let ts = part_two(&shuttles);
-    println!("Part2: {}", ts);
+    println!("Part 2: {ts}");
 }
 
 fn load_notes(notes: &str) -> (i32, Vec<i32>) {
@@ -18,7 +18,7 @@ fn load_notes(notes: &str) -> (i32, Vec<i32>) {
             "x" => None,
              s  => s.parse::<i32>().ok()
         })
-        .collect::<Vec<i32>>();
+        .collect::<Vec<_>>();
 
     (ts, shuttles)
 }
@@ -29,7 +29,7 @@ fn load_shuttles(notes: &str) -> Vec<(u64, u64)> {
         .enumerate()
         .filter_map(|(i, v)| match v {
             "x" => None,
-             s  => s.parse::<u64>().and_then(|v| Ok((i as u64, v))).ok()
+             s  => s.parse::<u64>().map(|v| (i as u64, v)).ok()
         })
         .collect();
 
@@ -100,64 +100,64 @@ fn modinv(a: u64, m: u64) -> u64 {
 
 #[cfg(test)]
 mod tests {
-  use super::*;
+    use super::*;
 
-  #[test]
-  fn it_works() {
-    let (ts, shuttles) = load_notes(include_str!("./notes.txt"));
-    let bus = part_one(ts, &shuttles);
-    assert_eq!(bus, 203);
+    #[test]
+    fn it_works() {
+        let (ts, shuttles) = load_notes(include_str!("./notes.txt"));
+        let bus = part_one(ts, &shuttles);
+        assert_eq!(bus, 203);
 
-    let shuttles = load_shuttles(include_str!("./notes.txt"));
-    let ts = part_two(&shuttles);
-    assert_eq!(ts, 905694340256752);
-  }
+        let shuttles = load_shuttles(include_str!("./notes.txt"));
+        let ts = part_two(&shuttles);
+        assert_eq!(ts, 905694340256752);
+    }
 
-  #[test]
-  fn example_1() {
-    let shuttles = load_shuttles("0\n7,13,x,x,59,x,31,19");
+    #[test]
+    fn example_1() {
+        let shuttles = load_shuttles("0\n7,13,x,x,59,x,31,19");
 
-    let ts = part_two(&shuttles);
-    assert_eq!(ts, 1068781);
-  }
+        let ts = part_two(&shuttles);
+        assert_eq!(ts, 1068781);
+    }
 
-  #[test]
-  fn example_2() {
-    let shuttles = load_shuttles("0\n17,x,13,19");
+    #[test]
+    fn example_2() {
+        let shuttles = load_shuttles("0\n17,x,13,19");
 
-    let ts = part_two(&shuttles);
-    assert_eq!(ts, 3417);
-  }
+        let ts = part_two(&shuttles);
+        assert_eq!(ts, 3417);
+    }
 
-  #[test]
-  fn example_3() {
-    let shuttles = load_shuttles("0\n67,7,59,61");
-    println!("{:?}", shuttles);
-    let ts = part_two(&shuttles);
-    assert_eq!(ts, 754018);
-  }
+    #[test]
+    fn example_3() {
+        let shuttles = load_shuttles("0\n67,7,59,61");
+        println!("{:?}", shuttles);
+        let ts = part_two(&shuttles);
+        assert_eq!(ts, 754018);
+    }
 
-  #[test]
-  fn example_4() {
-    let shuttles = load_shuttles("0\n67,x,7,59,61");
+    #[test]
+    fn example_4() {
+        let shuttles = load_shuttles("0\n67,x,7,59,61");
 
-    let ts = part_two(&shuttles);
-    assert_eq!(ts, 779210);
-  }
+        let ts = part_two(&shuttles);
+        assert_eq!(ts, 779210);
+    }
 
-  #[test]
-  fn example_5() {
-    let shuttles = load_shuttles("0\n67,7,x,59,61");
-    let ts = part_two(&shuttles);
+    #[test]
+    fn example_5() {
+        let shuttles = load_shuttles("0\n67,7,x,59,61");
+        let ts = part_two(&shuttles);
 
-    assert_eq!(ts, 1261476);
-  }
+        assert_eq!(ts, 1261476);
+    }
 
-  #[test]
-  fn example_6() {
-    let shuttles = load_shuttles("0\n1789,37,47,1889");
-    let ts = part_two(&shuttles);
+    #[test]
+    fn example_6() {
+        let shuttles = load_shuttles("0\n1789,37,47,1889");
+        let ts = part_two(&shuttles);
 
-    assert_eq!(ts, 1202161486);
-  }
+        assert_eq!(ts, 1202161486);
+    }
 }
