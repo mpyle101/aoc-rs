@@ -3,10 +3,10 @@ use std::hash::{Hash, Hasher};
 use std::collections::{BinaryHeap, HashMap, HashSet};
 
 type Tile = (i32, i32);
-type Keys = HashMap<Tile, char>;
+type Keys = HashMap<Tile, u32>;
 type Paths = HashMap<u32, (u32, u32)>;
 type Tiles = HashSet<Tile>;
-type Doors = HashMap<Tile, char>;
+type Doors = HashMap<Tile, u32>;
 type Cache = HashMap<State, u32>;
 
 fn main() {
@@ -20,10 +20,10 @@ fn main() {
 }
 
 fn load(input: &str) -> Map {
-    let mut robot = (0, 0);
     let mut keys  = Keys::new();
     let mut doors = Doors::new();
     let mut tiles = Tiles::new();
+    let mut robots = vec![];
 
     for (y, s) in input.lines().enumerate() {
         for (x, c) in s.chars().enumerate() {
@@ -32,22 +32,23 @@ fn load(input: &str) -> Map {
                 '.' => { tiles.insert(tile); },
                 'a'..='z' => {
                     tiles.insert(tile);
-                    keys.insert(tile, c);
+                    keys.insert(tile, 1 << c as u8 - b'a');
                 },
                 'A'..='Z' => {
+                    let c = c.to_ascii_lowercase();
                     tiles.insert(tile);
-                    doors.insert(tile, c.to_ascii_lowercase());
+                    doors.insert(tile, 1 << c as u8 - b'a');
                 },
                 '@' => {
                     tiles.insert(tile);
-                    robot = tile;
+                    robots.push(tile);
                 },
                 _ => { /* ignore walls */ }
             }
         }
     }
 
-    Map { keys, doors, tiles, robot }
+    Map { keys, doors, tiles, robots }
 }
 
 fn part_one(map: &Map) -> u32 {
@@ -102,15 +103,17 @@ fn calc_paths(map: &Map) -> HashMap<u32, (u32, u32)> {
         .collect::<Vec<_>>();
 
     // Calculate the shortest path between any two keys along
-    // with the number of steps it takes and the keys needed.
-    map.keys.iter()
+    // with the number of steps it takes and the keys needed
+    // including the starting locations of the robots.
+    let robots = map.robots.iter().map(|p| (*p, 0u32)).collect::<HashMap<_,_>>();
+    map.keys.iter().chain(robots.iter())
         .combinations(2)
         .filter_map(|v| {
             bfs(v[0].0, |p| open(p), |p| p == v[1].0)
                 .map(|path| {
                     let doors = find_doors(&path, map);
                     let steps = path.len() as u32 - 1;
-                    let keys  = v.iter().fold(0u32, |n, (_, &c)| n | 1 << c as u8 - b'a');
+                    let keys  = v.iter().fold(0u32, |n, (_, &k)| n | k);
                     (keys, (steps, doors))
                 })
         })
@@ -118,41 +121,23 @@ fn calc_paths(map: &Map) -> HashMap<u32, (u32, u32)> {
 }
 
 fn init_heap(map: &Map) -> BinaryHeap<State> {
-    use pathfinding::prelude::bfs;
+    let keys = map.keys.values().fold(0u32, |n, k| n | k);
+    let state = State { keys, found: 0, robot: 0, steps: 0 };
 
-    let open = |(x, y): &Tile| DELTA.iter()
-        .map(|(dx, dy)| (x + dx, y + dy))
-        .filter(|p| map.tiles.contains(p))
-        .collect::<Vec<_>>();
-        
-    // Initialize a binary heap with states representing the robot
-    // moving from it's initial position to keys with no intermediate
-    // doors.
-    let keys = map.keys.values().fold(0u32, |n, c| n | 1 << *c as u8 - b'a');
-    map.keys.iter()
-        .filter_map(|(goal, c)| 
-            bfs(&map.robot, |p| open(p), |p| p == goal).map(|path| (path, c))
-        )
-        .filter_map(|(path, c)| {
-            let doors = find_doors(&path, map);
-            let steps = path.len() as u32 - 1;
-            (doors == 0).then(|| (steps, 1 << *c as u8 - b'a'))
-        })
-        .map(|(steps, k)| State { steps, found: k, robot: k, keys: keys & !k } )
-        .collect()
+    BinaryHeap::from([state])
 }
 
 fn find_doors(path: &[(i32, i32)], map: &Map) -> u32 {
     path.iter()
         .filter_map(|p| map.doors.get(p))
-        .fold(0u32, |n, c| n | 1 << *c as u8 - b'a')
+        .fold(0u32, |n, k| n | k)
 }
 
 struct Map {
     keys: Keys,
     doors: Doors,
     tiles: Tiles,
-    robot: Tile,
+    robots: Vec<Tile>,
 }
 
 #[derive(Clone, Debug, Eq)]
