@@ -1,11 +1,18 @@
+use std::collections::HashSet;
+
 fn main() {
     let answers = load(include_str!("./answers.txt"));
 
-    let count = part_one(&answers);
-    println!("Part 1: {}", count);
+    timeit("Part 1", || part_one(&answers));
+    timeit("Part 2", || part_two(&answers));
+}
 
-    let count = part_two(&answers);
-    println!("Part 2: {}", count);
+fn timeit<T>(s: &str, func: impl Fn() -> T)
+    where T: std::fmt::Debug
+{
+    let t = std::time::Instant::now();
+    let result = func();
+    println!("{s}: {:?} ({:?})", result, t.elapsed());
 }
 
 fn load(input: &str) -> Vec<Vec<&str>> {
@@ -13,26 +20,27 @@ fn load(input: &str) -> Vec<Vec<&str>> {
 }
 
 fn part_one(answers: &[Vec<&str>]) -> usize {
-    use std::collections::HashSet;
-
-    // Join vectors into a single set and get then length.
-    answers.iter().map(|v| 
-        v.iter().flat_map(|&s| s.as_bytes().iter().collect::<Vec<_>>())
-        .collect::<HashSet<_>>().len()
-    ).sum()
+    // Union the vectors for each group and sum the lengths.
+    answers.iter()
+        .map(|v| {
+            let f: HashSet<&u8> = HashSet::new();
+            v.iter().fold(f, |set, s| &set | &to_set(s)).len()
+        })
+        .sum()
 }
 
 fn part_two(answers: &[Vec<&str>]) -> usize {
-    use std::collections::HashSet;
-
     // Intersect the vectors for each group and sum the lengths.
-    answers.iter().map(|v| {
-        let f = v[0].as_bytes().iter().collect::<HashSet<_>>();
-        v.iter().fold(f, |acc, &s| {
-            let h = s.as_bytes().iter().collect::<HashSet<_>>();
-            acc.intersection(&h).cloned().collect::<HashSet<_>>()
-        }).len()
-    }).sum()
+    answers.iter()
+        .map(|v| {
+            let f: HashSet<&u8> = v[0].as_bytes().iter().collect();
+            v.iter().fold(f, |set, s| &set & &to_set(s)).len()
+        })
+        .sum()
+}
+
+fn to_set(s: &str) -> HashSet<&u8> {
+    s.as_bytes().iter().collect()
 }
 
 
