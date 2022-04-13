@@ -54,8 +54,9 @@ fn step(m: &mut [u32]) -> u32 {
     let mut flashes = 0;
     while let Some(pos) = q.pop_front() {
         flashes += 1;
-        neighbors(m, pos).iter().for_each(|(i, n)|
-            if *n > 0 && *n < 10 {
+        neighbors(m, pos).iter()
+            .filter(|(_, n)| *n > 0 && *n < 10)
+            .for_each(|(i, n)| {
                 m[*i] = (*n + 1) % 10;
                 if m[*i] == 0 { q.push_back(*i) }
             }
@@ -73,20 +74,27 @@ fn print(m: &[u32]) {
     println!();
 }
 
-fn neighbors(m: &[u32], pos: usize) -> [(usize, u32);8] {
-    const XDIM: usize = 10;
+fn neighbors(m: &[u32], p: usize) -> [(usize, u32);8] {
+    use core::num::Wrapping;
 
-    let top = pos.wrapping_sub(XDIM);
-    let bot = pos.wrapping_add(XDIM);
-    let pre = if pos % XDIM == 0 { 1000 } else { 1 };
-    let pst = if (pos + 1) % XDIM == 0 { 1000 } else { 1 };
+    const ONE: Wrapping<usize>  = Wrapping(1usize);
+    const ZERO: Wrapping<usize> = Wrapping(0usize);
+    const XDIM: Wrapping<usize> = Wrapping(10usize);
+
+    let pos = Wrapping(p);
+    let top = pos - XDIM;
+    let bot = pos + XDIM;
+    let pre = Wrapping(if pos % XDIM == ZERO { 1000 } else { 1 });
+    let pst = Wrapping(if (pos + ONE) % XDIM == ZERO { 1000 } else { 1 });
     let mut arr = [
-        (top.wrapping_sub(pre), u32::MAX), (top, u32::MAX), (top.wrapping_add(pst), u32::MAX),
-        (pos.wrapping_sub(pre), u32::MAX),                  (pos.wrapping_add(pst), u32::MAX),
-        (bot.wrapping_sub(pre), u32::MAX), (bot, u32::MAX), (bot.wrapping_add(pst), u32::MAX)
+        ((top - pre).0, u32::MAX), (top.0, u32::MAX), ((top + pst).0, u32::MAX),
+        ((pos - pre).0, u32::MAX),                    ((pos + pst).0, u32::MAX),
+        ((bot - pre).0, u32::MAX), (bot.0, u32::MAX), ((bot + pst).0, u32::MAX)
     ];
 
-    arr.iter_mut().for_each(|(i, n)| if *i < 100 { *n = m[*i] });
+    arr.iter_mut()
+        .filter(|(i, _)| *i < 100)
+        .for_each(|(i, n)| *n = m[*i]);
     arr
 }
 
